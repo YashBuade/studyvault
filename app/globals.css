@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f7f5f2;
+  --panel: #ffffff;
+  --surface: #f0f2f7;
+  --text: #0e1628;
+  --muted: #5b6475;
+  --border: #e2e6ef;
+  --brand: #2b6ae6;
+  --brand-strong: #1f4db3;
+  --brand-soft: #d9e7ff;
+  --danger: #d7373f;
+  --danger-strong: #b12c32;
+  --warning: #c8831a;
+  --shadow: 0 24px 60px rgba(14, 22, 40, 0.08);
+}
+
+.dark {
+  --bg: #0c111c;
+  --panel: #121a2a;
+  --surface: #161f33;
+  --text: #e8eef9;
+  --muted: #9aa6bf;
+  --border: #253150;
+  --brand: #6ea4ff;
+  --brand-strong: #4d86f2;
+  --brand-soft: #1c2c4e;
+  --danger: #f26b6b;
+  --danger-strong: #e05353;
+  --warning: #f2b84b;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 5%, color-mix(in srgb, var(--brand-soft) 55%, transparent), transparent 30%),
+    radial-gradient(circle at 90% 95%, color-mix(in srgb, var(--brand-soft) 35%, transparent), transparent 35%),
+    linear-gradient(135deg, color-mix(in srgb, var(--panel) 80%, transparent), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+button,
+a {
+  transition: all 180ms ease;
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 60%, white);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+.animate-page-in {
+  animation: page-in 220ms ease;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
