@@ -64,8 +64,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setOauthError(params.get("error") || "");
-    setOauthErrorDescription(params.get("error_description") || "");
+    const queryError = params.get("error") || "";
+    const queryDescription = params.get("error_description") || "";
+    const syncFromQuery = window.setTimeout(() => {
+      setOauthError(queryError);
+      setOauthErrorDescription(queryDescription);
+    }, 0);
 
     fetch("/api/auth/google/status")
       .then((res) => res.json())
@@ -97,6 +101,8 @@ export default function LoginPage() {
         setGoogleEnabled(false);
         setGoogleStatusMessage("Unable to verify Google OAuth configuration.");
       });
+
+    return () => window.clearTimeout(syncFromQuery);
   }, []);
 
   const oauthErrorMessage = () => {

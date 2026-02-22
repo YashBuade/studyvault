@@ -10,7 +10,10 @@ export function OnboardingModal() {
 
   useEffect(() => {
     const seen = localStorage.getItem(STORAGE_KEY);
-    setOpen(!seen);
+    const timer = window.setTimeout(() => {
+      setOpen(!seen);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const dismiss = () => {

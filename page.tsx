@@ -37,8 +37,9 @@ export default function SignupPage() {
       // Auto login or redirect to login
       router.push("/dashboard");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to create account";
+      setError(message);
       setIsLoading(false);
     }
   }
