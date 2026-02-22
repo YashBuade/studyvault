@@ -32,6 +32,7 @@ describe("auth signup api", () => {
       passwordHash: "hashed",
       avatarUrl: null,
       onboardingSeen: false,
+      role: "USER",
       createdAt: new Date(),
       updatedAt: new Date(),
       passwordChanged: new Date(),

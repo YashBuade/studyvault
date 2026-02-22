@@ -6,9 +6,9 @@ type AlertProps = {
 };
 
 const styles: Record<NonNullable<AlertProps["variant"]>, string> = {
-  info: "border-[var(--brand)]/30 bg-[var(--brand-soft)]/35 text-[var(--text)]",
-  success: "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
-  error: "border-[var(--danger)]/35 bg-[var(--danger)]/12 text-[var(--danger)]",
+  info: "border-[rgb(var(--primary))]/25 bg-[rgb(var(--primary-soft))] text-[rgb(var(--text-primary))]",
+  success: "border-[rgb(var(--success))]/30 bg-[rgb(var(--success))]/10 text-[rgb(var(--success))]",
+  error: "border-[rgb(var(--error))]/30 bg-[rgb(var(--error))]/10 text-[rgb(var(--error))]",
 };
 
 export function Alert({ variant = "info", message }: AlertProps) {

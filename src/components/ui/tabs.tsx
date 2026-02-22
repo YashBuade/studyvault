@@ -10,16 +10,16 @@ type TabsProps = {
 
 export function Tabs({ tabs, value, onChange }: TabsProps) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="inline-flex flex-wrap gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-1">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"
           onClick={() => onChange(tab.id)}
-          className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+          className={`rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-all duration-[var(--transition-base)] ${
             value === tab.id
-              ? "bg-[var(--brand)] text-white shadow-[var(--shadow)]"
-              : "border border-[var(--border)] bg-[var(--panel)] text-[var(--muted)] hover:bg-[var(--surface)]"
+              ? "bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] shadow-[var(--shadow-sm)]"
+              : "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface))]"
           }`}
         >
           {tab.label}

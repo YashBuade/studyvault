@@ -32,7 +32,15 @@ export default async function MyFilesPage() {
 
   return (
     <>
-      <PageHeader title="My Files" description="Browse and download your uploaded documents, slides, and study assets." />
+      <PageHeader
+        title="My Files"
+        description="Browse and download your uploaded documents, slides, and study assets."
+        insight={
+          files.length > 0
+            ? `You have ${files.length} recent file${files.length > 1 ? "s" : ""}. Group them by subject for faster revision retrieval.`
+            : "Upload your syllabus and core PDFs first to build your semester knowledge base."
+        }
+      />
       <FilesBrowserClient initialFiles={initialFiles} />
     </>
   );

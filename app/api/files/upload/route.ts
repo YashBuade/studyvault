@@ -19,6 +19,7 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file");
+    const isPublic = formData.get("isPublic") === "true";
 
     if (!(file instanceof File)) {
       return NextResponse.json(failure("VALIDATION_ERROR", "No file provided"), { status: 400 });
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
           path: relativePath,
           mimeType: file.type || "application/octet-stream",
           size: file.size,
+          isPublic,
           userId,
         },
       });

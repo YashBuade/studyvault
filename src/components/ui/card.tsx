@@ -7,9 +7,11 @@ type CardProps = {
 
 export function Card({ title, description, className = "", children }: CardProps) {
   return (
-    <section className={`rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5 shadow-[var(--shadow)] transition-transform transition-shadow hover:-translate-y-0.5 ${className}`}>
-      {title ? <h2 className="text-lg font-semibold text-[var(--text)]">{title}</h2> : null}
-      {description ? <p className="mt-1 text-sm text-[var(--muted)]">{description}</p> : null}
+    <section
+      className={`rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)] transition-all duration-[var(--transition-base)] hover:shadow-[var(--shadow-md)] sm:p-5 ${className}`}
+    >
+      {title ? <h2 className="text-lg font-semibold tracking-tight text-[rgb(var(--text-primary))]">{title}</h2> : null}
+      {description ? <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">{description}</p> : null}
       <div className={title || description ? "mt-4" : ""}>{children}</div>
     </section>
   );

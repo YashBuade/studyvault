@@ -27,7 +27,11 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <PageHeader title="Profile" description="Manage your personal identity and account details." />
+      <PageHeader
+        title="Profile"
+        description="Manage your personal identity and account details."
+        insight="Keep your profile current so shared notes are trusted by collaborators."
+      />
       <ProfileClient initialProfile={user} />
     </>
   );

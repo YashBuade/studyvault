@@ -30,81 +30,203 @@ enum ExamStatus {
 }
 
 model User {
-  id              Int               @id @default(autoincrement())
-  email           String            @unique
-  name            String
-  passwordHash    String
-  avatarUrl       String?
-  onboardingSeen  Boolean           @default(false)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  passwordChanged DateTime          @default(now())
-  notes           Note[]
-  files           File[]
+  id                Int               @id @default(autoincrement())
+  email             String            @unique
+  name              String
+  passwordHash      String?
+  avatarUrl         String?
+  onboardingSeen    Boolean           @default(false)
+  role              UserRole          @default(USER)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  passwordChanged   DateTime          @default(now())
+  notes             Note[]
+  files             File[]
   plannerCategories PlannerCategory[]
-  plannerItems    PlannerItem[]
-  assignments     Assignment[]
-  exams           Exam[]
-  resourceFolders ResourceFolder[]
-  resourceItems   ResourceItem[]
+  plannerItems      PlannerItem[]
+  assignments       Assignment[]
+  exams             Exam[]
+  resourceFolders   ResourceFolder[]
+  resourceItems     ResourceItem[]
+  notifications     Notification[]
+  noteReports       NoteReport[]      @relation("Reporter")
+  noteComments      NoteComment[]
+  noteLikes         NoteLike[]
+  noteRatings       NoteRating[]
+  noteBookmarks     NoteBookmark[]
+  noteShares        NoteShare[]       @relation("NoteShareCreator")
 }
 
 model Note {
-  id        Int      @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   title     String
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content   String         @db.Text
+  subject   String?        @db.VarChar(120)
+  semester  String?        @db.VarChar(40)
+  tags      String?        @db.VarChar(240)
+  isPublic  Boolean        @default(true)
+  slug      String?        @unique @db.VarChar(180)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   deletedAt DateTime?
+  userId    Int
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  NoteComment[]
+  likes     NoteLike[]
+  ratings   NoteRating[]
+  bookmarks NoteBookmark[]
+  reports   NoteReport[]
+  shares    NoteShare[]
+  attachments NoteAttachment[]
+
+  @@index([userId, deletedAt])
+  @@index([isPublic, deletedAt, createdAt])
+}
+
+model NoteComment {
+  id        Int      @id @default(autoincrement())
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  noteId    Int
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, deletedAt])
+  @@index([noteId, createdAt])
+}
+
+model NoteLike {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  noteId    Int
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+}
+
+model NoteRating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  createdAt DateTime @default(now())
+  noteId    Int
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+}
+
+model NoteBookmark {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  noteId    Int
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+}
+
+model NoteReport {
+  id         Int          @id @default(autoincrement())
+  reason     String       @db.VarChar(120)
+  details    String?      @db.Text
+  status     ReportStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  noteId     Int
+  note       Note         @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  reporterId Int
+  reporter   User         @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([noteId, status])
+}
+
+model NoteShare {
+  id         Int             @id @default(autoincrement())
+  token      String          @unique @db.VarChar(64)
+  permission SharePermission @default(VIEW)
+  createdAt  DateTime        @default(now())
+  noteId     Int
+  note       Note            @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  creatorId  Int
+  creator    User            @relation("NoteShareCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  type      NotificationType
+  message   String           @db.VarChar(240)
+  link      String?          @db.VarChar(240)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model File {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   originalName String
   storedName   String
   path         String
   mimeType     String
   size         Int
-  createdAt    DateTime @default(now())
+  isPublic     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
   deletedAt    DateTime?
   userId       Int
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attachments  NoteAttachment[]
 
   @@index([userId, deletedAt])
+  @@index([isPublic, deletedAt])
+}
+
+model NoteAttachment {
+  id        Int      @id @default(autoincrement())
+  noteId    Int
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  fileId    Int
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([noteId, fileId])
+  @@index([noteId])
 }
 
 model PlannerCategory {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   name      String
-  color     String   @default("#2563eb")
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  color     String        @default("#2563eb")
+  order     Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     PlannerItem[]
 
   @@index([userId])
 }
 
 model PlannerItem {
-  id          Int           @id @default(autoincrement())
-  title       String
-  details     String?
-  dueDate     DateTime?
-  priority    Priority      @default(MEDIUM)
-  status      PlannerStatus @default(TODO)
-  order       Int           @default(0)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  userId      Int
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId  Int?
-  category    PlannerCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  id         Int              @id @default(autoincrement())
+  title      String
+  details    String?
+  dueDate    DateTime?
+  priority   Priority         @default(MEDIUM)
+  status     PlannerStatus    @default(TODO)
+  order      Int              @default(0)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  userId     Int
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId Int?
+  category   PlannerCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([userId])
 }
@@ -140,29 +262,53 @@ model Exam {
 }
 
 model ResourceFolder {
-  id        Int      @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     ResourceItem[]
 
   @@index([userId])
 }
 
 model ResourceItem {
-  id        Int      @id @default(autoincrement())
+  id        Int             @id @default(autoincrement())
   title     String
   url       String?
   notes     String?
   tags      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   folderId  Int?
   folder    ResourceFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  REJECTED
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  RATING
+  BOOKMARK
+  REPORT
+}
+
+enum SharePermission {
+  VIEW
+  EDIT
 }

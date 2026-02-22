@@ -1,0 +1,26 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { AUTH_COOKIE_NAME, verifySession } from "@/lib/auth";
+
+const DASHBOARD_PATH = "/dashboard";
+const AUTH_PATH = "/auth";
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
+  const session = token ? await verifySession(token) : null;
+  const isAuthenticated = Boolean(session?.sub);
+
+  if (pathname.startsWith(DASHBOARD_PATH) && !isAuthenticated) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  if (pathname.startsWith(AUTH_PATH) && isAuthenticated) {
+    return NextResponse.redirect(new URL(DASHBOARD_PATH, request.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/auth/:path*"],
+};

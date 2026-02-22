@@ -96,7 +96,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
           {visible.map((file) => (
             <article
               key={file.id}
-              className="flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
                 <p className="text-sm font-medium">{file.originalName}</p>
@@ -108,7 +108,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
                 </Button>
                 <a
                   href={`/api/files/${file.id}/download`}
-                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-medium hover:-translate-y-0.5 hover:shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-sm font-medium hover:-translate-y-0.5 hover:shadow-sm"
                 >
                   Download
                 </a>

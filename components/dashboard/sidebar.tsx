@@ -4,22 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  BookOpen,
+  Archive,
+  BarChart3,
+  Bell,
   Calendar,
   ClipboardList,
+  FileText,
   FolderOpen,
   Gauge,
-  Menu,
-  Settings,
-  Upload,
-  User,
-  FileText,
+  Globe,
   GraduationCap,
   Library,
+  Menu,
+  Settings,
+  Shield,
+  Upload,
+  User,
   X,
-  Archive,
 } from "lucide-react";
 import { NavItem } from "@/src/components/ui/nav-item";
+import { Logo } from "@/components/ui/logo";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Gauge },
@@ -30,12 +34,15 @@ const navItems = [
   { href: "/dashboard/planner", label: "Planner", icon: Calendar },
   { href: "/dashboard/resources", label: "Resources", icon: Library },
   { href: "/dashboard/exams", label: "Exams", icon: GraduationCap },
+  { href: "/notes", label: "Public Library", icon: Globe },
   { href: "/dashboard/trash", label: "Trash", icon: Archive },
   { href: "/dashboard/profile", label: "Profile", icon: User },
+  { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ] as const;
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -44,46 +51,38 @@ export function DashboardSidebar() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-4 z-40 inline-flex items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel)] p-2 text-[var(--text)] shadow-[var(--shadow)] md:hidden"
+        className="fixed left-4 top-4 z-40 inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-2 text-[rgb(var(--text-primary))] shadow-[var(--shadow-sm)] md:hidden"
         aria-label="Open menu"
       >
         <Menu size={20} />
       </button>
 
-      {open ? (
-        <div className="fixed inset-0 z-40 bg-black/40 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />
-      ) : null}
+      {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" /> : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-[var(--border)] bg-[var(--panel)]/96 p-5 backdrop-blur transition-transform md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 p-5 backdrop-blur-xl transition-transform duration-300 md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         } md:block`}
       >
         <div className="mb-6 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-3 text-lg font-semibold text-[var(--text)]">
-            <div className="rounded-xl bg-[var(--brand-soft)] p-2 text-[var(--brand)] shadow-sm">
-              <BookOpen size={18} />
-            </div>
-            StudyVault
-          </Link>
+          <Logo size="md" showText href="/dashboard" />
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--surface)] md:hidden"
+            className="rounded-[var(--radius-sm)] p-2 text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] md:hidden"
             aria-label="Close menu"
           >
             <X size={18} />
           </button>
         </div>
 
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">Workspace</p>
         <nav className="space-y-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href;
-
             return (
               <div key={item.href} onClick={() => setOpen(false)}>
-                <NavItem href={item.href} active={active}>
+                <NavItem href={item.href} active={pathname === item.href}>
                   <Icon size={16} />
                   {item.label}
                 </NavItem>
@@ -92,8 +91,20 @@ export function DashboardSidebar() {
           })}
         </nav>
 
-        <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 text-xs text-[var(--muted)]">
-          Upload smarter, organize faster, and keep every class resource in one secure place.
+        {isAdmin ? (
+          <div className="mt-4 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Admin</p>
+            <div className="mt-2">
+              <NavItem href="/dashboard/admin" active={pathname === "/dashboard/admin"}>
+                <Shield size={16} />
+                Admin Panel
+              </NavItem>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-6 rounded-[var(--radius-md)] border border-[rgb(var(--primary))]/20 bg-[rgb(var(--primary-soft))] p-4 text-xs leading-relaxed text-[rgb(var(--text-secondary))]">
+          Build stronger routines with organized notes, timed deadlines, and one searchable study hub.
         </div>
       </aside>
     </>

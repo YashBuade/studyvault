@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 export const AUTH_COOKIE_NAME = "studyvault_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7;
+const LONG_SESSION_DURATION_SECONDS = 60 * 60 * 24 * 30;
 
 export type SessionPayload = {
   sub: string;
@@ -43,13 +44,16 @@ export async function verifySession(token: string) {
   }
 }
 
-export function getCookieOptions() {
+export function getCookieOptions(options?: { rememberMe?: boolean }) {
+  const rememberMe = options?.rememberMe ?? false;
+  const maxAge = rememberMe ? LONG_SESSION_DURATION_SECONDS : SESSION_DURATION_SECONDS;
+
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
-    maxAge: SESSION_DURATION_SECONDS,
+    maxAge,
   };
 }
 

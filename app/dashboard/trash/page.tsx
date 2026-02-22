@@ -104,7 +104,7 @@ export default function TrashPage() {
             <p className="text-sm text-[var(--muted)]">No trashed notes.</p>
           ) : (
             notes.map((note) => (
-              <div key={note.id} className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+              <div key={note.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
                 <p className="text-sm font-medium">{note.title}</p>
                 <div className="flex items-center gap-2">
                   <Button variant="secondary" onClick={() => restoreNote(note.id)}>
@@ -126,7 +126,7 @@ export default function TrashPage() {
             <p className="text-sm text-[var(--muted)]">No trashed files.</p>
           ) : (
             files.map((file) => (
-              <div key={file.id} className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+              <div key={file.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
                 <p className="text-sm font-medium">{file.originalName}</p>
                 <div className="flex items-center gap-2">
                   <Button variant="secondary" onClick={() => restoreFile(file.id)}>

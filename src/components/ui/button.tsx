@@ -9,12 +9,13 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--brand)] text-white shadow-[var(--shadow)] hover:bg-[var(--brand-strong)] hover:-translate-y-0.5 focus-visible:ring-[var(--brand)]/40",
+    "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary))]/35",
   secondary:
-    "bg-[var(--panel)] text-[var(--text)] border border-[var(--border)] hover:bg-[var(--surface)] hover:-translate-y-0.5 focus-visible:ring-[var(--brand)]/30",
+    "bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--surface-hover))] hover:shadow-[var(--shadow-xs)] focus-visible:ring-[rgb(var(--primary))]/30",
   danger:
-    "bg-[var(--danger)] text-white shadow-[var(--shadow)] hover:bg-[var(--danger-strong)] hover:-translate-y-0.5 focus-visible:ring-[var(--danger)]/40",
-  ghost: "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--text)] focus-visible:ring-[var(--brand)]/30",
+    "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:opacity-95 hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error))]/35",
+  ghost:
+    "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] focus-visible:ring-[rgb(var(--primary))]/30",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -25,7 +26,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] disabled:cursor-not-allowed disabled:opacity-60 ${variantClass[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] px-4 py-2.5 text-sm font-semibold transition-all duration-[var(--transition-base)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--background))] disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99] ${variantClass[variant]} ${className}`}
       {...props}
     >
       {loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" /> : null}

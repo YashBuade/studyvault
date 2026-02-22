@@ -1,0 +1,846 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BookOpen, Download, FileUp, Filter, Image as ImageIcon, LayoutGrid, List, Plus, Search, Settings2, Sparkles, Tag, X } from "lucide-react";
+import { Button } from "@/src/components/ui/button";
+import { Card } from "@/src/components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Select } from "@/src/components/ui/select";
+import { useToast } from "@/src/components/ui/toast-provider";
+
+type PublicNote = {
+  id: number;
+  title: string;
+  content: string;
+  slug: string;
+  subject?: string | null;
+  semester?: string | null;
+  tags?: string | null;
+  createdAt: string;
+  user: { name: string };
+  attachments?: { file: { id: number; originalName: string } }[];
+};
+
+type ApiResponse<T> = {
+  ok: boolean;
+  data?: T;
+  error?: { message?: string };
+  meta?: { hasMore?: boolean; nextCursor?: number | null };
+};
+
+type PublicFile = {
+  id: number;
+  originalName: string;
+  size: number;
+  createdAt: string;
+};
+
+const STUDENT_CATEGORIES = [
+  "Computer Science",
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Economics",
+  "Business",
+  "English",
+  "History",
+  "Engineering",
+] as const;
+const LIBRARY_PREFS_KEY = "studyvault-public-library-prefs-v1";
+
+type LibraryPrefs = {
+  categories: string[];
+  semesters: string[];
+  tags: string[];
+};
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function inferFileKind(fileName: string) {
+  const extension = fileName.split(".").pop()?.toLowerCase() ?? "";
+  if (["png", "jpg", "jpeg", "gif", "webp", "svg"].includes(extension)) return "Image";
+  if (["pdf"].includes(extension)) return "PDF";
+  if (["doc", "docx"].includes(extension)) return "Document";
+  if (["ppt", "pptx"].includes(extension)) return "Slides";
+  if (["xls", "xlsx", "csv"].includes(extension)) return "Sheet";
+  return "File";
+}
+
+function toInputDateValue(value: Date) {
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function normalizeListItem(value: string) {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+export function PublicNotesClient() {
+  const [notes, setNotes] = useState<PublicNote[]>([]);
+  const [search, setSearch] = useState("");
+  const [subject, setSubject] = useState("");
+  const [semester, setSemester] = useState("");
+  const [tag, setTag] = useState("");
+  const [sort, setSort] = useState<"latest" | "oldest">("latest");
+  const [cursor, setCursor] = useState<number | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const [files, setFiles] = useState<PublicFile[]>([]);
+  const [filesCursor, setFilesCursor] = useState<number | null>(null);
+  const [filesHasMore, setFilesHasMore] = useState(true);
+  const [filesLoading, setFilesLoading] = useState(false);
+  const [filesSearch, setFilesSearch] = useState("");
+  const [fileKindFilter, setFileKindFilter] = useState("All");
+  const [noteView, setNoteView] = useState<"grid" | "list">("grid");
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [newSubject, setNewSubject] = useState("");
+  const [newSemester, setNewSemester] = useState(toInputDateValue(new Date()));
+  const [newTags, setNewTags] = useState("");
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [creating, setCreating] = useState(false);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [customSemesters, setCustomSemesters] = useState<string[]>([]);
+  const [customTags, setCustomTags] = useState<string[]>([]);
+  const [categoryDraft, setCategoryDraft] = useState("");
+  const [semesterDraft, setSemesterDraft] = useState("");
+  const [tagDraft, setTagDraft] = useState("");
+  const hydratedPrefs = useRef(false);
+
+  const { pushToast } = useToast();
+  const notesLoadingRef = useRef(false);
+  const filesLoadingRef = useRef(false);
+
+  const subjects = useMemo(() => {
+    const set = new Set<string>([...STUDENT_CATEGORIES, ...customCategories]);
+    notes.forEach((note) => {
+      if (note.subject?.trim()) set.add(note.subject.trim());
+    });
+    return Array.from(set);
+  }, [notes, customCategories]);
+
+  const semesters = useMemo(() => {
+    const set = new Set<string>(customSemesters);
+    notes.forEach((note) => {
+      if (note.semester?.trim()) set.add(note.semester.trim());
+    });
+    return Array.from(set);
+  }, [notes, customSemesters]);
+
+  const tagsList = useMemo(() => {
+    const set = new Set<string>(customTags);
+    notes.forEach((note) => {
+      note.tags?.split(",").forEach((item) => {
+        const trimmed = item.trim();
+        if (trimmed) set.add(trimmed);
+      });
+    });
+    return Array.from(set);
+  }, [notes, customTags]);
+
+  const sortedNotes = useMemo(() => {
+    const copy = [...notes];
+    copy.sort((a, b) =>
+      sort === "latest"
+        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+    return copy;
+  }, [notes, sort]);
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (search.trim()) count += 1;
+    if (subject) count += 1;
+    if (semester) count += 1;
+    if (tag) count += 1;
+    return count;
+  }, [search, subject, semester, tag]);
+
+  const topTags = useMemo(() => {
+    const counter = new Map<string, number>();
+    notes.forEach((note) => {
+      note.tags
+        ?.split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .forEach((item) => counter.set(item, (counter.get(item) ?? 0) + 1));
+    });
+    return Array.from(counter.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name]) => name);
+  }, [notes]);
+
+  const recentNotesCount = useMemo(() => {
+    const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
+    return notes.filter((item) => new Date(item.createdAt).getTime() >= threeDaysAgo).length;
+  }, [notes]);
+
+  const availableFileKinds = useMemo(() => {
+    const kinds = new Set<string>();
+    files.forEach((file) => kinds.add(inferFileKind(file.originalName)));
+    return ["All", ...Array.from(kinds)];
+  }, [files]);
+
+  const visibleFiles = useMemo(() => {
+    if (fileKindFilter === "All") return files;
+    return files.filter((file) => inferFileKind(file.originalName) === fileKindFilter);
+  }, [files, fileKindFilter]);
+
+  const loadNotes = useCallback(
+    async (options: { reset?: boolean; cursor: number | null }) => {
+      if (notesLoadingRef.current) return;
+      notesLoadingRef.current = true;
+      setLoading(true);
+
+      const params = new URLSearchParams();
+      if (search.trim()) params.set("q", search.trim());
+      if (subject) params.set("subject", subject);
+      if (semester) params.set("semester", semester);
+      if (tag) params.set("tag", tag);
+      if (!options.reset && options.cursor) params.set("cursor", String(options.cursor));
+      params.set("limit", "12");
+
+      const response = await fetch(`/api/notes/public?${params.toString()}`);
+      const payload = (await response.json()) as ApiResponse<PublicNote[]>;
+
+      if (response.ok && payload.ok && payload.data) {
+        setNotes((prev) => (options.reset ? payload.data! : [...prev, ...payload.data!]));
+        setHasMore(Boolean(payload.meta?.hasMore));
+        setCursor(payload.meta?.nextCursor ?? null);
+      } else {
+        pushToast(payload.error?.message ?? "Unable to load public notes", "error");
+      }
+
+      setLoading(false);
+      notesLoadingRef.current = false;
+    },
+    [pushToast, search, subject, semester, tag],
+  );
+
+  const loadFiles = useCallback(
+    async (options: { reset?: boolean; cursor: number | null }) => {
+      if (filesLoadingRef.current) return;
+      filesLoadingRef.current = true;
+      setFilesLoading(true);
+
+      const params = new URLSearchParams();
+      if (filesSearch.trim()) params.set("q", filesSearch.trim());
+      if (!options.reset && options.cursor) params.set("cursor", String(options.cursor));
+      params.set("limit", "9");
+
+      const response = await fetch(`/api/files/public?${params.toString()}`);
+      const payload = (await response.json()) as ApiResponse<PublicFile[]>;
+      if (response.ok && payload.ok && payload.data) {
+        setFiles((prev) => (options.reset ? payload.data! : [...prev, ...payload.data!]));
+        setFilesHasMore(Boolean(payload.meta?.hasMore));
+        setFilesCursor(payload.meta?.nextCursor ?? null);
+      } else {
+        pushToast(payload.error?.message ?? "Unable to load public files", "error");
+      }
+
+      setFilesLoading(false);
+      filesLoadingRef.current = false;
+    },
+    [pushToast, filesSearch],
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(LIBRARY_PREFS_KEY);
+      if (!raw) {
+        hydratedPrefs.current = true;
+        return;
+      }
+      const parsed = JSON.parse(raw) as Partial<LibraryPrefs>;
+      setCustomCategories(Array.isArray(parsed.categories) ? parsed.categories.map(normalizeListItem).filter(Boolean) : []);
+      setCustomSemesters(Array.isArray(parsed.semesters) ? parsed.semesters.map(normalizeListItem).filter(Boolean) : []);
+      setCustomTags(Array.isArray(parsed.tags) ? parsed.tags.map(normalizeListItem).filter(Boolean) : []);
+    } catch {
+      // ignore malformed local data
+    } finally {
+      hydratedPrefs.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedPrefs.current || typeof window === "undefined") return;
+    const payload: LibraryPrefs = {
+      categories: customCategories,
+      semesters: customSemesters,
+      tags: customTags,
+    };
+    window.localStorage.setItem(LIBRARY_PREFS_KEY, JSON.stringify(payload));
+  }, [customCategories, customSemesters, customTags]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadNotes({ reset: true, cursor: null });
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [loadNotes]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadFiles({ reset: true, cursor: null });
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [loadFiles]);
+
+  async function createPublicNote() {
+    if (!title.trim() || !description.trim()) {
+      pushToast("Title and description are required.", "error");
+      return;
+    }
+
+    if (uploadFiles.length === 0) {
+      pushToast("At least one file is required to publish a public note.", "error");
+      return;
+    }
+
+    setCreating(true);
+    const attachmentIds: number[] = [];
+
+    for (const file of uploadFiles) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("isPublic", "true");
+
+      const uploadRes = await fetch("/api/files/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadPayload = (await uploadRes.json()) as ApiResponse<{ id: number }>;
+
+      if (uploadRes.status === 401) {
+        pushToast("Please sign in to upload public study content.", "error");
+        setCreating(false);
+        return;
+      }
+
+      if (!uploadRes.ok || !uploadPayload.ok || !uploadPayload.data?.id) {
+        pushToast(uploadPayload.error?.message ?? "Unable to upload one of the files.", "error");
+        setCreating(false);
+        return;
+      }
+
+      attachmentIds.push(uploadPayload.data.id);
+    }
+
+    const createRes = await fetch("/api/notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: title.trim(),
+        content: description.trim(),
+        subject: newSubject || undefined,
+        semester: newSemester || undefined,
+        tags: newTags || undefined,
+        isPublic: true,
+        attachmentIds,
+      }),
+    });
+
+    const createPayload = (await createRes.json()) as ApiResponse<PublicNote>;
+
+    if (createRes.status === 401) {
+      pushToast("Please sign in to publish public study content.", "error");
+      setCreating(false);
+      return;
+    }
+
+    if (!createRes.ok || !createPayload.ok || !createPayload.data) {
+      pushToast(createPayload.error?.message ?? "Could not publish your note.", "error");
+      setCreating(false);
+      return;
+    }
+
+    setTitle("");
+    setDescription("");
+    setNewSubject("");
+    setNewTags("");
+    setUploadFiles([]);
+    if (newSubject.trim()) {
+      const normalized = normalizeListItem(newSubject);
+      setCustomCategories((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
+    }
+    if (newSemester.trim()) {
+      const normalized = normalizeListItem(newSemester);
+      setCustomSemesters((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
+    }
+    if (newTags.trim()) {
+      const newTagItems = newTags.split(",").map(normalizeListItem).filter(Boolean);
+      if (newTagItems.length) {
+        setCustomTags((prev) => {
+          const merged = new Set(prev);
+          newTagItems.forEach((item) => merged.add(item));
+          return Array.from(merged);
+        });
+      }
+    }
+    pushToast("Public note published successfully.", "success");
+    setCreating(false);
+    void loadNotes({ reset: true, cursor: null });
+    void loadFiles({ reset: true, cursor: null });
+  }
+
+  return (
+    <div className="space-y-5">
+      <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))]">
+        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full bg-[rgb(var(--primary-soft))] px-3 py-1 text-xs font-semibold text-[rgb(var(--primary))]">
+              <Sparkles size={14} />
+              Student-first public knowledge hub
+            </p>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Public Notes Library</h2>
+            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+              Discover notes, formulas, summaries, and resources shared by students. Filter by category, semester, and tags.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{notes.length}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))]">Visible Notes</p>
+            </div>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{files.length}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))]">Public Files</p>
+            </div>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{recentNotesCount}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))]">Last 3 Days</p>
+            </div>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{tagsList.length}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))]">Active Topics</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Upload to Public Library" description="Share your notes, images, and documents with student-friendly categorization.">
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Title (e.g., OOP Unit-3 quick revision)" />
+            <Select
+              label="Category"
+              value={newSubject}
+              onChange={(event) => setNewSubject(event.target.value)}
+              options={[{ label: "Select category", value: "" }, ...subjects.map((item) => ({ label: item, value: item }))]}
+            />
+          </div>
+          <textarea
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            rows={5}
+            className="w-full rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2.5 text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] transition-all duration-[var(--transition-base)] focus-visible:outline-none focus-visible:border-[rgb(var(--border-focus))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/20"
+            placeholder="Description / note content (key concepts, formulas, important points)."
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input value={newSemester} onChange={(event) => setNewSemester(event.target.value)} placeholder="Semester (e.g., Sem 4)" />
+            <Input value={newTags} onChange={(event) => setNewTags(event.target.value)} placeholder="Tags (comma-separated: dsa, revision, exam)" />
+          </div>
+          <div className="rounded-xl border border-dashed border-[rgb(var(--border-hover))] bg-[rgb(var(--surface-hover))] p-3">
+            <label className="mb-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
+              <FileUp size={14} />
+              Attach Files or Images
+            </label>
+            <input
+              type="file"
+              multiple
+              onChange={(event) => setUploadFiles(Array.from(event.target.files ?? []))}
+              className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-sm"
+            />
+            {uploadFiles.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {uploadFiles.map((file) => (
+                  <span key={`${file.name}-${file.size}`} className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--surface))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))]">
+                    {file.type.startsWith("image/") ? <ImageIcon size={12} /> : <FileUp size={12} />}
+                    {file.name}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button loading={creating} onClick={() => void createPublicNote()}>
+              Publish Public Note
+            </Button>
+            <Link href="/auth/login" className="inline-flex items-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] px-4 py-2 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-hover))]">
+              Sign in required for upload
+            </Link>
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Customize Library Controls" description="Manage your own categories, semester presets, and tags used in uploads and filters.">
+        <div className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Categories</label>
+              <div className="flex gap-2">
+                <Input value={categoryDraft} onChange={(event) => setCategoryDraft(event.target.value)} placeholder="Add category" />
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    const normalized = normalizeListItem(categoryDraft);
+                    if (!normalized) return;
+                    setCustomCategories((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
+                    setCategoryDraft("");
+                  }}
+                >
+                  <Plus size={14} />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {customCategories.length === 0 ? (
+                  <span className="text-xs text-[rgb(var(--text-tertiary))]">No custom categories yet.</span>
+                ) : (
+                  customCategories.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setCustomCategories((prev) => prev.filter((value) => value !== item))}
+                      className="inline-flex items-center gap-1 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-xs text-[rgb(var(--text-secondary))]"
+                    >
+                      {item}
+                      <X size={11} />
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Semesters</label>
+              <div className="flex gap-2">
+                <Input value={semesterDraft} onChange={(event) => setSemesterDraft(event.target.value)} placeholder="Add semester" />
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    const normalized = normalizeListItem(semesterDraft);
+                    if (!normalized) return;
+                    setCustomSemesters((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
+                    setSemesterDraft("");
+                  }}
+                >
+                  <Plus size={14} />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {customSemesters.length === 0 ? (
+                  <span className="text-xs text-[rgb(var(--text-tertiary))]">No custom semesters yet.</span>
+                ) : (
+                  customSemesters.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setCustomSemesters((prev) => prev.filter((value) => value !== item))}
+                      className="inline-flex items-center gap-1 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-xs text-[rgb(var(--text-secondary))]"
+                    >
+                      {item}
+                      <X size={11} />
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Tags</label>
+              <div className="flex gap-2">
+                <Input value={tagDraft} onChange={(event) => setTagDraft(event.target.value)} placeholder="Add tag" />
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    const normalized = normalizeListItem(tagDraft);
+                    if (!normalized) return;
+                    setCustomTags((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
+                    setTagDraft("");
+                  }}
+                >
+                  <Plus size={14} />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {customTags.length === 0 ? (
+                  <span className="text-xs text-[rgb(var(--text-tertiary))]">No custom tags yet.</span>
+                ) : (
+                  customTags.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setCustomTags((prev) => prev.filter((value) => value !== item))}
+                      className="inline-flex items-center gap-1 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-xs text-[rgb(var(--text-secondary))]"
+                    >
+                      {item}
+                      <X size={11} />
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))]">
+            <Settings2 size={14} />
+            Preferences are saved on this device and automatically applied to upload forms and filters.
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Filters & Discovery" description="Find relevant content quickly with category and topic filters.">
+        <div className="space-y-3">
+          <div className="relative">
+            <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[rgb(var(--text-tertiary))]" />
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notes by title, content, subject or tags..." className="pl-9" />
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <Select
+              label="Category"
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              options={[{ label: "All Categories", value: "" }, ...subjects.map((item) => ({ label: item, value: item }))]}
+            />
+            <Select
+              label="Semester"
+              value={semester}
+              onChange={(event) => setSemester(event.target.value)}
+              options={[{ label: "All Semesters", value: "" }, ...semesters.map((item) => ({ label: item, value: item }))]}
+            />
+            <Select
+              label="Tag"
+              value={tag}
+              onChange={(event) => setTag(event.target.value)}
+              options={[{ label: "All Tags", value: "" }, ...tagsList.map((item) => ({ label: item, value: item }))]}
+            />
+            <Select
+              label="Sort"
+              value={sort}
+              onChange={(event) => setSort(event.target.value as "latest" | "oldest")}
+              options={[
+                { label: "Latest first", value: "latest" },
+                { label: "Oldest first", value: "oldest" },
+              ]}
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {subjects.slice(0, 12).map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setSubject((prev) => (prev === category ? "" : category))}
+                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                  subject === category
+                    ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
+                }`}
+              >
+                <Filter size={12} />
+                {category}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))]">
+            <span className="font-semibold text-[rgb(var(--text-primary))]">{activeFiltersCount}</span>
+            active filters
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setSubject("");
+                setSemester("");
+                setTag("");
+                setSort("latest");
+              }}
+              className="ml-auto rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2.5 py-1 font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+            >
+              Clear all
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">View</span>
+            <button
+              type="button"
+              onClick={() => setNoteView("grid")}
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                noteView === "grid"
+                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+              }`}
+            >
+              <LayoutGrid size={12} />
+              Grid
+            </button>
+            <button
+              type="button"
+              onClick={() => setNoteView("list")}
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                noteView === "list"
+                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+              }`}
+            >
+              <List size={12} />
+              List
+            </button>
+          </div>
+          {topTags.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Trending Tags</span>
+              {topTags.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setTag(item)}
+                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                    tag === item
+                      ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                      : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
+                  }`}
+                >
+                  <Tag size={11} />
+                  {item}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </Card>
+
+      {sortedNotes.length === 0 ? (
+        <Card>
+          <p className="text-sm text-[rgb(var(--text-secondary))]">No matching public notes yet. Try a different filter or publish one above.</p>
+        </Card>
+      ) : (
+        <div className={noteView === "grid" ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
+          {sortedNotes.map((note) => (
+            <Card key={note.id} className={noteView === "grid" ? "h-full" : ""}>
+              <div className={`flex gap-3 ${noteView === "grid" ? "h-full flex-col justify-between" : "flex-col sm:flex-row sm:items-start sm:justify-between"}`}>
+                <div>
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--primary-soft))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--primary))]">
+                      <BookOpen size={12} />
+                      {note.subject || "General"}
+                    </span>
+                    <span className="text-[11px] text-[rgb(var(--text-tertiary))]">{new Date(note.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
+                  <p className={`mt-2 text-sm text-[rgb(var(--text-secondary))] ${noteView === "grid" ? "line-clamp-3" : "line-clamp-2 sm:max-w-2xl"}`}>{note.content.replace(/<[^>]+>/g, "")}</p>
+                  <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">By {note.user.name}{note.semester ? ` | ${note.semester}` : ""}</p>
+                  {note.tags ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {note.tags
+                        .split(",")
+                        .map((item) => item.trim())
+                        .filter(Boolean)
+                        .slice(0, 4)
+                        .map((item) => (
+                          <span key={item} className="inline-flex items-center gap-1 rounded-full border border-[rgb(var(--border))] px-2 py-0.5 text-[11px] text-[rgb(var(--text-secondary))]">
+                            <Tag size={10} />
+                            {item}
+                          </span>
+                        ))}
+                    </div>
+                  ) : null}
+                  {note.attachments?.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {note.attachments.slice(0, 3).map((attachment) => (
+                        <a
+                          key={attachment.file.id}
+                          href={`/api/notes/public/files/${attachment.file.id}`}
+                          className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+                        >
+                          {attachment.file.originalName}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+                <Link
+                  href={`/notes/${note.slug}`}
+                  className={`inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] px-3 py-2 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-hover))] ${
+                    noteView === "list" ? "sm:min-w-40" : ""
+                  }`}
+                >
+                  Open Full Note
+                </Link>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {hasMore ? (
+        <div className="flex justify-center">
+          <Button variant="secondary" loading={loading} onClick={() => void loadNotes({ reset: false, cursor })}>
+            Load More Notes
+          </Button>
+        </div>
+      ) : null}
+
+      <Card title="Public Files & Images" description="Quick access to shared PDFs, docs, and images from the student community.">
+        <div className="mb-3 space-y-2">
+          <Input value={filesSearch} onChange={(event) => setFilesSearch(event.target.value)} placeholder="Search public files..." />
+          <div className="flex flex-wrap gap-2">
+            {availableFileKinds.map((kind) => (
+              <button
+                key={kind}
+                type="button"
+                onClick={() => setFileKindFilter(kind)}
+                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                  fileKindFilter === kind
+                    ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
+                }`}
+              >
+                {kind}
+              </button>
+            ))}
+          </div>
+        </div>
+        {visibleFiles.length === 0 ? (
+          <p className="text-sm text-[rgb(var(--text-secondary))]">No public files found for current search.</p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleFiles.map((file) => (
+              <div key={file.id} className="flex items-center justify-between gap-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{file.originalName}</p>
+                  <p className="text-xs text-[rgb(var(--text-tertiary))]">{formatFileSize(file.size)}</p>
+                  <p className="mt-1 inline-flex rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
+                    {inferFileKind(file.originalName)}
+                  </p>
+                </div>
+                <a
+                  href={`/api/files/public/${file.id}/download`}
+                  className="inline-flex items-center gap-1 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+                >
+                  <Download size={12} />
+                  Get
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+        {filesHasMore ? (
+          <div className="mt-4">
+            <Button variant="secondary" loading={filesLoading} onClick={() => void loadFiles({ reset: false, cursor: filesCursor })}>
+              Load More Files
+            </Button>
+          </div>
+        ) : null}
+      </Card>
+    </div>
+  );
+}

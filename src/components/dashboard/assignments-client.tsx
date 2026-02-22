@@ -22,6 +22,21 @@ type Assignment = {
 
 type ApiResponse<T> = { ok: boolean; data?: T; error?: { message: string } };
 
+function toIsoDate(input: string) {
+  if (!input.trim()) return "";
+  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(input.trim());
+  if (!match) return "";
+  const [, dd, mm, yyyy] = match;
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fromIsoDate(input?: string | null) {
+  if (!input) return "";
+  const [yyyy, mm, dd] = input.slice(0, 10).split("-");
+  if (!yyyy || !mm || !dd) return "";
+  return `${dd}-${mm}-${yyyy}`;
+}
+
 export function AssignmentsClient() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [title, setTitle] = useState("");
@@ -55,10 +70,15 @@ export function AssignmentsClient() {
 
   async function addAssignment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const isoDate = toIsoDate(dueDate);
+    if (dueDate && !isoDate) {
+      pushToast("Use date format dd-mm-yyyy", "error");
+      return;
+    }
     const response = await fetch("/api/assignments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, dueDate, status, priority }),
+      body: JSON.stringify({ title, description, dueDate: isoDate, status, priority }),
     });
 
     const payload = (await response.json()) as ApiResponse<Assignment>;
@@ -85,13 +105,18 @@ export function AssignmentsClient() {
     setEditing(assignment);
     setEditTitle(assignment.title);
     setEditDescription(assignment.description ?? "");
-    setEditDueDate(assignment.dueDate ? assignment.dueDate.slice(0, 10) : "");
+    setEditDueDate(fromIsoDate(assignment.dueDate));
     setEditStatus(assignment.status);
     setEditPriority(assignment.priority);
   }
 
   async function updateAssignment() {
     if (!editing) return;
+    const isoDate = toIsoDate(editDueDate);
+    if (editDueDate && !isoDate) {
+      pushToast("Use date format dd-mm-yyyy", "error");
+      return;
+    }
     const response = await fetch("/api/assignments", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -99,7 +124,7 @@ export function AssignmentsClient() {
         id: editing.id,
         title: editTitle,
         description: editDescription,
-        dueDate: editDueDate,
+        dueDate: isoDate,
         status: editStatus,
         priority: editPriority,
       }),
@@ -118,8 +143,31 @@ export function AssignmentsClient() {
     [assignments, filter],
   );
 
+  const summary = useMemo(() => {
+    const pending = assignments.filter((a) => a.status === "PENDING").length;
+    const completed = assignments.filter((a) => a.status === "COMPLETED").length;
+    const overdue = assignments.filter((a) => a.status === "OVERDUE").length;
+    return { pending, completed, overdue };
+  }, [assignments]);
+
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-amber-500/15 to-orange-600/10 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Pending</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.pending}</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-green-600/10 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completed</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.completed}</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-rose-500/15 to-red-600/10 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Overdue</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.overdue}</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
       <Card title="Assignments" description="Track deadlines, status, and priority.">
         <div className="mb-3 flex flex-wrap gap-2">
           {["ALL", "PENDING", "COMPLETED", "OVERDUE"].map((option) => (
@@ -140,7 +188,7 @@ export function AssignmentsClient() {
         ) : (
           <div className="space-y-3">
             {visible.map((item) => (
-              <div key={item.id} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+              <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold">{item.title}</p>
@@ -166,7 +214,7 @@ export function AssignmentsClient() {
         <form onSubmit={addAssignment} className="space-y-2">
           <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Assignment title" />
           <Textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Description" rows={4} />
-          <Input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
+          <Input value={dueDate} onChange={(event) => setDueDate(event.target.value)} placeholder="dd-mm-yyyy" />
           <Select
             label="Status"
             value={status}
@@ -211,7 +259,7 @@ export function AssignmentsClient() {
         <div className="space-y-2">
           <Input value={editTitle} onChange={(event) => setEditTitle(event.target.value)} placeholder="Assignment title" />
           <Textarea value={editDescription} onChange={(event) => setEditDescription(event.target.value)} placeholder="Description" rows={3} />
-          <Input type="date" value={editDueDate} onChange={(event) => setEditDueDate(event.target.value)} />
+          <Input value={editDueDate} onChange={(event) => setEditDueDate(event.target.value)} placeholder="dd-mm-yyyy" />
           <Select
             label="Status"
             value={editStatus}
@@ -234,6 +282,7 @@ export function AssignmentsClient() {
           />
         </div>
       </Modal>
+      </div>
     </div>
   );
 }

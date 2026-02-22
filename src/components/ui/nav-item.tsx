@@ -6,13 +6,13 @@ export function NavItem({ href, active, children }: { href: string; active: bool
   return (
     <Link
       href={href}
-      className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+      className={`group flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-sm font-medium transition-all duration-[var(--transition-base)] ${
         active
-          ? "bg-[var(--brand)] text-white shadow-[var(--shadow)]"
-          : "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--text)]"
+          ? "bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary-hover))] border border-[rgb(var(--primary))]/25"
+          : "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))]"
       }`}
     >
-      <span className={`h-2 w-2 rounded-full ${active ? "bg-white" : "bg-[var(--border)] group-hover:bg-[var(--brand)]"}`} />
+      <span className={`h-2 w-2 rounded-full ${active ? "bg-[rgb(var(--primary))]" : "bg-[rgb(var(--border))] group-hover:bg-[rgb(var(--primary))]"}`} />
       {children}
     </Link>
   );

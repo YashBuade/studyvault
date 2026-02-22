@@ -6,7 +6,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ c
   return (
     <input
       ref={ref}
-      className={`w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--muted)]/80 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/35 ${className}`}
+      className={`w-full rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2.5 text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] transition-all duration-[var(--transition-base)] focus-visible:outline-none focus-visible:border-[rgb(var(--border-focus))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/20 ${className}`}
       {...props}
     />
   );

@@ -22,7 +22,23 @@ type Exam = {
 
 type ApiResponse<T> = { ok: boolean; data?: T; error?: { message: string } };
 
+function toIsoDate(input: string) {
+  if (!input.trim()) return "";
+  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(input.trim());
+  if (!match) return "";
+  const [, dd, mm, yyyy] = match;
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fromIsoDate(input?: string | null) {
+  if (!input) return "";
+  const [yyyy, mm, dd] = input.slice(0, 10).split("-");
+  if (!yyyy || !mm || !dd) return "";
+  return `${dd}-${mm}-${yyyy}`;
+}
+
 export function ExamsClient() {
+  const [today, setToday] = useState<Date>(() => new Date());
   const [exams, setExams] = useState<Exam[]>([]);
   const [subject, setSubject] = useState("");
   const [date, setDate] = useState("");
@@ -57,12 +73,22 @@ export function ExamsClient() {
     void load();
   }, [pushToast]);
 
+  useEffect(() => {
+    const id = window.setInterval(() => setToday(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
   async function addExam(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const isoDate = toIsoDate(date);
+    if (!isoDate) {
+      pushToast("Use date format dd-mm-yyyy", "error");
+      return;
+    }
     const response = await fetch("/api/exams", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject, date, location, notes, status }),
+      body: JSON.stringify({ subject, date: isoDate, location, notes, status }),
     });
 
     const payload = (await response.json()) as ApiResponse<Exam>;
@@ -90,7 +116,7 @@ export function ExamsClient() {
   function startEdit(exam: Exam) {
     setEditing(exam);
     setEditSubject(exam.subject);
-    setEditDate(exam.date.slice(0, 10));
+    setEditDate(fromIsoDate(exam.date));
     setEditLocation(exam.location ?? "");
     setEditNotes(exam.notes ?? "");
     setEditStatus(exam.status);
@@ -98,13 +124,18 @@ export function ExamsClient() {
 
   async function updateExam() {
     if (!editing) return;
+    const isoDate = toIsoDate(editDate);
+    if (!isoDate) {
+      pushToast("Use date format dd-mm-yyyy", "error");
+      return;
+    }
     const response = await fetch("/api/exams", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: editing.id,
         subject: editSubject,
-        date: editDate,
+        date: isoDate,
         location: editLocation,
         notes: editNotes,
         status: editStatus,
@@ -124,8 +155,26 @@ export function ExamsClient() {
     [exams, filter],
   );
 
+  const examSummary = useMemo(() => {
+    const upcoming = exams.filter((item) => item.status === "UPCOMING").length;
+    const completed = exams.filter((item) => item.status === "COMPLETED").length;
+    return { upcoming, completed };
+  }, [exams]);
+
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-blue-600/10 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Upcoming Exams</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{examSummary.upcoming}</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completed Exams</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{examSummary.completed}</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="space-y-4">
         <Card title="Exams" description="Keep exam prep visible and prioritized.">
           <div className="mb-3 flex flex-wrap gap-2">
@@ -144,7 +193,7 @@ export function ExamsClient() {
             <div className="space-y-3">
               {visible.map((item) => {
                 const examDate = new Date(item.date);
-                const daysLeft = Math.ceil((examDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const daysLeft = Math.ceil((examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
                 const urgency =
                   item.status === "COMPLETED"
                     ? "Completed"
@@ -155,7 +204,7 @@ export function ExamsClient() {
                         : "Upcoming";
 
                 return (
-                  <div key={item.id} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+                  <div key={item.id} className="rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <p className="text-base font-semibold">{item.subject}</p>
@@ -185,7 +234,7 @@ export function ExamsClient() {
 
         <Card>
           <div className="flex items-center gap-3">
-            <div className="rounded-full border border-[var(--border)] bg-[var(--panel)] p-2 text-[var(--primary)]">
+            <div className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-2 text-[var(--primary)]">
               <Sparkles size={16} />
             </div>
             <div>
@@ -199,7 +248,7 @@ export function ExamsClient() {
       <Card title="New Exam" description="Add subject, date, and notes.">
         <form onSubmit={addExam} className="space-y-2">
           <Input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Subject" />
-          <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+          <Input value={date} onChange={(event) => setDate(event.target.value)} placeholder="dd-mm-yyyy" />
           <Input value={location} onChange={(event) => setLocation(event.target.value)} placeholder="Location" />
           <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Notes" rows={3} />
           <Select
@@ -234,7 +283,7 @@ export function ExamsClient() {
       >
         <div className="space-y-2">
           <Input value={editSubject} onChange={(event) => setEditSubject(event.target.value)} placeholder="Subject" />
-          <Input type="date" value={editDate} onChange={(event) => setEditDate(event.target.value)} />
+          <Input value={editDate} onChange={(event) => setEditDate(event.target.value)} placeholder="dd-mm-yyyy" />
           <Input value={editLocation} onChange={(event) => setEditLocation(event.target.value)} placeholder="Location" />
           <Textarea value={editNotes} onChange={(event) => setEditNotes(event.target.value)} placeholder="Notes" rows={3} />
           <Select
@@ -248,6 +297,7 @@ export function ExamsClient() {
           />
         </div>
       </Modal>
+      </div>
     </div>
   );
 }

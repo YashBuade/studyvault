@@ -44,6 +44,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
   const [cursor, setCursor] = useState<number | null>(initialFiles.at(-1)?.id ?? null);
   const [hasMore, setHasMore] = useState(initialFiles.length >= 10);
   const [fetching, setFetching] = useState(false);
+  const [makePublic, setMakePublic] = useState(true);
   const { pushToast } = useToast();
 
   const visible = useMemo(
@@ -69,6 +70,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
+    formData.append("isPublic", String(makePublic));
 
     const response = await fetch("/api/files/upload", {
       method: "POST",
@@ -85,6 +87,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
 
     setSelectedFile(null);
     setMessage("File uploaded successfully.");
+    setMakePublic(true);
     setLoading(false);
     setFiles((prev) => [payload.data!, ...prev]);
     pushToast("Upload complete", "success");
@@ -150,9 +153,18 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
           <input
             type="file"
             onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-            className="w-full rounded-xl border border-[var(--border)] bg-transparent px-3 py-2.5 text-sm"
+            className="w-full rounded-xl border border-[rgb(var(--border))] bg-transparent px-3 py-2.5 text-sm"
           />
           <p className="mt-2 text-xs text-[var(--muted)]">Accepted size: up to 10MB per file.</p>
+          <label className="mt-3 flex items-center gap-2 text-xs text-[var(--muted)]">
+            <input
+              type="checkbox"
+              checked={makePublic}
+              onChange={(event) => setMakePublic(event.target.checked)}
+              className="h-4 w-4 rounded border border-[rgb(var(--border))]"
+            />
+            Make this file public (available in the public library)
+          </label>
           {message ? <div className="mt-3"><Alert message={message} variant={message.includes("success") ? "success" : "info"} /></div> : null}
 
           <Button type="submit" loading={loading} className="mt-4">
@@ -188,7 +200,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
             <p className="text-sm text-[var(--muted)]">No files in this view.</p>
           ) : (
             visible.map((file) => (
-              <article key={file.id} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+              <article key={file.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium">{file.originalName}</p>
@@ -202,7 +214,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                     <div className="flex items-center gap-2">
                       <a
                         href={`/api/files/${file.id}/download`}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-xs font-semibold hover:-translate-y-0.5"
+                        className="rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold hover:-translate-y-0.5"
                       >
                         Download
                       </a>

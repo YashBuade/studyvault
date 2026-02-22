@@ -16,13 +16,20 @@ type ToastContextValue = {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
+function createToastId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `toast_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const value = useMemo<ToastContextValue>(
     () => ({
       pushToast(message, variant = "info") {
-        const id = crypto.randomUUID();
+        const id = createToastId();
         setToasts((prev) => [...prev, { id, message, variant }]);
         window.setTimeout(() => {
           setToasts((prev) => prev.filter((toast) => toast.id !== id));
@@ -41,7 +48,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={toast.id}
             className={`min-w-52 rounded-xl border px-3 py-2 text-sm shadow-lg backdrop-blur transition-all ${
               toast.variant === "success"
-                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-200"
+                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-200"
                 : toast.variant === "error"
                   ? "border-[var(--danger)]/45 bg-[var(--danger)]/18 text-[var(--danger)]"
                   : "border-[var(--brand)]/35 bg-[var(--panel)] text-[var(--text)]"

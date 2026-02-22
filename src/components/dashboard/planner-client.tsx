@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
@@ -30,6 +30,21 @@ type Item = {
 };
 
 type ApiResponse<T> = { ok: boolean; data?: T; error?: { message: string } };
+
+function toIsoDate(input: string) {
+  if (!input.trim()) return "";
+  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(input.trim());
+  if (!match) return "";
+  const [, dd, mm, yyyy] = match;
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fromIsoDate(input?: string | null) {
+  if (!input) return "";
+  const [yyyy, mm, dd] = input.slice(0, 10).split("-");
+  if (!yyyy || !mm || !dd) return "";
+  return `${dd}-${mm}-${yyyy}`;
+}
 
 export function PlannerClient() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -88,13 +103,18 @@ export function PlannerClient() {
   async function addItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    const isoDate = toIsoDate(dueDate);
+    if (dueDate && !isoDate) {
+      setError("Use date format dd-mm-yyyy.");
+      return;
+    }
     const response = await fetch("/api/planner/items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         title,
         details,
-        dueDate: dueDate || undefined,
+        dueDate: isoDate || undefined,
         priority,
         status,
         categoryId: categoryId ? Number(categoryId) : null,
@@ -129,12 +149,17 @@ export function PlannerClient() {
     setEditDetails(item.details ?? "");
     setEditPriority(item.priority);
     setEditStatus(item.status);
-    setEditDueDate(item.dueDate ? item.dueDate.slice(0, 10) : "");
+    setEditDueDate(fromIsoDate(item.dueDate));
     setEditCategoryId(item.categoryId ? String(item.categoryId) : "");
   }
 
   async function updateItem() {
     if (!editingItem) return;
+    const isoDate = toIsoDate(editDueDate);
+    if (editDueDate && !isoDate) {
+      setError("Use date format dd-mm-yyyy.");
+      return;
+    }
     const response = await fetch("/api/planner/items", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -142,7 +167,7 @@ export function PlannerClient() {
         id: editingItem.id,
         title: editTitle,
         details: editDetails,
-        dueDate: editDueDate || undefined,
+        dueDate: isoDate || undefined,
         priority: editPriority,
         status: editStatus,
         categoryId: editCategoryId ? Number(editCategoryId) : null,
@@ -209,8 +234,36 @@ export function PlannerClient() {
     return map;
   }, [categories, items]);
 
+  const plannerStats = useMemo(() => {
+    const todo = items.filter((item) => item.status === "TODO").length;
+    const inProgress = items.filter((item) => item.status === "IN_PROGRESS").length;
+    const done = items.filter((item) => item.status === "DONE").length;
+    const total = items.length;
+    const completion = total > 0 ? Math.round((done / total) * 100) : 0;
+    return { todo, inProgress, done, total, completion };
+  }, [items]);
+
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-sky-500/15 to-blue-600/10 p-4 shadow-[var(--shadow-sm)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Focus Queue</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.todo}</p>
+          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Tasks waiting to start</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-violet-600/10 p-4 shadow-[var(--shadow-sm)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">In Motion</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.inProgress}</p>
+          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Currently active tasks</p>
+        </div>
+        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4 shadow-[var(--shadow-sm)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completion</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.completion}%</p>
+          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">{plannerStats.done} completed tasks</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
       <Card title="Planner" description="Drag and drop tasks between categories, add due dates, and priorities.">
         <Tabs
           tabs={[
@@ -226,7 +279,7 @@ export function PlannerClient() {
             {[{ id: null, name: "Unassigned", color: "var(--muted)" }, ...categories].map((cat) => (
               <div
                 key={cat.id ?? "unassigned"}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3"
+                className="rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3"
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {
                   const itemId = Number(event.dataTransfer.getData("text/plain"));
@@ -254,7 +307,7 @@ export function PlannerClient() {
                       key={item.id}
                       draggable
                       onDragStart={(event) => event.dataTransfer.setData("text/plain", String(item.id))}
-                      className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3 shadow-sm"
+                      className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-sm"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div>
@@ -286,7 +339,7 @@ export function PlannerClient() {
               items
                 .filter((item) => item.dueDate)
                 .map((item) => (
-                  <div key={item.id} className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3">
+                  <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold">{item.title}</p>
@@ -330,7 +383,7 @@ export function PlannerClient() {
                 ]}
               />
             </div>
-            <Input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
+            <Input value={dueDate} onChange={(event) => setDueDate(event.target.value)} placeholder="dd-mm-yyyy" />
             <Select
               label="Category"
               value={categoryId}
@@ -349,6 +402,12 @@ export function PlannerClient() {
             <Input value={newCategory} onChange={(event) => setNewCategory(event.target.value)} placeholder="Category name" />
             <Button type="submit" variant="secondary">Add</Button>
           </form>
+        </Card>
+
+        <Card title="Planner Challenge" description="Daily micro-goal to keep momentum.">
+          <p className="text-sm text-[rgb(var(--text-secondary))]">
+            Complete one high-priority task before adding a new one today.
+          </p>
         </Card>
       </div>
 
@@ -394,7 +453,7 @@ export function PlannerClient() {
               ]}
             />
           </div>
-          <Input type="date" value={editDueDate} onChange={(event) => setEditDueDate(event.target.value)} />
+          <Input value={editDueDate} onChange={(event) => setEditDueDate(event.target.value)} placeholder="dd-mm-yyyy" />
           <Select
             label="Category"
             value={editCategoryId}
@@ -420,6 +479,7 @@ export function PlannerClient() {
           <Input value={editCategoryColor} onChange={(event) => setEditCategoryColor(event.target.value)} placeholder="Color (hex or CSS var)" />
         </div>
       </Modal>
+      </div>
     </div>
   );
 }

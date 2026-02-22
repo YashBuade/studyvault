@@ -1,14 +1,26 @@
 type PageHeaderProps = {
   title: string;
   description: string;
+  insight?: string;
 };
 
-export function PageHeader({ title, description }: PageHeaderProps) {
+export function PageHeader({ title, description, insight }: PageHeaderProps) {
   return (
-    <div className="mb-6">
-      <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">StudyVault</p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--text)] md:text-3xl">{title}</h1>
-      <p className="mt-2 text-sm text-[var(--muted)] md:text-base">{description}</p>
+    <div className="relative mb-6 overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)] md:mb-7 md:p-6">
+      <div className="pointer-events-none absolute -right-10 -top-8 h-28 w-28 rounded-full bg-sky-300/20 blur-2xl dark:bg-sky-500/20" />
+      <div className="pointer-events-none absolute right-16 top-8 h-10 w-10 rotate-12 rounded-lg bg-gradient-to-br from-blue-400/40 to-indigo-500/40 shadow-[var(--shadow-sm)]" />
+      <div className="pointer-events-none absolute right-8 top-20 h-7 w-7 -rotate-6 rounded-md bg-gradient-to-br from-cyan-300/35 to-blue-500/35 shadow-[var(--shadow-sm)]" />
+
+      <div className="relative">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">StudyVault Workspace</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[rgb(var(--text-primary))] sm:text-3xl md:text-4xl">{title}</h1>
+        <p className="mt-3 max-w-3xl text-sm text-[rgb(var(--text-secondary))] md:text-base">{description}</p>
+        {insight ? (
+          <p className="mt-4 inline-flex max-w-3xl rounded-full border border-[rgb(var(--primary))]/25 bg-[rgb(var(--primary-soft))] px-4 py-1.5 text-xs font-medium text-[rgb(var(--text-secondary))]">
+            {insight}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

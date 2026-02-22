@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { AUTH_COOKIE_NAME, getCookieOptions, signSession } from "@/lib/auth";
 import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
+import { withDbRetry } from "@/lib/db-safe";
 
 const signupSchema = z.object({
   name: z.string().min(2).max(100),
@@ -24,20 +25,22 @@ export async function POST(request: Request) {
     }
 
     const { name, email, password } = parsed.data;
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await withDbRetry(() => prisma.user.findUnique({ where: { email } }));
 
     if (existing) {
       return NextResponse.json(failure("CONFLICT", "Account already exists"), { status: 409 });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-      },
-    });
+    const user = await withDbRetry(() =>
+      prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+        },
+      })
+    );
 
     const token = await signSession({
       sub: String(user.id),

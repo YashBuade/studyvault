@@ -23,6 +23,7 @@ export async function getCurrentUser() {
       avatarUrl: true,
       createdAt: true,
       onboardingSeen: true,
+      role: true,
     },
   });
 }

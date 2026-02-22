@@ -5,10 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { AUTH_COOKIE_NAME, getCookieOptions, signSession } from "@/lib/auth";
 import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
+import { isTransientDbPoolError, withDbRetry } from "@/lib/db-safe";
 
 const loginSchema = z.object({
   email: z.string().email().toLowerCase(),
   password: z.string().min(1),
+  rememberMe: z.boolean().optional().default(false),
 });
 
 export async function POST(request: Request) {
@@ -20,10 +22,25 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("VALIDATION_ERROR", "Invalid credentials"), { status: 400 });
     }
 
-    const { email, password } = parsed.data;
-    const user = await prisma.user.findUnique({ where: { email } });
+    const { email, password, rememberMe } = parsed.data;
+    
+    let user;
+    try {
+      user = await withDbRetry(() => prisma.user.findUnique({ where: { email } }));
+    } catch (dbError) {
+      console.error("Database connection failed:", dbError);
+      return NextResponse.json(
+        failure(
+          "INTERNAL_ERROR",
+          isTransientDbPoolError(dbError)
+            ? "Database is busy. Please retry in a few seconds."
+            : "Database connection failed"
+        ),
+        { status: 500 }
+      );
+    }
 
-    if (!user) {
+    if (!user || !user.passwordHash) {
       return NextResponse.json(failure("UNAUTHORIZED", "Invalid credentials"), { status: 401 });
     }
 
@@ -41,7 +58,7 @@ export async function POST(request: Request) {
 
     logInfo("auth.login_success", { userId: user.id });
     const response = NextResponse.json(success({ authenticated: true }));
-    response.cookies.set(AUTH_COOKIE_NAME, token, getCookieOptions());
+    response.cookies.set(AUTH_COOKIE_NAME, token, getCookieOptions({ rememberMe }));
     return response;
   } catch (error) {
     logError("auth.login_failed", error);

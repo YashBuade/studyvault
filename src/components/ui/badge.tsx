@@ -4,7 +4,7 @@ type BadgeProps = {
 };
 
 const variants: Record<NonNullable<BadgeProps["variant"]>, string> = {
-  neutral: "bg-[var(--surface)] text-[var(--text)] border-[var(--border)]",
+  neutral: "bg-[rgb(var(--surface))] text-[var(--text)] border-[rgb(var(--border))]",
   info: "bg-[var(--brand-soft)] text-[var(--brand)] border-[var(--brand)]/30",
   danger: "bg-[var(--danger)]/15 text-[var(--danger)] border-[var(--danger)]/40",
   warning: "bg-[var(--warning)]/15 text-[var(--warning)] border-[var(--warning)]/40",
