@@ -1,11 +1,11 @@
 import { randomBytes } from "crypto";
-import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
 import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
+import { uploadObject } from "@/lib/supabase-storage";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -29,15 +29,13 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("VALIDATION_ERROR", "File exceeds 10MB limit"), { status: 400 });
     }
 
-    const bytes = Buffer.from(await file.arrayBuffer());
+    const bytes = await file.arrayBuffer();
     const extension = path.extname(file.name);
     const unique = `${Date.now()}-${randomBytes(8).toString("hex")}${extension}`;
-    const userFolder = path.join(process.cwd(), "public", "uploads", `u-${userId}`);
-    const absolutePath = path.join(userFolder, unique);
-    const relativePath = `/uploads/u-${userId}/${unique}`;
+    const objectPath = `u-${userId}/${unique}`;
+    const relativePath = `/uploads/${objectPath}`;
 
-    await mkdir(userFolder, { recursive: true });
-    await writeFile(absolutePath, bytes);
+    await uploadObject(objectPath, bytes, file.type || "application/octet-stream");
 
     try {
       const created = await prisma.file.create({
@@ -55,7 +53,6 @@ export async function POST(request: Request) {
       logInfo("files.uploaded", { userId, fileId: created.id });
       return NextResponse.json(success(created), { status: 201 });
     } catch (error) {
-      await unlink(absolutePath).catch(() => undefined);
       logError("files.metadata_failed", error, { userId });
       return NextResponse.json(failure("INTERNAL_ERROR", "Unable to store file metadata"), { status: 503 });
     }

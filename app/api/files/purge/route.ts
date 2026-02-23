@@ -1,10 +1,9 @@
-import { unlink } from "fs/promises";
-import path from "path";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
 import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
+import { deleteObject } from "@/lib/supabase-storage";
 
 export async function POST(request: Request) {
   try {
@@ -32,9 +31,8 @@ export async function POST(request: Request) {
 
     await prisma.file.delete({ where: { id: fileId } });
 
-    const relativePath = file.path.replace(/^\/+/, "");
-    const absolutePath = path.join(process.cwd(), "public", relativePath);
-    await unlink(absolutePath).catch(() => undefined);
+    const objectPath = file.path.replace(/^\/?uploads\//, "");
+    await deleteObject(objectPath).catch(() => undefined);
 
     logInfo("files.purged", { userId, fileId });
     return NextResponse.json(success({ id: fileId }));
