@@ -34,6 +34,10 @@ export async function PATCH(request: Request) {
       return NextResponse.json(failure("NOT_FOUND", "User not found"), { status: 404 });
     }
 
+    if (!user.passwordHash) {
+      return NextResponse.json(failure("UNAUTHORIZED", "Password login is not configured for this account"), { status: 401 });
+    }
+
     const isValid = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash);
 
     if (!isValid) {

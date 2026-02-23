@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { defineConfig } from "prisma/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -7,6 +7,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env.DATABASE_URL || "mysql://root:2005@127.0.0.1:3306/studyvault",
+    // Direct connection is more reliable for schema operations.
+    url: env("DIRECT_URL"),
   },
 });

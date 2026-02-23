@@ -1,51 +1,37 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-function parseDatabaseUrl() {
-  const fallback = "mysql://root:2005@127.0.0.1:3306/studyvault";
-  const rawUrl = process.env.DATABASE_URL || fallback;
-  const parsed = new URL(rawUrl);
+function getConnectionStrings() {
+  const pooled = process.env.DATABASE_URL;
+  const direct = process.env.DIRECT_URL;
 
-  const host = parsed.hostname;
-  const port = parsed.port ? Number(parsed.port) : 3306;
-  const user = decodeURIComponent(parsed.username || "root");
-  const password = decodeURIComponent(parsed.password || "");
-  const database = parsed.pathname.replace(/^\//, "") || "studyvault";
-
-  const connectionLimit = Number(parsed.searchParams.get("connection_limit") ?? "10");
-  const acquireTimeout = Number(parsed.searchParams.get("pool_timeout") ?? "60000");
-  const connectTimeout = Number(parsed.searchParams.get("connect_timeout") ?? "15000");
+  if (!pooled && !direct) {
+    throw new Error("DATABASE_URL or DIRECT_URL must be set for Prisma.");
+  }
 
   return {
-    rawUrl,
-    host,
-    port,
-    user,
-    password,
-    database,
-    connectionLimit,
-    acquireTimeout,
-    connectTimeout,
+    // Runtime traffic should use pooled URL; fallback to direct URL if needed.
+    runtimeUrl: pooled || direct!,
+    directUrl: direct || pooled!,
   };
 }
 
 function createPrismaClient() {
-  const config = parseDatabaseUrl();
+  const config = getConnectionStrings();
   console.log("[Prisma] Initializing database connection...");
-  console.log("[Prisma] Connection string:", config.rawUrl.replace(/:[^:]*@/, ":****@"));
+  console.log("[Prisma] Runtime connection:", config.runtimeUrl.replace(/:[^:]*@/, ":****@"));
+  console.log("[Prisma] Direct connection:", config.directUrl.replace(/:[^:]*@/, ":****@"));
 
-  const adapter = new PrismaMariaDb({
-    host: config.host,
-    port: config.port,
-    user: config.user,
-    password: config.password,
-    database: config.database,
-    connectionLimit: config.connectionLimit,
-    acquireTimeout: config.acquireTimeout,
-    connectTimeout: config.connectTimeout,
+  const pool = new Pool({
+    connectionString: config.runtimeUrl,
+    max: 10,
+    connectionTimeoutMillis: 15000,
+    idleTimeoutMillis: 60000,
   });
+  const adapter = new PrismaPg(pool);
 
   const client = new PrismaClient({
     adapter,
