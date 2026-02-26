@@ -1,13 +1,13 @@
 # StudyVault
 
-StudyVault is a production-ready full-stack student workspace built with Next.js App Router, TypeScript, Tailwind CSS, Prisma, and MySQL.
+StudyVault is a production-ready full-stack student workspace built with Next.js App Router, TypeScript, Tailwind CSS, Prisma, and PostgreSQL.
 
 ## Stack
 
 - Next.js 16 (App Router)
 - TypeScript
 - Tailwind CSS v4
-- Prisma + MySQL
+- Prisma + PostgreSQL
 - HTTP-only cookie authentication
 - lucide-react icons
 - Vercel-ready deployment configuration
