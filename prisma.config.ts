@@ -7,7 +7,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Direct connection is more reliable for schema operations.
-    url: env("DIRECT_URL"),
+    // Prefer direct URL for migrations; fallback to pooled URL if direct is unavailable.
+    url: process.env.DIRECT_URL || env("DATABASE_URL"),
   },
 });
