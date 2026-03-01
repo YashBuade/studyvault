@@ -70,18 +70,26 @@ export async function GET(request: Request) {
             file: {
               isPublic: true,
               deletedAt: null,
-              verificationStatus: "VERIFIED",
             },
           },
           select: {
-            file: { select: { id: true, originalName: true } },
+            file: { select: { id: true, originalName: true, verificationStatus: true } },
           },
         },
       },
     });
 
     const hasMore = notes.length > limit;
-    const data = hasMore ? notes.slice(0, limit) : notes;
+    const sliced = hasMore ? notes.slice(0, limit) : notes;
+    const data = sliced.map((note) => {
+      const attachmentStatuses = note.attachments.map((item) => item.file.verificationStatus);
+      const hasAttachments = attachmentStatuses.length > 0;
+      const allVerified = hasAttachments && attachmentStatuses.every((status) => status === "VERIFIED");
+      return {
+        ...note,
+        noteVerificationStatus: allVerified ? "VERIFIED" : "UNVERIFIED",
+      };
+    });
     const nextCursor = hasMore ? data[data.length - 1]?.id : null;
 
     return NextResponse.json(success(data, { hasMore, nextCursor }));

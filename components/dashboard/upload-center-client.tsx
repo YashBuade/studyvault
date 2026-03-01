@@ -274,7 +274,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                       <button
                         type="button"
                         onClick={() => setPendingDelete(file.id)}
-                        className="rounded-lg p-2 text-[var(--muted)] hover:bg-white/50 hover:text-red-500"
+                        className="rounded-lg p-2 text-[var(--muted)] hover:bg-[rgb(var(--surface-hover))] hover:text-red-500"
                         aria-label="Delete file"
                       >
                         <Trash2 size={14} />

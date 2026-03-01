@@ -469,7 +469,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                       <button
                         type="button"
                         onClick={() => setPendingDelete(note.id)}
-                        className="rounded-lg p-2 text-[var(--muted)] hover:bg-white/50 hover:text-red-500"
+                        className="rounded-lg p-2 text-[var(--muted)] hover:bg-[rgb(var(--surface-hover))] hover:text-red-500"
                         aria-label="Delete note"
                       >
                         <Trash2 size={16} />

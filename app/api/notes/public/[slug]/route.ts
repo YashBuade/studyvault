@@ -22,11 +22,10 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ sl
             file: {
               isPublic: true,
               deletedAt: null,
-              verificationStatus: "VERIFIED",
             },
           },
           select: {
-            file: { select: { id: true, originalName: true } },
+            file: { select: { id: true, originalName: true, verificationStatus: true } },
           },
         },
         _count: { select: { likes: true, comments: true, bookmarks: true, ratings: true } },
@@ -37,7 +36,15 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ sl
       return NextResponse.json(failure("NOT_FOUND", "Note not found"), { status: 404 });
     }
 
-    return NextResponse.json(success(note));
+    const attachmentStatuses = note.attachments.map((item) => item.file.verificationStatus);
+    const hasAttachments = attachmentStatuses.length > 0;
+    const allVerified = hasAttachments && attachmentStatuses.every((status) => status === "VERIFIED");
+    return NextResponse.json(
+      success({
+        ...note,
+        noteVerificationStatus: allVerified ? "VERIFIED" : "UNVERIFIED",
+      }),
+    );
   } catch (error) {
     logError("notes.public_detail_failed", error);
     return NextResponse.json(failure("INTERNAL_ERROR", "Unable to fetch note"), { status: 503 });

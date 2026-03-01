@@ -18,7 +18,7 @@ export function PageHeader({ title, description, insight }: PageHeaderProps) {
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[rgb(var(--text-primary))] sm:text-3xl md:text-4xl">{title}</h1>
         <p className="mt-3 max-w-3xl text-sm text-[rgb(var(--text-secondary))] md:text-base">{description}</p>
         {insight ? (
-          <p className="mt-4 inline-flex max-w-3xl rounded-full border border-[rgb(var(--primary))]/25 bg-white/80 px-4 py-1.5 text-xs font-medium text-[rgb(var(--text-secondary))]">
+          <p className="mt-4 inline-flex max-w-3xl rounded-full border border-[rgb(var(--primary))]/30 bg-[rgb(var(--surface-hover))] px-4 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))]">
             {insight}
           </p>
         ) : null}

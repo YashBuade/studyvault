@@ -40,7 +40,8 @@ type PublicNote = {
     role: "USER" | "ADMIN" | "TEACHER";
     teacherVerificationStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
   };
-  attachments?: { file: { id: number; originalName: string } }[];
+  noteVerificationStatus?: "VERIFIED" | "UNVERIFIED";
+  attachments?: { file: { id: number; originalName: string; verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" } }[];
 };
 
 type ApiResponse<T> = {
@@ -86,8 +87,8 @@ type LibraryPrefs = {
   tags: string[];
 };
 
-const CLIENT_UPLOAD_MAX_MB = Number(process.env.NEXT_PUBLIC_FILE_UPLOAD_MAX_MB ?? 4);
-const CLIENT_UPLOAD_MAX_BYTES = Math.max(1, Math.min(CLIENT_UPLOAD_MAX_MB, 25)) * 1024 * 1024;
+const CLIENT_UPLOAD_MAX_MB = Number(process.env.NEXT_PUBLIC_FILE_UPLOAD_MAX_MB ?? 20);
+const CLIENT_UPLOAD_MAX_BYTES = Math.max(1, Math.min(CLIENT_UPLOAD_MAX_MB, 100)) * 1024 * 1024;
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -907,7 +908,20 @@ export function PublicNotesClient() {
                       <BookOpen size={12} />
                       {note.subject || "General"}
                     </span>
-                    <span className="text-[11px] text-[rgb(var(--text-tertiary))]">{new Date(note.createdAt).toLocaleDateString()}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-[rgb(var(--text-tertiary))]">{new Date(note.createdAt).toLocaleDateString()}</span>
+                      {note.noteVerificationStatus === "VERIFIED" ? (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/60 bg-emerald-100/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                          <BadgeCheck size={10} />
+                          Verified
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-100/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                          <Info size={10} />
+                          Unverified
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
                   <p className={`mt-2 text-sm text-[rgb(var(--text-secondary))] ${noteView === "grid" ? "line-clamp-3" : "line-clamp-2 sm:max-w-2xl"}`}>{note.content.replace(/<[^>]+>/g, "")}</p>
@@ -934,13 +948,23 @@ export function PublicNotesClient() {
                   {note.attachments?.length ? (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {note.attachments.slice(0, 3).map((attachment) => (
-                        <a
-                          key={attachment.file.id}
-                          href={`/api/notes/public/files/${attachment.file.id}`}
-                          className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
-                        >
-                          {attachment.file.originalName}
-                        </a>
+                        attachment.file.verificationStatus === "VERIFIED" ? (
+                          <a
+                            key={attachment.file.id}
+                            href={`/api/notes/public/files/${attachment.file.id}`}
+                            className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+                          >
+                            {attachment.file.originalName}
+                          </a>
+                        ) : (
+                          <span
+                            key={attachment.file.id}
+                            className="inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-800"
+                          >
+                            <Info size={10} />
+                            {attachment.file.originalName} (Pending verification)
+                          </span>
+                        )
                       ))}
                     </div>
                   ) : null}

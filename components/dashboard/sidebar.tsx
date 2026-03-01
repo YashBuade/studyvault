@@ -69,6 +69,21 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const adminSections = isAdmin
+    ? [
+        {
+          label: "Admin Control",
+          items: [{ href: "/dashboard/admin", label: "Admin Panel", icon: Shield }],
+        },
+        {
+          label: "Admin Verification",
+          items: [
+            { href: "/dashboard/admin/teachers", label: "Teacher Verification", icon: User },
+            { href: "/dashboard/teacher/review", label: "File Verification Queue", icon: Shield },
+          ],
+        },
+      ]
+    : [];
 
   return (
     <>
@@ -101,7 +116,7 @@ export function DashboardSidebar({
         </div>
 
         <nav className="space-y-4">
-          {navSections.map((section) => (
+          {[...navSections, ...adminSections].map((section) => (
             <div key={section.label}>
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">
                 {section.label}
@@ -122,22 +137,6 @@ export function DashboardSidebar({
             </div>
           ))}
         </nav>
-
-        {isAdmin ? (
-          <div className="mt-4 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Admin</p>
-            <div className="mt-2">
-              <NavItem href="/dashboard/admin" active={pathname === "/dashboard/admin"}>
-                <Shield size={16} />
-                Admin Panel
-              </NavItem>
-              <NavItem href="/dashboard/admin/teachers" active={pathname === "/dashboard/admin/teachers"}>
-                <User size={16} />
-                Teacher Approval
-              </NavItem>
-            </div>
-          </div>
-        ) : null}
 
         {isTeacher ? (
           <div className="mt-4 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">

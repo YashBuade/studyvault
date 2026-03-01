@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { Bookmark, Flag, Heart, Paperclip, Star } from "lucide-react";
+import { BadgeCheck, Bookmark, Flag, Heart, Info, Paperclip, Star } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Modal } from "@/src/components/ui/modal";
@@ -19,7 +19,8 @@ type NoteDetail = {
   tags?: string | null;
   createdAt: string;
   user: { id: number; name: string };
-  attachments?: { file: { id: number; originalName: string } }[];
+  noteVerificationStatus?: "VERIFIED" | "UNVERIFIED";
+  attachments?: { file: { id: number; originalName: string; verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" } }[];
   _count: { likes: number; comments: number; bookmarks: number; ratings: number };
 };
 
@@ -179,6 +180,19 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
 
       <Card>
         <h1 className="text-2xl font-semibold text-[var(--text)]">{note.title}</h1>
+        <div className="mt-2">
+          {note.noteVerificationStatus === "VERIFIED" ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/60 bg-emerald-100/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+              <BadgeCheck size={12} />
+              Verified note
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+              <Info size={12} />
+              Unverified note
+            </span>
+          )}
+        </div>
         <p className="mt-1 text-xs text-[var(--muted)]">
           by <Link href={`/u/${note.user.id}`} className="text-[var(--brand)] hover:underline">{note.user.name}</Link>
         </p>
@@ -192,14 +206,24 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
             <p className="text-xs font-semibold text-[var(--muted)]">Attachments</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {note.attachments.map((attachment) => (
-                <a
-                key={attachment.file.id}
-                href={`/api/files/public/${attachment.file.id}/download`}
-                className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline"
-              >
-                  <Paperclip size={12} />
-                  {attachment.file.originalName}
-                </a>
+                attachment.file.verificationStatus === "VERIFIED" ? (
+                  <a
+                    key={attachment.file.id}
+                    href={`/api/files/public/${attachment.file.id}/download`}
+                    className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline"
+                  >
+                    <Paperclip size={12} />
+                    {attachment.file.originalName}
+                  </a>
+                ) : (
+                  <span
+                    key={attachment.file.id}
+                    className="inline-flex items-center gap-2 rounded-full border border-amber-300/70 bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-800"
+                  >
+                    <Info size={12} />
+                    {attachment.file.originalName} (Pending verification)
+                  </span>
+                )
               ))}
             </div>
           </div>

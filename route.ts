@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const tokens = await tokenResponse.json();
 
     if (!tokenResponse.ok) {
-      console.error("[Google Auth] Token Error:", tokens);
+      console.error("[Google Auth] Token exchange failed");
       throw new Error("Failed to retrieve tokens");
     }
 
@@ -92,8 +92,8 @@ export async function GET(request: NextRequest) {
 
     return response;
 
-  } catch (err) {
-    console.error("[Google Auth] Callback Error:", err);
+  } catch {
+    console.error("[Google Auth] Callback Error");
     return NextResponse.redirect(new URL("/auth/login?error=auth_failed", appUrl));
   }
 }
