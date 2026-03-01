@@ -11,8 +11,16 @@ const loginSchema = z.object({
   email: z.string().email().toLowerCase(),
   password: z.string().min(1),
   rememberMe: z.boolean().optional().default(false),
-  expectedRole: z.enum(["TEACHER", "STUDENT"]).optional(),
+  expectedRole: z.enum(["TEACHER", "STUDENT", "ADMIN"]).optional(),
 });
+
+function parseAdminAllowlist() {
+  const raw = process.env.ADMIN_EMAIL_ALLOWLIST ?? "";
+  return raw
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
 
 export async function POST(request: Request) {
   try {
@@ -55,8 +63,19 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("FORBIDDEN", "This login is for teacher accounts only"), { status: 403 });
     }
 
-    if (expectedRole === "STUDENT" && user.role === "TEACHER") {
-      return NextResponse.json(failure("FORBIDDEN", "Use teacher login for teacher accounts"), { status: 403 });
+    if (expectedRole === "STUDENT" && user.role !== "USER") {
+      return NextResponse.json(failure("FORBIDDEN", "Use the correct portal for your account type"), { status: 403 });
+    }
+
+    if (expectedRole === "ADMIN" && user.role !== "ADMIN") {
+      return NextResponse.json(failure("FORBIDDEN", "This login is for admin accounts only"), { status: 403 });
+    }
+
+    if (expectedRole === "ADMIN") {
+      const allowlist = parseAdminAllowlist();
+      if (allowlist.length > 0 && !allowlist.includes(user.email.toLowerCase())) {
+        return NextResponse.json(failure("FORBIDDEN", "Admin email is not allowed"), { status: 403 });
+      }
     }
 
     const token = await signSession({

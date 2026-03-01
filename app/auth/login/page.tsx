@@ -17,6 +17,7 @@ export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
   const isTeacherLogin = pathname === "/auth/teacher/login";
+  const isAdminLogin = pathname === "/auth/admin/login";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -50,6 +51,7 @@ export default function LoginPage() {
           password,
           rememberMe,
           ...(isTeacherLogin ? { expectedRole: "TEACHER" } : {}),
+          ...(isAdminLogin ? { expectedRole: "ADMIN" } : {}),
         }),
       });
 
@@ -181,9 +183,13 @@ export default function LoginPage() {
             <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 p-6 shadow-[var(--shadow-lg)] backdrop-blur sm:p-8">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Sign in</h2>
+                  <h2 className="text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))]">
+                    {isAdminLogin ? "Admin sign in" : "Sign in"}
+                  </h2>
                   <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
-                    {isTeacherLogin
+                    {isAdminLogin
+                      ? "Sign in with an existing admin account. Public admin signup is disabled."
+                      : isTeacherLogin
                       ? "Sign in with your teacher account. Admin approval controls file verification access."
                       : "Continue to your StudyVault dashboard."}
                   </p>
@@ -202,9 +208,11 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                {isTeacherLogin ? (
+                {isTeacherLogin || isAdminLogin ? (
                   <div className="rounded-[var(--radius-md)] border border-amber-400/50 bg-amber-100/70 px-3 py-2 text-xs text-amber-900">
-                    Teacher login uses teacher credentials. Google quick login is disabled for the teacher portal.
+                    {isAdminLogin
+                      ? "Admin login uses admin credentials. Google quick login is disabled for the admin portal."
+                      : "Teacher login uses teacher credentials. Google quick login is disabled for the teacher portal."}
                   </div>
                 ) : googleEnabled ? (
                   <>
@@ -274,15 +282,26 @@ export default function LoginPage() {
 
                 <p className="text-center text-sm text-[rgb(var(--text-secondary))]">
                   New to StudyVault?{" "}
-                  <Link href={isTeacherLogin ? "/auth/teacher/signup" : "/auth/signup"} className="font-semibold">
+                  <Link
+                    href={isTeacherLogin ? "/auth/teacher/signup" : isAdminLogin ? "/auth/signup" : "/auth/signup"}
+                    className="font-semibold"
+                  >
                     {isTeacherLogin ? "Teacher signup" : "Create account"}
                   </Link>
                 </p>
-                {!isTeacherLogin ? (
+                {!isTeacherLogin && !isAdminLogin ? (
                   <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
                     Teacher account?{" "}
                     <Link href="/auth/teacher/login" className="font-semibold">
                       Use dedicated teacher sign in
+                    </Link>
+                  </p>
+                ) : null}
+                {!isAdminLogin ? (
+                  <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
+                    Administrator?{" "}
+                    <Link href="/auth/admin/login" className="font-semibold">
+                      Use admin sign in
                     </Link>
                   </p>
                 ) : null}

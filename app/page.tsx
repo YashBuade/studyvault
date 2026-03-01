@@ -43,6 +43,9 @@ export default async function HomePage() {
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo size="md" showText href="/" />
           <div className="flex items-center gap-3">
+            <Link href="/auth/admin/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
+              Admin Portal
+            </Link>
             <Link href="/auth/teacher/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
               Teacher Portal
             </Link>
