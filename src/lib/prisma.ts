@@ -4,11 +4,20 @@ import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-function createPrismaClient() {
-  const pooled = process.env.DATABASE_URL;
-  const direct = process.env.DIRECT_URL;
+function asValidConnectionString(value: string | undefined) {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  if (trimmed.includes("${")) return undefined;
+  if (!trimmed.startsWith("postgresql://")) return undefined;
+  return trimmed;
+}
 
-  const runtimeUrl = process.env.DATABASE_RUNTIME_URL || pooled || direct;
+function createPrismaClient() {
+  const pooled = asValidConnectionString(process.env.DATABASE_URL);
+  const direct = asValidConnectionString(process.env.DIRECT_URL);
+  const runtimeOverride = asValidConnectionString(process.env.DATABASE_RUNTIME_URL);
+  const runtimeUrl = runtimeOverride || pooled || direct;
 
   if (!pooled && runtimeUrl) {
     process.env.DATABASE_URL = runtimeUrl;
