@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoutButton } from "@/components/dashboard/logout-button";
@@ -27,6 +28,8 @@ export default async function DashboardLayout({
 
       <DashboardSidebar
         isAdmin={user.role === "ADMIN"}
+        isTeacher={user.role === "TEACHER"}
+        teacherStatus={user.teacherVerificationStatus}
         isVerifiedTeacher={user.role === "TEACHER" && user.teacherVerificationStatus === "APPROVED"}
       />
       <div className="md:pl-72">
@@ -70,6 +73,15 @@ export default async function DashboardLayout({
                 Teacher verification is pending admin approval. Reviewer tools unlock after approval.
               </div>
             ) : null}
+            <section className="mb-5 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-xs)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[rgb(var(--text-tertiary))]">Quick Start</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <Link href="/dashboard/notes" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">1. Capture notes</Link>
+                <Link href="/dashboard/upload-center" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">2. Upload files</Link>
+                <Link href="/dashboard/planner" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">3. Plan your week</Link>
+                <Link href="/notes" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">4. Explore public library</Link>
+              </div>
+            </section>
             <PageTransition>{children}</PageTransition>
           </div>
         </main>

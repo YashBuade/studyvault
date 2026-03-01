@@ -161,6 +161,7 @@ export function PublicNotesClient() {
   const [semesterDraft, setSemesterDraft] = useState("");
   const [tagDraft, setTagDraft] = useState("");
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [libraryMode, setLibraryMode] = useState<"browse" | "share" | "all">("browse");
   const hydratedPrefs = useRef(false);
 
   const { pushToast } = useToast();
@@ -488,6 +489,47 @@ export function PublicNotesClient() {
         </div>
       </Card>
 
+      <Card title="Choose Your Mode" description="Pick a focused mode to avoid information overload.">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setLibraryMode("browse")}
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              libraryMode === "browse"
+                ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+            }`}
+          >
+            <Search size={12} />
+            Browse Content
+          </button>
+          <button
+            type="button"
+            onClick={() => setLibraryMode("share")}
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              libraryMode === "share"
+                ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+            }`}
+          >
+            <FileUp size={12} />
+            Share Your Notes
+          </button>
+          <button
+            type="button"
+            onClick={() => setLibraryMode("all")}
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              libraryMode === "all"
+                ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+            }`}
+          >
+            <LayoutGrid size={12} />
+            Full Workspace
+          </button>
+        </div>
+      </Card>
+
       <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))]">
         <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-center">
           <div>
@@ -521,6 +563,7 @@ export function PublicNotesClient() {
         </div>
       </Card>
 
+      {libraryMode !== "browse" ? (
       <Card title="Upload to Public Library" description="Share your notes, images, and documents with student-friendly categorization.">
         <div className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -583,7 +626,9 @@ export function PublicNotesClient() {
           </div>
         </div>
       </Card>
+      ) : null}
 
+      {libraryMode === "all" ? (
       <Card title="Advanced Library Controls" description="Optional: customize category, semester, and tag presets used in uploads and filters.">
         <button
           type="button"
@@ -712,7 +757,9 @@ export function PublicNotesClient() {
           </p>
         )}
       </Card>
+      ) : null}
 
+      {libraryMode !== "share" ? (
       <Card title="Find Notes Quickly" description="Use search and filters below to discover relevant notes fast.">
         <div className="space-y-3">
           <div className="relative">
@@ -843,12 +890,13 @@ export function PublicNotesClient() {
           ) : null}
         </div>
       </Card>
+      ) : null}
 
-      {visibleNotes.length === 0 ? (
+      {libraryMode !== "share" && visibleNotes.length === 0 ? (
         <Card>
           <p className="text-sm text-[rgb(var(--text-secondary))]">No matching public notes yet. Try a different filter or publish one above.</p>
         </Card>
-      ) : (
+      ) : libraryMode !== "share" ? (
         <div className={noteView === "grid" ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
           {visibleNotes.map((note) => (
             <Card key={note.id} className={noteView === "grid" ? "h-full" : ""}>
@@ -909,9 +957,9 @@ export function PublicNotesClient() {
             </Card>
           ))}
         </div>
-      )}
+      ) : null}
 
-      {hasMore ? (
+      {libraryMode !== "share" && hasMore ? (
         <div className="flex justify-center">
           <Button variant="secondary" loading={loading} onClick={() => void loadNotes({ reset: false, cursor })}>
             Load More Notes
@@ -919,6 +967,7 @@ export function PublicNotesClient() {
         </div>
       ) : null}
 
+      {libraryMode !== "share" ? (
       <Card title="Public Files & Images" description="Quick access to shared PDFs, docs, and images from the student community.">
         <div className="mb-3 space-y-2">
           <Input value={filesSearch} onChange={(event) => setFilesSearch(event.target.value)} placeholder="Search public files..." />
@@ -981,6 +1030,7 @@ export function PublicNotesClient() {
           </div>
         ) : null}
       </Card>
+      ) : null}
     </div>
   );
 }

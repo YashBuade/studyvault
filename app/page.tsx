@@ -97,6 +97,23 @@ export default async function HomePage() {
         </section>
 
         <section className="px-4 pb-20 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-6 grid w-full max-w-6xl gap-3 md:grid-cols-3">
+            <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)]">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Students</p>
+              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Use notes, files, planner, assignments, and exams in one dashboard.</p>
+              <Link href="/auth/signup" className="mt-3 inline-flex text-sm font-semibold">Create student account</Link>
+            </div>
+            <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)]">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Teachers</p>
+              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Sign up with college ID and expertise, then review uploaded files after admin approval.</p>
+              <Link href="/auth/teacher/signup" className="mt-3 inline-flex text-sm font-semibold">Open teacher signup</Link>
+            </div>
+            <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)]">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Admins</p>
+              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Validate teachers, manage quality checks, and moderate reported public content.</p>
+              <Link href="/auth/admin/login" className="mt-3 inline-flex text-sm font-semibold">Open admin portal</Link>
+            </div>
+          </div>
           <div className="mx-auto mb-6 max-w-6xl">
             <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] to-[rgb(var(--surface-hover))] p-6 shadow-[var(--shadow-md)] animate-slide-up">
               <h2 className="text-2xl font-semibold tracking-tight text-[rgb(var(--text-primary))]">Everything in one learning cockpit</h2>
