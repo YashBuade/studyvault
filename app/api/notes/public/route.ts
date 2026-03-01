@@ -60,6 +60,13 @@ export async function GET(request: Request) {
         createdAt: true,
         user: { select: { name: true } },
         attachments: {
+          where: {
+            file: {
+              isPublic: true,
+              deletedAt: null,
+              verificationStatus: "VERIFIED",
+            },
+          },
           select: {
             file: { select: { id: true, originalName: true } },
           },

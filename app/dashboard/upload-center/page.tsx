@@ -8,6 +8,10 @@ type UploadRecord = {
   id: number;
   originalName: string;
   size: number;
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationNotes: string | null;
+  verifiedAt: Date | null;
+  verifiedBy: { id: number; name: string; email: string } | null;
   deletedAt: Date | null;
 };
 
@@ -26,12 +30,23 @@ export default async function UploadCenterPage() {
       id: true,
       originalName: true,
       size: true,
+      verificationStatus: true,
+      verificationNotes: true,
+      verifiedAt: true,
+      verifiedBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       deletedAt: true,
     },
   })) as UploadRecord[];
 
   const initialFiles = files.map((file) => ({
     ...file,
+    verifiedAt: file.verifiedAt ? file.verifiedAt.toISOString() : null,
     deletedAt: file.deletedAt ? file.deletedAt.toISOString() : null,
   }));
 

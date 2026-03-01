@@ -1,9 +1,8 @@
-import { readFile } from "fs/promises";
-import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { failure } from "@/lib/api/response";
 import { logError } from "@/lib/api/logger";
+import { downloadObject } from "@/lib/supabase-storage";
 
 export async function GET(_request: NextRequest, context: { params: Promise<{ id: string; }> }) {
   const params = await context.params;
@@ -20,17 +19,30 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
       },
       select: {
         file: {
-          select: { path: true, mimeType: true, size: true, originalName: true, deletedAt: true },
+          select: {
+            path: true,
+            mimeType: true,
+            size: true,
+            originalName: true,
+            deletedAt: true,
+            isPublic: true,
+            verificationStatus: true,
+          },
         },
       },
     });
 
-    if (!attachment?.file || attachment.file.deletedAt) {
+    if (
+      !attachment?.file ||
+      attachment.file.deletedAt ||
+      !attachment.file.isPublic ||
+      attachment.file.verificationStatus !== "VERIFIED"
+    ) {
       return NextResponse.json(failure("NOT_FOUND", "File not found"), { status: 404 });
     }
 
-    const diskPath = path.join(process.cwd(), "public", attachment.file.path.replace(/^\//, ""));
-    const buffer = await readFile(diskPath);
+    const objectPath = attachment.file.path.replace(/^\/?uploads\//, "");
+    const buffer = await downloadObject(objectPath);
 
     return new NextResponse(buffer, {
       status: 200,

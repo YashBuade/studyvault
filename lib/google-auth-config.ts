@@ -11,6 +11,11 @@ function normalizeBaseUrl(value: string) {
   return value.replace(/\/+$/, "");
 }
 
+function firstForwardedValue(value: string | null) {
+  if (!value) return null;
+  return value.split(",")[0]?.trim() || null;
+}
+
 function parseAllowedOrigins() {
   const raw = process.env.GOOGLE_OAUTH_ALLOWED_ORIGINS ?? "";
   return raw
@@ -25,8 +30,8 @@ export function resolveRequestOrigin(request: Request) {
   const directOrigin = normalizeBaseUrl(requestUrl.origin);
   const appUrl = normalizeBaseUrl(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
 
-  const forwardedHost = request.headers.get("x-forwarded-host")?.trim();
-  const forwardedProto = request.headers.get("x-forwarded-proto")?.trim();
+  const forwardedHost = firstForwardedValue(request.headers.get("x-forwarded-host"));
+  const forwardedProto = firstForwardedValue(request.headers.get("x-forwarded-proto"));
   const forwardedOrigin =
     forwardedHost && forwardedProto ? normalizeBaseUrl(`${forwardedProto}://${forwardedHost}`) : null;
 

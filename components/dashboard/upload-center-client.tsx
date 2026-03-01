@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { Search, Trash2, UploadCloud, RotateCcw } from "lucide-react";
+import { BadgeCheck, Clock3, RotateCcw, Search, Trash2, UploadCloud, XCircle } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -13,13 +13,17 @@ type UserFile = {
   id: number;
   originalName: string;
   size: number;
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationNotes?: string | null;
+  verifiedAt?: string | null;
+  verifiedBy?: { id: number; name: string; email: string } | null;
   deletedAt?: string | null;
 };
 
 type ApiResponse<T> = {
   ok: boolean;
   data?: T;
-  error?: { message: string };
+  error?: { message: string; details?: unknown };
   meta?: { hasMore?: boolean; nextCursor?: number | null };
 };
 
@@ -80,7 +84,13 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
     const payload = (await response.json()) as ApiResponse<UserFile>;
 
     if (!response.ok || !payload.ok || !payload.data) {
-      setMessage(payload.error?.message ?? "Upload failed.");
+      const detailText =
+        typeof payload.error?.details === "object" && payload.error?.details && "details" in payload.error.details
+          ? String((payload.error.details as { details?: string }).details || "")
+          : typeof payload.error?.details === "string"
+            ? payload.error.details
+            : "";
+      setMessage([payload.error?.message ?? "Upload failed.", detailText].filter(Boolean).join(" | "));
       setLoading(false);
       return;
     }
@@ -205,6 +215,25 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                   <div>
                     <p className="text-sm font-medium">{file.originalName}</p>
                     <p className="text-xs text-[var(--muted)]">{formatBytes(file.size)}</p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">
+                      {file.verificationStatus === "VERIFIED" ? (
+                        <span className="inline-flex items-center gap-1 text-emerald-600">
+                          <BadgeCheck size={12} />
+                          Verified by {file.verifiedBy?.name ?? "Teacher"}
+                        </span>
+                      ) : file.verificationStatus === "REJECTED" ? (
+                        <span className="inline-flex items-center gap-1 text-rose-600">
+                          <XCircle size={12} />
+                          Rejected by reviewer
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-amber-600">
+                          <Clock3 size={12} />
+                          Awaiting teacher verification
+                        </span>
+                      )}
+                    </p>
+                    {file.verificationNotes ? <p className="text-xs text-[var(--muted)]">Reviewer note: {file.verificationNotes}</p> : null}
                   </div>
                   {view === "trash" ? (
                     <Button variant="secondary" onClick={() => restoreFile(file.id)}>

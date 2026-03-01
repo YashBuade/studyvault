@@ -2,7 +2,22 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BookOpen, Download, FileUp, Filter, Image as ImageIcon, LayoutGrid, List, Plus, Search, Settings2, Sparkles, Tag, X } from "lucide-react";
+import {
+  BadgeCheck,
+  BookOpen,
+  Download,
+  FileUp,
+  Filter,
+  Image as ImageIcon,
+  LayoutGrid,
+  List,
+  Plus,
+  Search,
+  Settings2,
+  Sparkles,
+  Tag,
+  X,
+} from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
@@ -34,6 +49,9 @@ type PublicFile = {
   originalName: string;
   size: number;
   createdAt: string;
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verifiedAt?: string | null;
+  verifiedBy?: { id: number; name: string } | null;
 };
 
 const STUDENT_CATEGORIES = [
@@ -818,6 +836,12 @@ export function PublicNotesClient() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{file.originalName}</p>
                   <p className="text-xs text-[rgb(var(--text-tertiary))]">{formatFileSize(file.size)}</p>
+                  {file.verificationStatus === "VERIFIED" && file.verifiedBy ? (
+                    <p className="mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-100/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                      <BadgeCheck size={11} />
+                      Verified by {file.verifiedBy.name}
+                    </p>
+                  ) : null}
                   <p className="mt-1 inline-flex rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
                     {inferFileKind(file.originalName)}
                   </p>

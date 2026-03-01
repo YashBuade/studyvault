@@ -1,8 +1,8 @@
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SUPABASE_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET;
-
 function getStorageConfig() {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const SUPABASE_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET;
+
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_STORAGE_BUCKET) {
     throw new Error("SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_STORAGE_BUCKET are required.");
   }
@@ -16,7 +16,11 @@ function getStorageConfig() {
 
 function getObjectEndpoint(objectPath: string) {
   const cfg = getStorageConfig();
-  const normalizedPath = objectPath.replace(/^\/+/, "");
+  const normalizedPath = objectPath
+    .replace(/^\/+/, "")
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
   return `${cfg.url}/storage/v1/object/${cfg.bucket}/${normalizedPath}`;
 }
 

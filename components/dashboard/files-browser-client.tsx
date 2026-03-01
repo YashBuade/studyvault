@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Pencil, Search } from "lucide-react";
+import { BadgeCheck, Clock3, Pencil, Search, XCircle } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
@@ -13,6 +13,10 @@ type UserFile = {
   originalName: string;
   mimeType: string;
   size: number;
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationNotes?: string | null;
+  verifiedAt?: string | null;
+  verifiedBy?: { id: number; name: string; email: string } | null;
   deletedAt: string | null;
 };
 
@@ -101,6 +105,25 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
               <div>
                 <p className="text-sm font-medium">{file.originalName}</p>
                 <p className="text-xs text-[var(--muted)]">{file.mimeType} - {formatBytes(file.size)}</p>
+                <p className="mt-1 text-xs text-[var(--muted)]">
+                  {file.verificationStatus === "VERIFIED" ? (
+                    <span className="inline-flex items-center gap-1 text-emerald-600">
+                      <BadgeCheck size={12} />
+                      Verified by {file.verifiedBy?.name ?? "Teacher"}
+                    </span>
+                  ) : file.verificationStatus === "REJECTED" ? (
+                    <span className="inline-flex items-center gap-1 text-rose-600">
+                      <XCircle size={12} />
+                      Rejected by reviewer
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-amber-600">
+                      <Clock3 size={12} />
+                      Awaiting teacher verification
+                    </span>
+                  )}
+                </p>
+                {file.verificationNotes ? <p className="mt-1 text-xs text-[var(--muted)]">Reviewer note: {file.verificationNotes}</p> : null}
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="secondary" onClick={() => startEdit(file)}>

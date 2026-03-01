@@ -9,6 +9,10 @@ type FileRecord = {
   originalName: string;
   mimeType: string;
   size: number;
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationNotes: string | null;
+  verifiedAt: Date | null;
+  verifiedBy: { id: number; name: string; email: string } | null;
   deletedAt: Date | null;
 };
 
@@ -23,10 +27,28 @@ export default async function MyFilesPage() {
     where: { userId, deletedAt: null },
     orderBy: { createdAt: "desc" },
     take: 10,
+    select: {
+      id: true,
+      originalName: true,
+      mimeType: true,
+      size: true,
+      verificationStatus: true,
+      verificationNotes: true,
+      verifiedAt: true,
+      verifiedBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      deletedAt: true,
+    },
   })) as FileRecord[];
 
   const initialFiles = files.map((file) => ({
     ...file,
+    verifiedAt: file.verifiedAt ? file.verifiedAt.toISOString() : null,
     deletedAt: file.deletedAt ? file.deletedAt.toISOString() : null,
   }));
 

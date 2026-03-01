@@ -25,7 +25,10 @@ export default async function DashboardLayout({
         <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-indigo-300/20 blur-3xl dark:bg-indigo-500/15" />
       </div>
 
-      <DashboardSidebar isAdmin={user.role === "ADMIN"} />
+      <DashboardSidebar
+        isAdmin={user.role === "ADMIN"}
+        isVerifiedTeacher={user.role === "TEACHER" && user.teacherVerificationStatus === "APPROVED"}
+      />
       <div className="md:pl-72">
         <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/90 backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
@@ -42,6 +45,15 @@ export default async function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4">
+              <div className="hidden rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] sm:block">
+                {user.role === "ADMIN"
+                  ? "Admin"
+                  : user.role === "TEACHER"
+                    ? user.teacherVerificationStatus === "APPROVED"
+                      ? "Verified Teacher"
+                      : "Teacher Pending"
+                    : "Student"}
+              </div>
               <div className="hidden rounded-full bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs font-medium text-[rgb(var(--text-secondary))] sm:block">
                 {user.name || user.email}
               </div>
@@ -53,6 +65,11 @@ export default async function DashboardLayout({
 
         <main className="px-4 py-6 sm:px-6 md:px-8 md:py-8">
           <div className="mx-auto max-w-7xl">
+            {user.role === "TEACHER" && user.teacherVerificationStatus !== "APPROVED" ? (
+              <div className="mb-4 rounded-[var(--radius-md)] border border-amber-300/70 bg-amber-50/80 px-4 py-3 text-sm text-amber-800">
+                Teacher verification is pending admin approval. Reviewer tools unlock after approval.
+              </div>
+            ) : null}
             <PageTransition>{children}</PageTransition>
           </div>
         </main>

@@ -24,6 +24,11 @@ export async function getCurrentUser() {
       createdAt: true,
       onboardingSeen: true,
       role: true,
+      collegeId: true,
+      department: true,
+      teacherVerificationStatus: true,
+      teacherReviewNotes: true,
+      teacherVerifiedAt: true,
     },
   });
 }

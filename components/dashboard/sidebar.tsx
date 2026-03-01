@@ -41,7 +41,13 @@ const navItems = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ] as const;
 
-export function DashboardSidebar({ isAdmin }: { isAdmin: boolean }) {
+export function DashboardSidebar({
+  isAdmin,
+  isVerifiedTeacher,
+}: {
+  isAdmin: boolean;
+  isVerifiedTeacher: boolean;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -97,6 +103,22 @@ export function DashboardSidebar({ isAdmin }: { isAdmin: boolean }) {
               <NavItem href="/dashboard/admin" active={pathname === "/dashboard/admin"}>
                 <Shield size={16} />
                 Admin Panel
+              </NavItem>
+              <NavItem href="/dashboard/admin/teachers" active={pathname === "/dashboard/admin/teachers"}>
+                <User size={16} />
+                Teacher Approval
+              </NavItem>
+            </div>
+          </div>
+        ) : null}
+
+        {isVerifiedTeacher ? (
+          <div className="mt-4 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Teacher</p>
+            <div className="mt-2">
+              <NavItem href="/dashboard/teacher/review" active={pathname === "/dashboard/teacher/review"}>
+                <Shield size={16} />
+                File Verification
               </NavItem>
             </div>
           </div>

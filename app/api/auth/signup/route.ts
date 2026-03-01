@@ -11,6 +11,9 @@ const signupSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.string().email().toLowerCase(),
   password: z.string().min(6).max(100),
+  role: z.enum(["STUDENT", "TEACHER"]).default("STUDENT"),
+  collegeId: z.string().min(3).max(120).optional(),
+  department: z.string().min(2).max(120).optional(),
 });
 
 export async function POST(request: Request) {
@@ -24,7 +27,14 @@ export async function POST(request: Request) {
       });
     }
 
-    const { name, email, password } = parsed.data;
+    const { name, email, password, role, collegeId, department } = parsed.data;
+    if (role === "TEACHER" && (!collegeId?.trim() || !department?.trim())) {
+      return NextResponse.json(
+        failure("VALIDATION_ERROR", "College ID and department are required for teacher registration"),
+        { status: 400 }
+      );
+    }
+
     const existing = await withDbRetry(() => prisma.user.findUnique({ where: { email } }));
 
     if (existing) {
@@ -38,6 +48,10 @@ export async function POST(request: Request) {
           name,
           email,
           passwordHash,
+          role: role === "TEACHER" ? "TEACHER" : "USER",
+          collegeId: role === "TEACHER" ? collegeId?.trim() : null,
+          department: role === "TEACHER" ? department?.trim() : null,
+          teacherVerificationStatus: role === "TEACHER" ? "PENDING" : "NONE",
         },
       })
     );

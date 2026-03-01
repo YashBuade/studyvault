@@ -38,6 +38,27 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      select: {
+        id: true,
+        originalName: true,
+        storedName: true,
+        path: true,
+        mimeType: true,
+        size: true,
+        isPublic: true,
+        verificationStatus: true,
+        verificationNotes: true,
+        verifiedAt: true,
+        createdAt: true,
+        deletedAt: true,
+        verifiedBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
 
     const hasMore = files.length > limit;

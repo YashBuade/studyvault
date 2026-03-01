@@ -40,11 +40,20 @@ model User {
   avatarUrl         String?
   onboardingSeen    Boolean           @default(false)
   role              UserRole          @default(USER)
+  collegeId         String?           @db.VarChar(120)
+  department        String?           @db.VarChar(120)
+  teacherVerificationStatus TeacherVerificationStatus @default(NONE)
+  teacherReviewNotes String?          @db.Text
+  teacherVerifiedAt DateTime?
+  teacherReviewedById Int?
+  teacherReviewedBy User?             @relation("TeacherReviewAdmin", fields: [teacherReviewedById], references: [id], onDelete: SetNull)
+  reviewedTeachers  User[]            @relation("TeacherReviewAdmin")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   passwordChanged   DateTime          @default(now())
   notes             Note[]
-  files             File[]
+  files             File[]            @relation("FileOwner")
+  verifiedFiles     File[]            @relation("FileVerifier")
   plannerCategories PlannerCategory[]
   plannerItems      PlannerItem[]
   assignments       Assignment[]
@@ -58,6 +67,8 @@ model User {
   noteRatings       NoteRating[]
   noteBookmarks     NoteBookmark[]
   noteShares        NoteShare[]       @relation("NoteShareCreator")
+
+  @@index([role, teacherVerificationStatus])
 }
 
 model Note {
@@ -180,14 +191,20 @@ model File {
   mimeType     String
   size         Int
   isPublic     Boolean   @default(true)
+  verificationStatus FileVerificationStatus @default(PENDING)
+  verificationNotes String? @db.Text
+  verifiedAt DateTime?
+  verifiedById Int?
+  verifiedBy User? @relation("FileVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
   createdAt    DateTime  @default(now())
   deletedAt    DateTime?
   userId       Int
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation("FileOwner", fields: [userId], references: [id], onDelete: Cascade)
   attachments  NoteAttachment[]
 
   @@index([userId, deletedAt])
-  @@index([isPublic, deletedAt])
+  @@index([isPublic, verificationStatus, deletedAt])
+  @@index([verificationStatus, deletedAt])
 }
 
 model NoteAttachment {
@@ -294,7 +311,21 @@ model ResourceItem {
 
 enum UserRole {
   USER
+  TEACHER
   ADMIN
+}
+
+enum TeacherVerificationStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum FileVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 enum ReportStatus {

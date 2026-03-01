@@ -22,13 +22,14 @@ type GoogleUserInfo = {
 
 export async function GET(request: Request) {
   const origin = resolveRequestOrigin(request);
+  const secureCookies = origin.startsWith("https://");
   const config = getGoogleOAuthConfig(origin);
-  const appUrl = config?.appUrl || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = config?.appUrl || origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const loginUrl = new URL("/auth/login", appUrl);
   const clearStateCookie = (response: NextResponse) => {
     response.cookies.set("google_oauth_state", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: secureCookies,
       sameSite: "lax",
       path: "/",
       maxAge: 0,
@@ -128,7 +129,7 @@ export async function GET(request: Request) {
       name: user.name,
     });
 
-    const response = clearStateCookie(NextResponse.redirect(new URL("/dashboard", appUrl)));
+    const response = clearStateCookie(NextResponse.redirect(new URL("/dashboard", origin || appUrl)));
     response.cookies.set(AUTH_COOKIE_NAME, sessionToken, getCookieOptions({ rememberMe: true }));
     return response;
   } catch (error) {

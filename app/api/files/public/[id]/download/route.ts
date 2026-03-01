@@ -13,7 +13,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
     }
 
     const file = await prisma.file.findUnique({ where: { id: fileId } });
-    if (!file || !file.isPublic || file.deletedAt) {
+    if (!file || !file.isPublic || file.deletedAt || file.verificationStatus !== "VERIFIED") {
       return NextResponse.json(failure("NOT_FOUND", "File not found"), { status: 404 });
     }
 

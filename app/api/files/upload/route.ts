@@ -46,6 +46,7 @@ export async function POST(request: Request) {
           mimeType: file.type || "application/octet-stream",
           size: file.size,
           isPublic,
+          verificationStatus: isPublic ? "PENDING" : "VERIFIED",
           userId,
         },
       });
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     logError("files.upload_failed", error);
-    return NextResponse.json(failure("INTERNAL_ERROR", "Unable to upload file"), { status: 503 });
+    const details = error instanceof Error ? error.message : "Unknown upload error";
+    return NextResponse.json(failure("INTERNAL_ERROR", "Unable to upload file", { details }), { status: 503 });
   }
 }

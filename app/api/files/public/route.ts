@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     const files = await prisma.file.findMany({
       where: {
         isPublic: true,
+        verificationStatus: "VERIFIED",
         deletedAt: null,
         ...(q ? { originalName: { contains: q } } : {}),
       },
@@ -24,6 +25,14 @@ export async function GET(request: Request) {
         originalName: true,
         size: true,
         createdAt: true,
+        verificationStatus: true,
+        verifiedAt: true,
+        verifiedBy: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 

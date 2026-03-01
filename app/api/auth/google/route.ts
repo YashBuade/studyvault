@@ -5,6 +5,7 @@ import { getGoogleOAuthConfig, resolveRequestOrigin } from "@/lib/google-auth-co
 export async function GET(request: Request) {
   const origin = resolveRequestOrigin(request);
   const config = getGoogleOAuthConfig(origin);
+  const secureCookies = origin.startsWith("https://");
 
   if (!config) {
     return NextResponse.redirect(new URL("/auth/login?error=google_not_configured", request.url));
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   const response = NextResponse.redirect(url);
   response.cookies.set("google_oauth_state", state, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 10,

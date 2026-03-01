@@ -18,6 +18,13 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ sl
         createdAt: true,
         user: { select: { id: true, name: true } },
         attachments: {
+          where: {
+            file: {
+              isPublic: true,
+              deletedAt: null,
+              verificationStatus: "VERIFIED",
+            },
+          },
           select: {
             file: { select: { id: true, originalName: true } },
           },

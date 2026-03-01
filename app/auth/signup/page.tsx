@@ -24,6 +24,9 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"STUDENT" | "TEACHER">("STUDENT");
+  const [collegeId, setCollegeId] = useState("");
+  const [department, setDepartment] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -46,11 +49,17 @@ export default function SignupPage() {
       return;
     }
 
+    if (role === "TEACHER" && (!collegeId.trim() || !department.trim())) {
+      setError("College ID and department are required for teacher signup.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role, collegeId, department }),
       });
 
       const data = (await response.json()) as AuthErrorResponse;
@@ -238,6 +247,47 @@ export default function SignupPage() {
                     placeholder="you@example.com"
                     required
                   />
+
+                  <div className="space-y-2">
+                    <label htmlFor="role" className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                      Account type
+                    </label>
+                    <select
+                      id="role"
+                      className="input"
+                      value={role}
+                      onChange={(event) => setRole(event.target.value as "STUDENT" | "TEACHER")}
+                    >
+                      <option value="STUDENT">Student</option>
+                      <option value="TEACHER">Teacher</option>
+                    </select>
+                  </div>
+
+                  {role === "TEACHER" ? (
+                    <>
+                      <ModernInput
+                        id="collegeId"
+                        label="College ID"
+                        type="text"
+                        value={collegeId}
+                        onChange={(event) => setCollegeId(event.target.value)}
+                        placeholder="Faculty ID / Employee ID"
+                        required
+                      />
+                      <ModernInput
+                        id="department"
+                        label="Department"
+                        type="text"
+                        value={department}
+                        onChange={(event) => setDepartment(event.target.value)}
+                        placeholder="Computer Science"
+                        required
+                      />
+                      <p className="text-xs text-[rgb(var(--text-secondary))]">
+                        Teacher accounts are activated only after admin verification.
+                      </p>
+                    </>
+                  ) : null}
 
                   <div className="space-y-2">
                     <label htmlFor="password" className="text-sm font-semibold text-[rgb(var(--text-primary))]">

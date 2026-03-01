@@ -30,6 +30,15 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
+  const accessUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+
+  if (accessUser?.role === "TEACHER") {
+    redirect("/dashboard/teacher");
+  }
+
   const now = new Date();
   const weekAgo = new Date(now);
   weekAgo.setDate(weekAgo.getDate() - 7);
