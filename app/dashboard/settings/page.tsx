@@ -3,6 +3,7 @@ import { Bell, BookOpenCheck, CalendarCheck2, Lock, MoonStar, ShieldCheck, Spark
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Card } from "@/src/components/ui/card";
+import { ModuleShell } from "@/components/dashboard/module-shell";
 
 const preferences = [
   { icon: Bell, title: "Notifications", description: "Weekly digests and deadline reminders are active." },
@@ -43,7 +44,10 @@ export default function SettingsPage() {
         description="Control workspace behavior, visual preferences, and privacy defaults."
         insight="Set the right theme and workflow defaults once, then keep your daily study sessions friction-free."
       />
-
+      <ModuleShell
+        summary="Use settings once to align your workspace, then focus on study execution with fewer distractions."
+        checklist={["Set preferred theme", "Review security/privacy defaults", "Use quick links to core modules"]}
+      >
       <section className="grid max-w-5xl gap-4 md:grid-cols-2">
         <Card className="md:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -95,6 +99,7 @@ export default function SettingsPage() {
           );
         })}
       </section>
+      </ModuleShell>
     </>
   );
 }

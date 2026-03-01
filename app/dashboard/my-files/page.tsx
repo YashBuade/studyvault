@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { FilesBrowserClient } from "@/components/dashboard/files-browser-client";
+import { ModuleShell } from "@/components/dashboard/module-shell";
 
 type FileRecord = {
   id: number;
@@ -63,7 +64,13 @@ export default async function MyFilesPage() {
             : "Upload your syllabus and core PDFs first to build your semester knowledge base."
         }
       />
-      <FilesBrowserClient initialFiles={initialFiles} />
+      <ModuleShell
+        summary="Use this module to browse, rename, and download your files by study need."
+        checklist={["Use meaningful file names", "Check file verification status", "Keep only needed active files"]}
+        highlights={[{ label: "Recent Files", value: String(files.length) }]}
+      >
+        <FilesBrowserClient initialFiles={initialFiles} />
+      </ModuleShell>
     </>
   );
 }

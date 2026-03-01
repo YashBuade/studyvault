@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { NotesClient } from "@/components/dashboard/notes-client";
+import { ModuleShell } from "@/components/dashboard/module-shell";
 
 type NoteRecord = {
   id: number;
@@ -74,7 +75,16 @@ export default async function NotesPage() {
             : "Start with one master note per subject and update it after each class."
         }
       />
-      <NotesClient initialNotes={initialNotes} />
+      <ModuleShell
+        summary="Capture concise notes, add clear tags/subjects, and keep public notes polished for discovery."
+        checklist={["Create a note per topic", "Tag by subject + unit", "Publish only clean revision-ready notes"]}
+        highlights={[
+          { label: "Recent Notes", value: String(notes.length) },
+          { label: "Public Notes", value: String(notes.filter((note) => note.isPublic).length) },
+        ]}
+      >
+        <NotesClient initialNotes={initialNotes} />
+      </ModuleShell>
     </>
   );
 }

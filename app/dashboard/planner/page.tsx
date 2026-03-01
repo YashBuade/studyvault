@@ -4,6 +4,7 @@ import { getCurrentUserId } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { getPlannerPrompt } from "@/lib/student-insights";
+import { ModuleShell } from "@/components/dashboard/module-shell";
 
 export default async function PlannerPage() {
   const userId = await getCurrentUserId();
@@ -20,7 +21,17 @@ export default async function PlannerPage() {
   return (
     <>
       <PageHeader title="Planner" description="Customize categories, drag-and-drop priorities, and due dates." insight={insight} />
-      <PlannerClient />
+      <ModuleShell
+        summary="Use planner as your execution board: move tasks daily from TODO to IN PROGRESS to DONE."
+        checklist={["Create weekly plan", "Move active tasks to in progress", "Finish with end-of-day cleanup"]}
+        highlights={[
+          { label: "TODO", value: String(todoCount) },
+          { label: "In Progress", value: String(inProgressCount) },
+          { label: "Done", value: String(doneCount) },
+        ]}
+      >
+        <PlannerClient />
+      </ModuleShell>
     </>
   );
 }

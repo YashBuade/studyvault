@@ -6,6 +6,8 @@ import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Modal } from "@/src/components/ui/modal";
 import { useToast } from "@/src/components/ui/toast-provider";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { ModuleShell } from "@/components/dashboard/module-shell";
 
 type Note = { id: number; title: string; deletedAt: string | null };
 type File = { id: number; originalName: string; deletedAt: string | null };
@@ -97,68 +99,84 @@ export default function TrashPage() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <Card title="Trashed Notes" description="Restore notes that were soft-deleted.">
-        <div className="space-y-2">
-          {notes.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No trashed notes.</p>
-          ) : (
-            notes.map((note) => (
-              <div key={note.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
-                <p className="text-sm font-medium">{note.title}</p>
-                <div className="flex items-center gap-2">
-                  <Button variant="secondary" onClick={() => restoreNote(note.id)}>
-                    <RotateCcw size={14} /> Restore
-                  </Button>
-                  <Button variant="danger" onClick={() => setPendingNotePurge(note.id)}>
-                    <Trash2 size={14} /> Delete
-                  </Button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </Card>
-
-      <Card title="Trashed Files" description="Restore file records.">
-        <div className="space-y-2">
-          {files.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No trashed files.</p>
-          ) : (
-            files.map((file) => (
-              <div key={file.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
-                <p className="text-sm font-medium">{file.originalName}</p>
-                <div className="flex items-center gap-2">
-                  <Button variant="secondary" onClick={() => restoreFile(file.id)}>
-                    <RotateCcw size={14} /> Restore
-                  </Button>
-                  <Button variant="danger" onClick={() => setPendingFilePurge(file.id)}>
-                    <Trash2 size={14} /> Delete
-                  </Button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </Card>
-
-      <Modal
-        open={pendingNotePurge !== null}
-        title="Delete note permanently"
-        description="This will remove the note forever. This action cannot be undone."
-        onClose={() => setPendingNotePurge(null)}
-        onConfirm={purgeNote}
-        danger
+    <div className="space-y-5">
+      <PageHeader
+        title="Trash"
+        description="Recover recently deleted notes and files, or permanently remove them."
+        insight="Restore items quickly if removed by mistake. Permanent delete cannot be undone."
       />
+      <ModuleShell
+        summary="Use trash as a safety layer: restore accidental deletions first, and purge only when sure."
+        checklist={["Review deleted notes", "Restore needed files", "Purge only final removals"]}
+        highlights={[
+          { label: "Trashed Notes", value: String(notes.length) },
+          { label: "Trashed Files", value: String(files.length) },
+        ]}
+      >
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card title="Trashed Notes" description="Restore notes that were soft-deleted.">
+          <div className="space-y-2">
+            {notes.length === 0 ? (
+              <p className="text-sm text-[var(--muted)]">No trashed notes.</p>
+            ) : (
+              notes.map((note) => (
+                <div key={note.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+                  <p className="text-sm font-medium">{note.title}</p>
+                  <div className="flex items-center gap-2">
+                    <Button variant="secondary" onClick={() => restoreNote(note.id)}>
+                      <RotateCcw size={14} /> Restore
+                    </Button>
+                    <Button variant="danger" onClick={() => setPendingNotePurge(note.id)}>
+                      <Trash2 size={14} /> Delete
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
 
-      <Modal
-        open={pendingFilePurge !== null}
-        title="Delete file permanently"
-        description="This will remove the file forever. This action cannot be undone."
-        onClose={() => setPendingFilePurge(null)}
-        onConfirm={purgeFile}
-        danger
-      />
+        <Card title="Trashed Files" description="Restore file records.">
+          <div className="space-y-2">
+            {files.length === 0 ? (
+              <p className="text-sm text-[var(--muted)]">No trashed files.</p>
+            ) : (
+              files.map((file) => (
+                <div key={file.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+                  <p className="text-sm font-medium">{file.originalName}</p>
+                  <div className="flex items-center gap-2">
+                    <Button variant="secondary" onClick={() => restoreFile(file.id)}>
+                      <RotateCcw size={14} /> Restore
+                    </Button>
+                    <Button variant="danger" onClick={() => setPendingFilePurge(file.id)}>
+                      <Trash2 size={14} /> Delete
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+
+        <Modal
+          open={pendingNotePurge !== null}
+          title="Delete note permanently"
+          description="This will remove the note forever. This action cannot be undone."
+          onClose={() => setPendingNotePurge(null)}
+          onConfirm={purgeNote}
+          danger
+        />
+
+        <Modal
+          open={pendingFilePurge !== null}
+          title="Delete file permanently"
+          description="This will remove the file forever. This action cannot be undone."
+          onClose={() => setPendingFilePurge(null)}
+          onConfirm={purgeFile}
+          danger
+        />
+      </div>
+      </ModuleShell>
     </div>
   );
 }

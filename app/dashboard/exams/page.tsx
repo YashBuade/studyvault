@@ -3,6 +3,7 @@ import { ExamsClient } from "@/src/components/dashboard/exams-client";
 import { getCurrentUserId } from "@/lib/require-user";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { ModuleShell } from "@/components/dashboard/module-shell";
 
 export default async function ExamsPage() {
   const userId = await getCurrentUserId();
@@ -19,7 +20,13 @@ export default async function ExamsPage() {
   return (
     <>
       <PageHeader title="Exams" description="Track upcoming exams with urgency indicators." insight={insight} />
-      <ExamsClient />
+      <ModuleShell
+        summary="Keep exam dates accurate and prioritize preparation by the nearest exam first."
+        checklist={["Add every exam date", "Mark completed exams", "Review nearest exam daily"]}
+        highlights={[{ label: "Upcoming Exams", value: String(upcoming) }]}
+      >
+        <ExamsClient />
+      </ModuleShell>
     </>
   );
 }
