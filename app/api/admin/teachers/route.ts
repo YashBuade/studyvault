@@ -44,6 +44,8 @@ export async function GET() {
         teacherVerificationStatus: true,
         teacherReviewNotes: true,
         teacherVerifiedAt: true,
+        teacherCollegeIdImagePath: true,
+        teacherCollegeIdImageMimeType: true,
         createdAt: true,
         teacherReviewedBy: {
           select: {

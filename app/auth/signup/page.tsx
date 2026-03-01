@@ -30,6 +30,7 @@ export default function SignupPage() {
   const [role, setRole] = useState<"STUDENT" | "TEACHER">(isTeacherSignup ? "TEACHER" : "STUDENT");
   const [collegeId, setCollegeId] = useState("");
   const [department, setDepartment] = useState("");
+  const [teacherIdPhoto, setTeacherIdPhoto] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,12 +64,27 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
+    if (role === "TEACHER" && !teacherIdPhoto) {
+      setError("Teacher signup requires uploading a photo of your college ID.");
+      setLoading(false);
+      return;
+    }
 
     try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("role", role);
+      formData.append("collegeId", collegeId);
+      formData.append("department", department);
+      if (teacherIdPhoto) {
+        formData.append("teacherIdPhoto", teacherIdPhoto);
+      }
+
       const response = await fetch("/api/auth/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role, collegeId, department }),
+        body: formData,
       });
 
       const data = (await response.json()) as AuthErrorResponse;
@@ -317,6 +333,22 @@ export default function SignupPage() {
                       <p className="text-xs text-[rgb(var(--text-secondary))]">
                         Teacher profile remains pending until admin verifies your College ID and expertise.
                       </p>
+                      <div className="space-y-2">
+                        <label htmlFor="teacherIdPhoto" className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                          College ID Photo
+                        </label>
+                        <input
+                          id="teacherIdPhoto"
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={(event) => setTeacherIdPhoto(event.target.files?.[0] ?? null)}
+                          className="input"
+                          required
+                        />
+                        <p className="text-xs text-[rgb(var(--text-secondary))]">
+                          Upload a clear photo of your college ID card (JPG, PNG, WEBP).
+                        </p>
+                      </div>
                     </>
                   ) : null}
 

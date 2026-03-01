@@ -15,6 +15,8 @@ type TeacherRequest = {
   teacherVerificationStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
   teacherReviewNotes?: string | null;
   teacherVerifiedAt?: string | null;
+  teacherCollegeIdImagePath?: string | null;
+  teacherCollegeIdImageMimeType?: string | null;
   createdAt: string;
   teacherReviewedBy?: { id: number; name: string; email: string } | null;
 };
@@ -85,7 +87,7 @@ export function AdminTeachersClient() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
         <p className="text-sm font-semibold">Teacher requests</p>
-          <p className="text-xs text-[var(--muted)]">Validate each teacher by College ID and expertise before granting reviewer access.</p>
+          <p className="text-xs text-[var(--muted)]">Validate each teacher by College ID, expertise, and uploaded college-ID photo before granting reviewer access.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {(["ALL", "PENDING", "APPROVED", "REJECTED"] as const).map((status) => (
@@ -118,6 +120,21 @@ export function AdminTeachersClient() {
                 <p className="text-xs text-[var(--muted)]">{item.email}</p>
                 <p className="text-xs text-[var(--muted)]">College ID: {item.collegeId || "Not provided"}</p>
                 <p className="text-xs text-[var(--muted)]">Expertise: {item.department || "Not provided"}</p>
+                <p className="text-xs text-[var(--muted)]">
+                  ID Photo:{" "}
+                  {item.teacherCollegeIdImagePath ? (
+                    <a
+                      href={`/api/admin/teachers/${item.id}/id-photo`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold text-[rgb(var(--primary))]"
+                    >
+                      View submitted ID photo
+                    </a>
+                  ) : (
+                    "Not uploaded"
+                  )}
+                </p>
                 <p className="text-xs text-[var(--muted)]">Status: {item.teacherVerificationStatus}</p>
               </div>
               {item.teacherVerificationStatus === "PENDING" ? (

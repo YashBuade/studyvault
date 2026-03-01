@@ -16,7 +16,7 @@ export default async function AdminTeachersPage() {
     <>
       <PageHeader
         title="Teacher Verification"
-        description="Validate teacher accounts by College ID and field expertise before granting expert reviewer access."
+        description="Validate teacher accounts by College ID, field expertise, and ID photo before granting expert reviewer access."
       />
       <ModuleShell
         summary="Review each teacher request carefully before granting expert review permissions."

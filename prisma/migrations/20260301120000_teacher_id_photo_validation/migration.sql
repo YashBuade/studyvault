@@ -1,0 +1,3 @@
+ALTER TABLE "User"
+ADD COLUMN IF NOT EXISTS "teacherCollegeIdImagePath" VARCHAR(300),
+ADD COLUMN IF NOT EXISTS "teacherCollegeIdImageMimeType" VARCHAR(120);

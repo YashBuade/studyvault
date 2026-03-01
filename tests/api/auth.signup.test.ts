@@ -38,6 +38,8 @@ describe("auth signup api", () => {
       teacherVerificationStatus: "NONE",
       teacherReviewNotes: null,
       teacherVerifiedAt: null,
+      teacherCollegeIdImagePath: null,
+      teacherCollegeIdImageMimeType: null,
       teacherReviewedById: null,
       createdAt: new Date(),
       updatedAt: new Date(),

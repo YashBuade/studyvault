@@ -45,6 +45,8 @@ model User {
   teacherVerificationStatus TeacherVerificationStatus @default(NONE)
   teacherReviewNotes String?          @db.Text
   teacherVerifiedAt DateTime?
+  teacherCollegeIdImagePath String?   @db.VarChar(300)
+  teacherCollegeIdImageMimeType String? @db.VarChar(120)
   teacherReviewedById Int?
   teacherReviewedBy User?             @relation("TeacherReviewAdmin", fields: [teacherReviewedById], references: [id], onDelete: SetNull)
   reviewedTeachers  User[]            @relation("TeacherReviewAdmin")
