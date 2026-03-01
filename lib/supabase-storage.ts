@@ -1,3 +1,6 @@
+import { mkdir, readFile, unlink, writeFile } from "fs/promises";
+import path from "path";
+
 function getStorageConfig() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -12,6 +15,19 @@ function getStorageConfig() {
     key: SUPABASE_SERVICE_ROLE_KEY,
     bucket: SUPABASE_STORAGE_BUCKET,
   };
+}
+
+function isLocalObjectPath(objectPath: string) {
+  return objectPath.startsWith("local/");
+}
+
+function getLocalUploadsRoot() {
+  return process.env.LOCAL_UPLOADS_DIR?.trim() || path.join(process.cwd(), "public", "uploads");
+}
+
+function toLocalAbsolutePath(objectPath: string) {
+  const relative = objectPath.replace(/^local\//, "").replace(/^\/+/, "");
+  return path.join(getLocalUploadsRoot(), relative);
 }
 
 function normalizeObjectPath(objectPath: string) {
@@ -93,6 +109,13 @@ function getAuthHeaders(contentType?: string) {
 }
 
 export async function uploadObject(objectPath: string, bytes: ArrayBuffer, contentType: string) {
+  if (isLocalObjectPath(objectPath)) {
+    const absolutePath = toLocalAbsolutePath(objectPath);
+    await mkdir(path.dirname(absolutePath), { recursive: true });
+    await writeFile(absolutePath, Buffer.from(bytes));
+    return;
+  }
+
   const endpoints = getObjectEndpoints(objectPath);
   const blob = new Blob([bytes], { type: contentType });
   await fetchStorageWithFallback(endpoints, {
@@ -106,6 +129,11 @@ export async function uploadObject(objectPath: string, bytes: ArrayBuffer, conte
 }
 
 export async function downloadObject(objectPath: string) {
+  if (isLocalObjectPath(objectPath)) {
+    const absolutePath = toLocalAbsolutePath(objectPath);
+    return readFile(absolutePath);
+  }
+
   const endpoints = getObjectEndpoints(objectPath);
   const response = await fetchStorageWithFallback(endpoints, {
     method: "GET",
@@ -116,6 +144,12 @@ export async function downloadObject(objectPath: string) {
 }
 
 export async function deleteObject(objectPath: string) {
+  if (isLocalObjectPath(objectPath)) {
+    const absolutePath = toLocalAbsolutePath(objectPath);
+    await unlink(absolutePath).catch(() => undefined);
+    return;
+  }
+
   const endpoints = getObjectEndpoints(objectPath);
   try {
     await fetchStorageWithFallback(endpoints, {

@@ -68,10 +68,25 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const extension = path.extname(file.name);
     const unique = `${Date.now()}-${randomBytes(8).toString("hex")}${extension}`;
-    const objectPath = `u-${userId}/${unique}`;
-    const relativePath = `/uploads/${objectPath}`;
+    let objectPath = `u-${userId}/${unique}`;
+    let relativePath = `/uploads/${objectPath}`;
 
-    await uploadObject(objectPath, bytes, mimeType);
+    try {
+      await uploadObject(objectPath, bytes, mimeType);
+    } catch (error) {
+      const message = error instanceof Error ? error.message.toLowerCase() : "";
+      const allowLocalFallback = process.env.LOCAL_UPLOAD_FALLBACK !== "false";
+      const isNetworkStorageFailure = message.includes("supabase storage request failed") || message.includes("fetch failed");
+
+      if (!allowLocalFallback || !isNetworkStorageFailure) {
+        throw error;
+      }
+
+      objectPath = `local/${objectPath}`;
+      relativePath = `/uploads/${objectPath}`;
+      await uploadObject(objectPath, bytes, mimeType);
+      logInfo("files.upload_fallback_local_storage", { userId, objectPath });
+    }
 
     try {
       const created = await prisma.file.create({
