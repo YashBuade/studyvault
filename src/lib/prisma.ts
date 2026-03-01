@@ -8,9 +8,7 @@ function createPrismaClient() {
   const pooled = process.env.DATABASE_URL;
   const direct = process.env.DIRECT_URL;
 
-  const runtimeUrl =
-    process.env.DATABASE_RUNTIME_URL ||
-    (process.env.NODE_ENV === "development" ? direct || pooled : pooled || direct);
+  const runtimeUrl = process.env.DATABASE_RUNTIME_URL || pooled || direct;
 
   if (!pooled && runtimeUrl) {
     process.env.DATABASE_URL = runtimeUrl;
