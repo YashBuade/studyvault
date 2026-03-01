@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
@@ -20,7 +22,16 @@ function createPrismaClient() {
     throw new Error("DATABASE_URL or DIRECT_URL must be set for Prisma.");
   }
 
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: 10,
+    connectionTimeoutMillis: 15000,
+    idleTimeoutMillis: 60000,
+  });
+  const adapter = new PrismaPg(pool);
+
   return new PrismaClient({
+    adapter,
     log: [{ emit: "stdout", level: "error" }, { emit: "stdout", level: "warn" }],
   });
 }
