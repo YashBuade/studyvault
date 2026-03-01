@@ -24,28 +24,47 @@ import {
 import { NavItem } from "@/src/components/ui/nav-item";
 import { Logo } from "@/components/ui/logo";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Gauge },
-  { href: "/dashboard/notes", label: "Notes", icon: FileText },
-  { href: "/dashboard/my-files", label: "My Files", icon: FolderOpen },
-  { href: "/dashboard/upload-center", label: "Upload Center", icon: Upload },
-  { href: "/dashboard/assignments", label: "Assignments", icon: ClipboardList },
-  { href: "/dashboard/planner", label: "Planner", icon: Calendar },
-  { href: "/dashboard/resources", label: "Resources", icon: Library },
-  { href: "/dashboard/exams", label: "Exams", icon: GraduationCap },
-  { href: "/notes", label: "Public Library", icon: Globe },
-  { href: "/dashboard/trash", label: "Trash", icon: Archive },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
-  { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+const navSections = [
+  {
+    label: "Core",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: Gauge },
+      { href: "/dashboard/notes", label: "Notes", icon: FileText },
+      { href: "/dashboard/my-files", label: "My Files", icon: FolderOpen },
+      { href: "/dashboard/upload-center", label: "Upload Center", icon: Upload },
+    ],
+  },
+  {
+    label: "Study Planning",
+    items: [
+      { href: "/dashboard/assignments", label: "Assignments", icon: ClipboardList },
+      { href: "/dashboard/planner", label: "Planner", icon: Calendar },
+      { href: "/dashboard/exams", label: "Exams", icon: GraduationCap },
+      { href: "/dashboard/resources", label: "Resources", icon: Library },
+    ],
+  },
+  {
+    label: "Explore & Account",
+    items: [
+      { href: "/notes", label: "Public Library", icon: Globe },
+      { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
+      { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+      { href: "/dashboard/profile", label: "Profile", icon: User },
+      { href: "/dashboard/settings", label: "Settings", icon: Settings },
+      { href: "/dashboard/trash", label: "Trash", icon: Archive },
+    ],
+  },
 ] as const;
 
 export function DashboardSidebar({
   isAdmin,
+  isTeacher,
+  teacherStatus,
   isVerifiedTeacher,
 }: {
   isAdmin: boolean;
+  isTeacher: boolean;
+  teacherStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
   isVerifiedTeacher: boolean;
 }) {
   const pathname = usePathname();
@@ -81,19 +100,27 @@ export function DashboardSidebar({
           </button>
         </div>
 
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">Workspace</p>
-        <nav className="space-y-1.5">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.href} onClick={() => setOpen(false)}>
-                <NavItem href={item.href} active={pathname === item.href}>
-                  <Icon size={16} />
-                  {item.label}
-                </NavItem>
+        <nav className="space-y-4">
+          {navSections.map((section) => (
+            <div key={section.label}>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">
+                {section.label}
+              </p>
+              <div className="space-y-1.5">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.href} onClick={() => setOpen(false)}>
+                      <NavItem href={item.href} active={pathname === item.href}>
+                        <Icon size={16} />
+                        {item.label}
+                      </NavItem>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </nav>
 
         {isAdmin ? (
@@ -112,14 +139,19 @@ export function DashboardSidebar({
           </div>
         ) : null}
 
-        {isVerifiedTeacher ? (
+        {isTeacher ? (
           <div className="mt-4 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Teacher</p>
             <div className="mt-2">
+              <NavItem href="/dashboard/teacher" active={pathname === "/dashboard/teacher"}>
+                <User size={16} />
+                Teacher Workspace
+              </NavItem>
               <NavItem href="/dashboard/teacher/review" active={pathname === "/dashboard/teacher/review"}>
                 <Shield size={16} />
-                File Verification
+                {isVerifiedTeacher ? "File Verification" : "Verification Pending"}
               </NavItem>
+              <p className="mt-2 text-[11px] text-[rgb(var(--text-tertiary))]">Status: {teacherStatus}</p>
             </div>
           </div>
         ) : null}

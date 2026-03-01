@@ -6,6 +6,7 @@ import {
   BadgeCheck,
   BookOpen,
   Download,
+  Info,
   FileUp,
   Filter,
   Image as ImageIcon,
@@ -14,6 +15,7 @@ import {
   Plus,
   Search,
   Settings2,
+  ChevronDown,
   Sparkles,
   Tag,
   X,
@@ -158,6 +160,7 @@ export function PublicNotesClient() {
   const [categoryDraft, setCategoryDraft] = useState("");
   const [semesterDraft, setSemesterDraft] = useState("");
   const [tagDraft, setTagDraft] = useState("");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const hydratedPrefs = useRef(false);
 
   const { pushToast } = useToast();
@@ -465,6 +468,26 @@ export function PublicNotesClient() {
 
   return (
     <div className="space-y-5">
+      <Card title="Start Here" description="New to StudyVault public sharing? Follow these 3 simple steps.">
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Step 1</p>
+            <p className="mt-1 text-sm font-semibold text-[rgb(var(--text-primary))]">Upload files</p>
+            <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Attach your PDF, docs, or images with clear names.</p>
+          </div>
+          <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Step 2</p>
+            <p className="mt-1 text-sm font-semibold text-[rgb(var(--text-primary))]">Publish note</p>
+            <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Add title, description, category, and tags.</p>
+          </div>
+          <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Step 3</p>
+            <p className="mt-1 text-sm font-semibold text-[rgb(var(--text-primary))]">Expert verification</p>
+            <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Public files are visible after teacher/admin verification.</p>
+          </div>
+        </div>
+      </Card>
+
       <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))]">
         <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-center">
           <div>
@@ -554,10 +577,23 @@ export function PublicNotesClient() {
               Sign in required for upload
             </Link>
           </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))]">
+            <Info size={12} />
+            Uploaded public files will show up after expert verification.
+          </div>
         </div>
       </Card>
 
-      <Card title="Customize Library Controls" description="Manage your own categories, semester presets, and tags used in uploads and filters.">
+      <Card title="Advanced Library Controls" description="Optional: customize category, semester, and tag presets used in uploads and filters.">
+        <button
+          type="button"
+          onClick={() => setAdvancedOpen((prev) => !prev)}
+          className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))]"
+        >
+          {advancedOpen ? "Hide Advanced Controls" : "Show Advanced Controls"}
+          <ChevronDown size={14} className={advancedOpen ? "rotate-180 transition-transform" : "transition-transform"} />
+        </button>
+        {advancedOpen ? (
         <div className="space-y-4">
           <div className="grid gap-3 md:grid-cols-3">
             <div className="space-y-2">
@@ -670,9 +706,14 @@ export function PublicNotesClient() {
             Preferences are saved on this device and automatically applied to upload forms and filters.
           </div>
         </div>
+        ) : (
+          <p className="text-sm text-[rgb(var(--text-secondary))]">
+            Keep this collapsed if you just want to upload and browse without extra setup.
+          </p>
+        )}
       </Card>
 
-      <Card title="Filters & Discovery" description="Find relevant content quickly with category and topic filters.">
+      <Card title="Find Notes Quickly" description="Use search and filters below to discover relevant notes fast.">
         <div className="space-y-3">
           <div className="relative">
             <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[rgb(var(--text-tertiary))]" />
