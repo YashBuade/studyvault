@@ -15,7 +15,7 @@ export default async function AdminTeachersPage() {
     <>
       <PageHeader
         title="Teacher Verification"
-        description="Approve or reject teacher accounts based on submitted college identification."
+        description="Validate teacher accounts by College ID and field expertise before granting expert reviewer access."
       />
       <AdminTeachersClient />
     </>

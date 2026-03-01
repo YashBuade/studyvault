@@ -50,6 +50,8 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
   const [fetching, setFetching] = useState(false);
   const [makePublic, setMakePublic] = useState(true);
   const { pushToast } = useToast();
+  const uploadLimitMb = Number(process.env.NEXT_PUBLIC_FILE_UPLOAD_MAX_MB ?? 4);
+  const uploadLimitBytes = Math.max(1, Math.min(uploadLimitMb, 25)) * 1024 * 1024;
 
   const visible = useMemo(
     () =>
@@ -68,6 +70,10 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
       setMessage("Please select a file to upload.");
       return;
     }
+    if (selectedFile.size > uploadLimitBytes) {
+      setMessage(`Selected file exceeds ${Math.round(uploadLimitBytes / (1024 * 1024))}MB limit.`);
+      return;
+    }
 
     setLoading(true);
     setMessage("");
@@ -76,31 +82,47 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
     formData.append("file", selectedFile);
     formData.append("isPublic", String(makePublic));
 
-    const response = await fetch("/api/files/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("/api/files/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const raw = await response.text();
+      let payload: ApiResponse<UserFile> | null = null;
+      try {
+        payload = raw ? (JSON.parse(raw) as ApiResponse<UserFile>) : null;
+      } catch {
+        payload = null;
+      }
 
-    const payload = (await response.json()) as ApiResponse<UserFile>;
+      if (!response.ok || !payload?.ok || !payload.data) {
+        const detailText =
+          typeof payload?.error?.details === "object" && payload?.error?.details && "details" in payload.error.details
+            ? String((payload.error.details as { details?: string }).details || "")
+            : typeof payload?.error?.details === "string"
+              ? payload.error.details
+              : "";
+        const fallback =
+          response.status === 413
+            ? "Upload payload too large for deployment function. Use a smaller file."
+            : response.status >= 500
+              ? `Server error (${response.status}).`
+              : `Request failed (${response.status}).`;
+        setMessage([payload?.error?.message ?? fallback, detailText].filter(Boolean).join(" | "));
+        setLoading(false);
+        return;
+      }
 
-    if (!response.ok || !payload.ok || !payload.data) {
-      const detailText =
-        typeof payload.error?.details === "object" && payload.error?.details && "details" in payload.error.details
-          ? String((payload.error.details as { details?: string }).details || "")
-          : typeof payload.error?.details === "string"
-            ? payload.error.details
-            : "";
-      setMessage([payload.error?.message ?? "Upload failed.", detailText].filter(Boolean).join(" | "));
+      setSelectedFile(null);
+      setMessage("File uploaded successfully.");
+      setMakePublic(true);
       setLoading(false);
-      return;
+      setFiles((prev) => [payload.data!, ...prev]);
+      pushToast("Upload complete", "success");
+    } catch {
+      setMessage("Unable to reach upload service. Please retry.");
+      setLoading(false);
     }
-
-    setSelectedFile(null);
-    setMessage("File uploaded successfully.");
-    setMakePublic(true);
-    setLoading(false);
-    setFiles((prev) => [payload.data!, ...prev]);
-    pushToast("Upload complete", "success");
   }
 
   async function deleteFile() {
@@ -162,10 +184,18 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
         <form onSubmit={onSubmit}>
           <input
             type="file"
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg,.txt"
             onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
             className="w-full rounded-xl border border-[rgb(var(--border))] bg-transparent px-3 py-2.5 text-sm"
           />
-          <p className="mt-2 text-xs text-[var(--muted)]">Accepted size: up to 10MB per file.</p>
+          <p className="mt-2 text-xs text-[var(--muted)]">
+            Accepted size: up to {uploadLimitMb}MB per file (deployment-safe limit).
+          </p>
+          {selectedFile ? (
+            <p className="mt-1 text-xs text-[var(--muted)]">
+              Selected: {selectedFile.name} ({formatBytes(selectedFile.size)})
+            </p>
+          ) : null}
           <label className="mt-3 flex items-center gap-2 text-xs text-[var(--muted)]">
             <input
               type="checkbox"
@@ -219,7 +249,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                       {file.verificationStatus === "VERIFIED" ? (
                         <span className="inline-flex items-center gap-1 text-emerald-600">
                           <BadgeCheck size={12} />
-                          Verified by {file.verifiedBy?.name ?? "Teacher"}
+                          Verified by expert {file.verifiedBy?.name ?? "reviewer"}
                         </span>
                       ) : file.verificationStatus === "REJECTED" ? (
                         <span className="inline-flex items-center gap-1 text-rose-600">

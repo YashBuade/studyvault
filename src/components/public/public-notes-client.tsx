@@ -33,7 +33,11 @@ type PublicNote = {
   semester?: string | null;
   tags?: string | null;
   createdAt: string;
-  user: { name: string };
+  user: {
+    name: string;
+    role: "USER" | "ADMIN" | "TEACHER";
+    teacherVerificationStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+  };
   attachments?: { file: { id: number; originalName: string } }[];
 };
 
@@ -52,6 +56,12 @@ type PublicFile = {
   verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
   verifiedAt?: string | null;
   verifiedBy?: { id: number; name: string } | null;
+  user: {
+    id: number;
+    name: string;
+    role: "USER" | "ADMIN" | "TEACHER";
+    teacherVerificationStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+  };
 };
 
 const STUDENT_CATEGORIES = [
@@ -73,6 +83,9 @@ type LibraryPrefs = {
   semesters: string[];
   tags: string[];
 };
+
+const CLIENT_UPLOAD_MAX_MB = Number(process.env.NEXT_PUBLIC_FILE_UPLOAD_MAX_MB ?? 4);
+const CLIENT_UPLOAD_MAX_BYTES = Math.max(1, Math.min(CLIENT_UPLOAD_MAX_MB, 25)) * 1024 * 1024;
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -98,6 +111,20 @@ function normalizeListItem(value: string) {
   return value.trim().replace(/\s+/g, " ");
 }
 
+function isVerifiedTeacher(user: { role: "USER" | "ADMIN" | "TEACHER"; teacherVerificationStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED" }) {
+  return user.role === "TEACHER" && user.teacherVerificationStatus === "APPROVED";
+}
+
+async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T> | null> {
+  const raw = await response.text();
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as ApiResponse<T>;
+  } catch {
+    return null;
+  }
+}
+
 export function PublicNotesClient() {
   const [notes, setNotes] = useState<PublicNote[]>([]);
   const [search, setSearch] = useState("");
@@ -116,6 +143,7 @@ export function PublicNotesClient() {
   const [filesSearch, setFilesSearch] = useState("");
   const [fileKindFilter, setFileKindFilter] = useState("All");
   const [noteView, setNoteView] = useState<"grid" | "list">("grid");
+  const [teacherOnly, setTeacherOnly] = useState(false);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -173,6 +201,11 @@ export function PublicNotesClient() {
     return copy;
   }, [notes, sort]);
 
+  const visibleNotes = useMemo(
+    () => sortedNotes.filter((note) => (teacherOnly ? isVerifiedTeacher(note.user) : true)),
+    [sortedNotes, teacherOnly],
+  );
+
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (search.trim()) count += 1;
@@ -209,9 +242,12 @@ export function PublicNotesClient() {
   }, [files]);
 
   const visibleFiles = useMemo(() => {
-    if (fileKindFilter === "All") return files;
-    return files.filter((file) => inferFileKind(file.originalName) === fileKindFilter);
-  }, [files, fileKindFilter]);
+    return files.filter((file) => {
+      const kindMatches = fileKindFilter === "All" || inferFileKind(file.originalName) === fileKindFilter;
+      const teacherMatches = teacherOnly ? isVerifiedTeacher(file.user) : true;
+      return kindMatches && teacherMatches;
+    });
+  }, [files, fileKindFilter, teacherOnly]);
 
   const loadNotes = useCallback(
     async (options: { reset?: boolean; cursor: number | null }) => {
@@ -228,14 +264,14 @@ export function PublicNotesClient() {
       params.set("limit", "12");
 
       const response = await fetch(`/api/notes/public?${params.toString()}`);
-      const payload = (await response.json()) as ApiResponse<PublicNote[]>;
+      const payload = await parseApiResponse<PublicNote[]>(response);
 
-      if (response.ok && payload.ok && payload.data) {
+      if (response.ok && payload?.ok && payload.data) {
         setNotes((prev) => (options.reset ? payload.data! : [...prev, ...payload.data!]));
         setHasMore(Boolean(payload.meta?.hasMore));
         setCursor(payload.meta?.nextCursor ?? null);
       } else {
-        pushToast(payload.error?.message ?? "Unable to load public notes", "error");
+        pushToast(payload?.error?.message ?? "Unable to load public notes", "error");
       }
 
       setLoading(false);
@@ -256,13 +292,13 @@ export function PublicNotesClient() {
       params.set("limit", "9");
 
       const response = await fetch(`/api/files/public?${params.toString()}`);
-      const payload = (await response.json()) as ApiResponse<PublicFile[]>;
-      if (response.ok && payload.ok && payload.data) {
+      const payload = await parseApiResponse<PublicFile[]>(response);
+      if (response.ok && payload?.ok && payload.data) {
         setFiles((prev) => (options.reset ? payload.data! : [...prev, ...payload.data!]));
         setFilesHasMore(Boolean(payload.meta?.hasMore));
         setFilesCursor(payload.meta?.nextCursor ?? null);
       } else {
-        pushToast(payload.error?.message ?? "Unable to load public files", "error");
+        pushToast(payload?.error?.message ?? "Unable to load public files", "error");
       }
 
       setFilesLoading(false);
@@ -325,6 +361,15 @@ export function PublicNotesClient() {
       return;
     }
 
+    const oversized = uploadFiles.find((file) => file.size > CLIENT_UPLOAD_MAX_BYTES);
+    if (oversized) {
+      pushToast(
+        `${oversized.name} exceeds the ${Math.round(CLIENT_UPLOAD_MAX_BYTES / (1024 * 1024))}MB upload limit.`,
+        "error",
+      );
+      return;
+    }
+
     setCreating(true);
     const attachmentIds: number[] = [];
 
@@ -338,7 +383,7 @@ export function PublicNotesClient() {
         body: formData,
       });
 
-      const uploadPayload = (await uploadRes.json()) as ApiResponse<{ id: number }>;
+      const uploadPayload = await parseApiResponse<{ id: number }>(uploadRes);
 
       if (uploadRes.status === 401) {
         pushToast("Please sign in to upload public study content.", "error");
@@ -346,8 +391,14 @@ export function PublicNotesClient() {
         return;
       }
 
-      if (!uploadRes.ok || !uploadPayload.ok || !uploadPayload.data?.id) {
-        pushToast(uploadPayload.error?.message ?? "Unable to upload one of the files.", "error");
+      if (!uploadRes.ok || !uploadPayload?.ok || !uploadPayload.data?.id) {
+        const fallback =
+          uploadRes.status === 413
+            ? "Upload payload too large for deployment function. Use a smaller file."
+            : uploadRes.status >= 500
+              ? `Upload service failed (${uploadRes.status}).`
+              : "Unable to upload one of the files.";
+        pushToast(uploadPayload?.error?.message ?? fallback, "error");
         setCreating(false);
         return;
       }
@@ -369,7 +420,7 @@ export function PublicNotesClient() {
       }),
     });
 
-    const createPayload = (await createRes.json()) as ApiResponse<PublicNote>;
+    const createPayload = await parseApiResponse<PublicNote>(createRes);
 
     if (createRes.status === 401) {
       pushToast("Please sign in to publish public study content.", "error");
@@ -377,8 +428,8 @@ export function PublicNotesClient() {
       return;
     }
 
-    if (!createRes.ok || !createPayload.ok || !createPayload.data) {
-      pushToast(createPayload.error?.message ?? "Could not publish your note.", "error");
+    if (!createRes.ok || !createPayload?.ok || !createPayload.data) {
+      pushToast(createPayload?.error?.message ?? "Could not publish your note.", "error");
       setCreating(false);
       return;
     }
@@ -423,7 +474,7 @@ export function PublicNotesClient() {
             </p>
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Public Notes Library</h2>
             <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
-              Discover notes, formulas, summaries, and resources shared by students. Filter by category, semester, and tags.
+              Discover notes, formulas, summaries, and resources shared by students and verified teachers.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -477,15 +528,19 @@ export function PublicNotesClient() {
             <input
               type="file"
               multiple
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg,.txt"
               onChange={(event) => setUploadFiles(Array.from(event.target.files ?? []))}
               className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-sm"
             />
+            <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">
+              Max {Math.round(CLIENT_UPLOAD_MAX_BYTES / (1024 * 1024))}MB per file.
+            </p>
             {uploadFiles.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-2">
                 {uploadFiles.map((file) => (
                   <span key={`${file.name}-${file.size}`} className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--surface))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))]">
                     {file.type.startsWith("image/") ? <ImageIcon size={12} /> : <FileUp size={12} />}
-                    {file.name}
+                    {file.name} ({formatFileSize(file.size)})
                   </span>
                 ))}
               </div>
@@ -674,12 +729,24 @@ export function PublicNotesClient() {
             active filters
             <button
               type="button"
+              onClick={() => setTeacherOnly((prev) => !prev)}
+              className={`rounded-full border px-2.5 py-1 font-semibold transition ${
+                teacherOnly
+                  ? "border-emerald-500/70 bg-emerald-100/80 text-emerald-700"
+                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))]"
+              }`}
+            >
+              {teacherOnly ? "Verified Teachers Only" : "All Contributors"}
+            </button>
+            <button
+              type="button"
               onClick={() => {
                 setSearch("");
                 setSubject("");
                 setSemester("");
                 setTag("");
                 setSort("latest");
+                setTeacherOnly(false);
               }}
               className="ml-auto rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2.5 py-1 font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
             >
@@ -736,13 +803,13 @@ export function PublicNotesClient() {
         </div>
       </Card>
 
-      {sortedNotes.length === 0 ? (
+      {visibleNotes.length === 0 ? (
         <Card>
           <p className="text-sm text-[rgb(var(--text-secondary))]">No matching public notes yet. Try a different filter or publish one above.</p>
         </Card>
       ) : (
         <div className={noteView === "grid" ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
-          {sortedNotes.map((note) => (
+          {visibleNotes.map((note) => (
             <Card key={note.id} className={noteView === "grid" ? "h-full" : ""}>
               <div className={`flex gap-3 ${noteView === "grid" ? "h-full flex-col justify-between" : "flex-col sm:flex-row sm:items-start sm:justify-between"}`}>
                 <div>
@@ -755,7 +822,11 @@ export function PublicNotesClient() {
                   </div>
                   <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
                   <p className={`mt-2 text-sm text-[rgb(var(--text-secondary))] ${noteView === "grid" ? "line-clamp-3" : "line-clamp-2 sm:max-w-2xl"}`}>{note.content.replace(/<[^>]+>/g, "")}</p>
-                  <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">By {note.user.name}{note.semester ? ` | ${note.semester}` : ""}</p>
+                  <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">
+                    By {note.user.name}
+                    {note.semester ? ` | ${note.semester}` : ""}
+                    {isVerifiedTeacher(note.user) ? " | Teacher Contributor" : ""}
+                  </p>
                   {note.tags ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {note.tags
@@ -836,10 +907,14 @@ export function PublicNotesClient() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{file.originalName}</p>
                   <p className="text-xs text-[rgb(var(--text-tertiary))]">{formatFileSize(file.size)}</p>
+                  <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                    By {file.user.name}
+                    {isVerifiedTeacher(file.user) ? " | Teacher Contributor" : ""}
+                  </p>
                   {file.verificationStatus === "VERIFIED" && file.verifiedBy ? (
                     <p className="mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-100/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
                       <BadgeCheck size={11} />
-                      Verified by {file.verifiedBy.name}
+                      Verified by expert {file.verifiedBy.name}
                     </p>
                   ) : null}
                   <p className="mt-1 inline-flex rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">

@@ -11,6 +11,7 @@ const loginSchema = z.object({
   email: z.string().email().toLowerCase(),
   password: z.string().min(1),
   rememberMe: z.boolean().optional().default(false),
+  expectedRole: z.enum(["TEACHER", "STUDENT"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("VALIDATION_ERROR", "Invalid credentials"), { status: 400 });
     }
 
-    const { email, password, rememberMe } = parsed.data;
+    const { email, password, rememberMe, expectedRole } = parsed.data;
     
     let user;
     try {
@@ -48,6 +49,14 @@ export async function POST(request: Request) {
 
     if (!isValid) {
       return NextResponse.json(failure("UNAUTHORIZED", "Invalid credentials"), { status: 401 });
+    }
+
+    if (expectedRole === "TEACHER" && user.role !== "TEACHER") {
+      return NextResponse.json(failure("FORBIDDEN", "This login is for teacher accounts only"), { status: 403 });
+    }
+
+    if (expectedRole === "STUDENT" && user.role === "TEACHER") {
+      return NextResponse.json(failure("FORBIDDEN", "Use teacher login for teacher accounts"), { status: 403 });
     }
 
     const token = await signSession({

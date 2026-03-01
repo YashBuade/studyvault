@@ -6,6 +6,7 @@ import { AUTH_COOKIE_NAME, getCookieOptions, signSession } from "@/lib/auth";
 import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
 import { withDbRetry } from "@/lib/db-safe";
+import { validateCollegeId, validateTeacherExpertise } from "@/lib/teacher-validation";
 
 const signupSchema = z.object({
   name: z.string().min(2).max(100),
@@ -35,6 +36,23 @@ export async function POST(request: Request) {
       );
     }
 
+    let normalizedCollegeId: string | null = null;
+    let normalizedExpertise: string | null = null;
+    if (role === "TEACHER") {
+      const collegeValidation = validateCollegeId(collegeId ?? "");
+      if (!collegeValidation.ok) {
+        return NextResponse.json(failure("VALIDATION_ERROR", collegeValidation.message), { status: 400 });
+      }
+
+      const expertiseValidation = validateTeacherExpertise(department ?? "");
+      if (!expertiseValidation.ok) {
+        return NextResponse.json(failure("VALIDATION_ERROR", expertiseValidation.message), { status: 400 });
+      }
+
+      normalizedCollegeId = collegeValidation.value;
+      normalizedExpertise = expertiseValidation.value;
+    }
+
     const existing = await withDbRetry(() => prisma.user.findUnique({ where: { email } }));
 
     if (existing) {
@@ -49,8 +67,8 @@ export async function POST(request: Request) {
           email,
           passwordHash,
           role: role === "TEACHER" ? "TEACHER" : "USER",
-          collegeId: role === "TEACHER" ? collegeId?.trim() : null,
-          department: role === "TEACHER" ? department?.trim() : null,
+          collegeId: role === "TEACHER" ? normalizedCollegeId : null,
+          department: role === "TEACHER" ? normalizedExpertise : null,
           teacherVerificationStatus: role === "TEACHER" ? "PENDING" : "NONE",
         },
       })

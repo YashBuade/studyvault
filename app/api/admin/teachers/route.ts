@@ -6,11 +6,21 @@ import { isAdminUser } from "@/lib/admin";
 import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
 
-const updateTeacherSchema = z.object({
-  teacherId: z.number().int().positive(),
-  status: z.enum(["APPROVED", "REJECTED"]),
-  reviewNotes: z.string().max(1000).optional(),
-});
+const updateTeacherSchema = z
+  .object({
+    teacherId: z.number().int().positive(),
+    status: z.enum(["APPROVED", "REJECTED"]),
+    reviewNotes: z.string().max(1000).optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.status === "REJECTED" && !value.reviewNotes?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Review note is required when rejecting a teacher request.",
+        path: ["reviewNotes"],
+      });
+    }
+  });
 
 export async function GET() {
   try {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { ModernButton } from "@/components/ui/modern-button";
@@ -15,6 +15,8 @@ type AuthErrorResponse = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const isTeacherLogin = pathname === "/auth/teacher/login";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -43,7 +45,12 @@ export default function LoginPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, rememberMe }),
+        body: JSON.stringify({
+          email,
+          password,
+          rememberMe,
+          ...(isTeacherLogin ? { expectedRole: "TEACHER" } : {}),
+        }),
       });
 
       const data = (await response.json()) as AuthErrorResponse;
@@ -175,7 +182,11 @@ export default function LoginPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Sign in</h2>
-                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">Continue to your StudyVault dashboard.</p>
+                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+                    {isTeacherLogin
+                      ? "Sign in with your teacher account. Admin approval controls file verification access."
+                      : "Continue to your StudyVault dashboard."}
+                  </p>
                 </div>
 
                 {(error || oauthErrorMessage()) && (
@@ -191,7 +202,11 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                {googleEnabled ? (
+                {isTeacherLogin ? (
+                  <div className="rounded-[var(--radius-md)] border border-amber-400/50 bg-amber-100/70 px-3 py-2 text-xs text-amber-900">
+                    Teacher login uses teacher credentials. Google quick login is disabled for the teacher portal.
+                  </div>
+                ) : googleEnabled ? (
                   <>
                     <GoogleAuthButton text="Continue with Google" />
                     <div className="relative">
@@ -259,10 +274,18 @@ export default function LoginPage() {
 
                 <p className="text-center text-sm text-[rgb(var(--text-secondary))]">
                   New to StudyVault?{" "}
-                  <Link href="/auth/signup" className="font-semibold">
-                    Create account
+                  <Link href={isTeacherLogin ? "/auth/teacher/signup" : "/auth/signup"} className="font-semibold">
+                    {isTeacherLogin ? "Teacher signup" : "Create account"}
                   </Link>
                 </p>
+                {!isTeacherLogin ? (
+                  <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
+                    Teacher account?{" "}
+                    <Link href="/auth/teacher/login" className="font-semibold">
+                      Use dedicated teacher sign in
+                    </Link>
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>

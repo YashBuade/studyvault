@@ -33,6 +33,14 @@ export async function GET(request: Request) {
             name: true,
           },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            teacherVerificationStatus: true,
+          },
+        },
       },
     });
 

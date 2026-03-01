@@ -58,7 +58,13 @@ export async function GET(request: Request) {
         semester: true,
         tags: true,
         createdAt: true,
-        user: { select: { name: true } },
+        user: {
+          select: {
+            name: true,
+            role: true,
+            teacherVerificationStatus: true,
+          },
+        },
         attachments: {
           where: {
             file: {

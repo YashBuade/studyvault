@@ -43,6 +43,9 @@ export default async function HomePage() {
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo size="md" showText href="/" />
           <div className="flex items-center gap-3">
+            <Link href="/auth/teacher/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
+              Teacher Portal
+            </Link>
             <Link href="/auth/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
               Sign In
             </Link>
@@ -79,6 +82,12 @@ export default async function HomePage() {
                 className="inline-flex h-12 items-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] px-7 text-base font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-hover))]"
               >
                 Open Public Notes
+              </Link>
+              <Link
+                href="/auth/teacher/signup"
+                className="inline-flex h-12 items-center rounded-[var(--radius-md)] border border-emerald-400/70 bg-emerald-100/70 px-7 text-base font-semibold text-emerald-800 transition hover:bg-emerald-200/80"
+              >
+                Teacher Signup
               </Link>
             </div>
           </div>

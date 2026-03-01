@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { ModernButton } from "@/components/ui/modern-button";
 import { ModernInput } from "@/components/ui/modern-input";
 import { Logo } from "@/components/ui/logo";
 import { GoogleAuthButton } from "@/google-auth-button";
+import { TEACHER_EXPERTISE_FIELDS } from "@/lib/teacher-validation";
 
 type AuthErrorResponse = {
   error?: string | { message?: string };
@@ -21,10 +22,12 @@ function getPasswordStrength(password: string): "weak" | "medium" | "strong" {
 
 export default function SignupPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const isTeacherSignup = pathname === "/auth/teacher/signup";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"STUDENT" | "TEACHER">("STUDENT");
+  const [role, setRole] = useState<"STUDENT" | "TEACHER">(isTeacherSignup ? "TEACHER" : "STUDENT");
   const [collegeId, setCollegeId] = useState("");
   const [department, setDepartment] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +39,12 @@ export default function SignupPage() {
   const [googleEnabled, setGoogleEnabled] = useState(false);
   const [googleStatusMessage, setGoogleStatusMessage] = useState("Checking Google OAuth configuration...");
   const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
+
+  useEffect(() => {
+    if (isTeacherSignup) {
+      setRole("TEACHER");
+    }
+  }, [isTeacherSignup]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -192,8 +201,14 @@ export default function SignupPage() {
             <div className="card p-6 sm:p-8">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <h2 className="text-3xl font-bold text-[rgb(var(--text-primary))]">Create account</h2>
-                  <p className="text-sm text-[rgb(var(--text-secondary))]">Set up your StudyVault account.</p>
+                  <h2 className="text-3xl font-bold text-[rgb(var(--text-primary))]">
+                    {isTeacherSignup ? "Teacher signup" : "Create account"}
+                  </h2>
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">
+                    {isTeacherSignup
+                      ? "Register a teacher profile. Admin approval is required before file review access."
+                      : "Set up your StudyVault account."}
+                  </p>
                 </div>
 
                 {(error || oauthErrorMessage()) && (
@@ -209,7 +224,11 @@ export default function SignupPage() {
                   </div>
                 )}
 
-                {googleEnabled ? (
+                {isTeacherSignup ? (
+                  <div className="rounded-[var(--radius-md)] border border-amber-400/50 bg-amber-100/70 px-3 py-2 text-xs text-amber-900">
+                    Teacher signup requires College ID and expertise validation, so Google quick signup is disabled for this flow.
+                  </div>
+                ) : googleEnabled ? (
                   <>
                     <GoogleAuthButton text="Continue with Google" />
                     <div className="relative">
@@ -248,20 +267,22 @@ export default function SignupPage() {
                     required
                   />
 
-                  <div className="space-y-2">
-                    <label htmlFor="role" className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                      Account type
-                    </label>
-                    <select
-                      id="role"
-                      className="input"
-                      value={role}
-                      onChange={(event) => setRole(event.target.value as "STUDENT" | "TEACHER")}
-                    >
-                      <option value="STUDENT">Student</option>
-                      <option value="TEACHER">Teacher</option>
-                    </select>
-                  </div>
+                  {!isTeacherSignup ? (
+                    <div className="space-y-2">
+                      <label htmlFor="role" className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                        Account type
+                      </label>
+                      <select
+                        id="role"
+                        className="input"
+                        value={role}
+                        onChange={(event) => setRole(event.target.value as "STUDENT" | "TEACHER")}
+                      >
+                        <option value="STUDENT">Student</option>
+                        <option value="TEACHER">Teacher</option>
+                      </select>
+                    </div>
+                  ) : null}
 
                   {role === "TEACHER" ? (
                     <>
@@ -274,17 +295,27 @@ export default function SignupPage() {
                         placeholder="Faculty ID / Employee ID"
                         required
                       />
-                      <ModernInput
-                        id="department"
-                        label="Department"
-                        type="text"
-                        value={department}
-                        onChange={(event) => setDepartment(event.target.value)}
-                        placeholder="Computer Science"
-                        required
-                      />
+                      <div className="space-y-2">
+                        <label htmlFor="expertise" className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                          Field of Expertise
+                        </label>
+                        <select
+                          id="expertise"
+                          className="input"
+                          value={department}
+                          onChange={(event) => setDepartment(event.target.value)}
+                          required
+                        >
+                          <option value="">Select expertise</option>
+                          {TEACHER_EXPERTISE_FIELDS.map((item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                       <p className="text-xs text-[rgb(var(--text-secondary))]">
-                        Teacher accounts are activated only after admin verification.
+                        Teacher profile remains pending until admin verifies your College ID and expertise.
                       </p>
                     </>
                   ) : null}
@@ -346,10 +377,18 @@ export default function SignupPage() {
 
                 <p className="text-center text-sm text-[rgb(var(--text-secondary))]">
                   Already have an account?{" "}
-                  <Link href="/auth/login" className="font-semibold">
-                    Sign in
+                  <Link href={isTeacherSignup ? "/auth/teacher/login" : "/auth/login"} className="font-semibold">
+                    {isTeacherSignup ? "Teacher sign in" : "Sign in"}
                   </Link>
                 </p>
+                {!isTeacherSignup ? (
+                  <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
+                    Are you a teacher?{" "}
+                    <Link href="/auth/teacher/signup" className="font-semibold">
+                      Use dedicated teacher signup
+                    </Link>
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>

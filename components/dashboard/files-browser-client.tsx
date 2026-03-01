@@ -109,7 +109,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
                   {file.verificationStatus === "VERIFIED" ? (
                     <span className="inline-flex items-center gap-1 text-emerald-600">
                       <BadgeCheck size={12} />
-                      Verified by {file.verifiedBy?.name ?? "Teacher"}
+                      Verified by expert {file.verifiedBy?.name ?? "reviewer"}
                     </span>
                   ) : file.verificationStatus === "REJECTED" ? (
                     <span className="inline-flex items-center gap-1 text-rose-600">

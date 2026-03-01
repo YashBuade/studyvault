@@ -7,7 +7,24 @@ import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
 import { uploadObject } from "@/lib/supabase-storage";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_FILE_SIZE_MB = Number(process.env.FILE_UPLOAD_MAX_MB ?? 4);
+const MAX_FILE_SIZE = Math.max(1, Math.min(MAX_FILE_SIZE_MB, 25)) * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/csv",
+  "text/plain",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+]);
 
 export async function POST(request: Request) {
   try {
@@ -25,8 +42,27 @@ export async function POST(request: Request) {
       return NextResponse.json(failure("VALIDATION_ERROR", "No file provided"), { status: 400 });
     }
 
+    if (!file.name.trim()) {
+      return NextResponse.json(failure("VALIDATION_ERROR", "File name is required"), { status: 400 });
+    }
+
+    if (file.size <= 0) {
+      return NextResponse.json(failure("VALIDATION_ERROR", "File is empty"), { status: 400 });
+    }
+
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(failure("VALIDATION_ERROR", "File exceeds 10MB limit"), { status: 400 });
+      return NextResponse.json(
+        failure("VALIDATION_ERROR", `File exceeds ${Math.round(MAX_FILE_SIZE / (1024 * 1024))}MB limit`),
+        { status: 400 }
+      );
+    }
+
+    const mimeType = file.type || "application/octet-stream";
+    if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+      return NextResponse.json(
+        failure("VALIDATION_ERROR", "File type not supported for upload"),
+        { status: 400 }
+      );
     }
 
     const bytes = await file.arrayBuffer();
@@ -35,7 +71,7 @@ export async function POST(request: Request) {
     const objectPath = `u-${userId}/${unique}`;
     const relativePath = `/uploads/${objectPath}`;
 
-    await uploadObject(objectPath, bytes, file.type || "application/octet-stream");
+    await uploadObject(objectPath, bytes, mimeType);
 
     try {
       const created = await prisma.file.create({
@@ -43,7 +79,7 @@ export async function POST(request: Request) {
           originalName: file.name,
           storedName: unique,
           path: relativePath,
-          mimeType: file.type || "application/octet-stream",
+          mimeType,
           size: file.size,
           isPublic,
           verificationStatus: isPublic ? "PENDING" : "VERIFIED",

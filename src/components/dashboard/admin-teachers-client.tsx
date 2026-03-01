@@ -30,6 +30,7 @@ export function AdminTeachersClient() {
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [submitting, setSubmitting] = useState<Record<number, boolean>>({});
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL");
   const { pushToast } = useToast();
 
   useEffect(() => {
@@ -45,6 +46,11 @@ export function AdminTeachersClient() {
   }, []);
 
   async function review(teacherId: number, status: "APPROVED" | "REJECTED") {
+    if (status === "REJECTED" && !notes[teacherId]?.trim()) {
+      pushToast("Add a rejection reason before rejecting this teacher.", "error");
+      return;
+    }
+
     setSubmitting((prev) => ({ ...prev, [teacherId]: true }));
     const response = await fetch("/api/admin/teachers", {
       method: "PATCH",
@@ -76,24 +82,49 @@ export function AdminTeachersClient() {
 
   return (
     <Card>
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
         <p className="text-sm font-semibold">Teacher requests</p>
-        <p className="text-xs text-[var(--muted)]">Validate each teacher by college ID before granting reviewer access.</p>
+          <p className="text-xs text-[var(--muted)]">Validate each teacher by College ID and expertise before granting reviewer access.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {(["ALL", "PENDING", "APPROVED", "REJECTED"] as const).map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setStatusFilter(status)}
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                statusFilter === status
+                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-4 space-y-3">
         {loading ? <p className="text-sm text-[var(--muted)]">Loading teacher requests...</p> : null}
         {!loading && items.length === 0 ? <p className="text-sm text-[var(--muted)]">No teacher accounts found.</p> : null}
-        {items.map((item) => (
+        {items
+          .filter((item) => (statusFilter === "ALL" ? true : item.teacherVerificationStatus === statusFilter))
+          .map((item) => (
           <article key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold">{item.name}</p>
                 <p className="text-xs text-[var(--muted)]">{item.email}</p>
                 <p className="text-xs text-[var(--muted)]">College ID: {item.collegeId || "Not provided"}</p>
-                <p className="text-xs text-[var(--muted)]">Department: {item.department || "Not provided"}</p>
+                <p className="text-xs text-[var(--muted)]">Expertise: {item.department || "Not provided"}</p>
                 <p className="text-xs text-[var(--muted)]">Status: {item.teacherVerificationStatus}</p>
               </div>
+              {item.teacherVerificationStatus === "PENDING" ? (
+                <span className="rounded-full border border-amber-400/70 bg-amber-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                  Needs validation
+                </span>
+              ) : null}
             </div>
 
             <div className="mt-3 space-y-2">

@@ -27,13 +27,15 @@ type ApiResponse<T> = {
 export function TeacherFileReviewClient() {
   const [files, setFiles] = useState<ReviewFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<"PENDING" | "VERIFIED" | "REJECTED">("PENDING");
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [submitting, setSubmitting] = useState<Record<number, boolean>>({});
   const { pushToast } = useToast();
 
   useEffect(() => {
     async function loadQueue() {
-      const response = await fetch("/api/teacher/files/review?status=PENDING");
+      setLoading(true);
+      const response = await fetch(`/api/teacher/files/review?status=${statusFilter}`);
       const payload = (await response.json()) as ApiResponse<ReviewFile[]>;
       if (response.ok && payload.ok && payload.data) {
         setFiles(payload.data);
@@ -41,7 +43,7 @@ export function TeacherFileReviewClient() {
       setLoading(false);
     }
     void loadQueue();
-  }, []);
+  }, [statusFilter]);
 
   async function updateFile(fileId: number, status: "VERIFIED" | "REJECTED") {
     setSubmitting((prev) => ({ ...prev, [fileId]: true }));
@@ -63,14 +65,32 @@ export function TeacherFileReviewClient() {
 
   return (
     <Card>
-      <div>
-        <p className="text-sm font-semibold">Pending files</p>
-        <p className="text-xs text-[var(--muted)]">Only verified files become visible in the public library.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold">Expert file verification queue</p>
+          <p className="text-xs text-[var(--muted)]">Only expert-verified files become visible in the public library.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {(["PENDING", "VERIFIED", "REJECTED"] as const).map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setStatusFilter(status)}
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                statusFilter === status
+                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-4 space-y-3">
         {loading ? <p className="text-sm text-[var(--muted)]">Loading queue...</p> : null}
-        {!loading && files.length === 0 ? <p className="text-sm text-[var(--muted)]">No files awaiting review.</p> : null}
+        {!loading && files.length === 0 ? <p className="text-sm text-[var(--muted)]">No files found for this status.</p> : null}
         {files.map((file) => (
           <article key={file.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -89,23 +109,34 @@ export function TeacherFileReviewClient() {
               </a>
             </div>
             <div className="mt-3 space-y-2">
-              <Input
-                value={notes[file.id] || ""}
-                onChange={(event) => setNotes((prev) => ({ ...prev, [file.id]: event.target.value }))}
-                placeholder="Optional review note"
-              />
-              <div className="flex items-center gap-2">
-                <Button loading={Boolean(submitting[file.id])} onClick={() => updateFile(file.id, "VERIFIED")}>
-                  Verify
-                </Button>
-                <Button
-                  variant="danger"
-                  loading={Boolean(submitting[file.id])}
-                  onClick={() => updateFile(file.id, "REJECTED")}
-                >
-                  Reject
-                </Button>
-              </div>
+              {statusFilter === "PENDING" ? (
+                <>
+                  <Input
+                    value={notes[file.id] || ""}
+                    onChange={(event) => setNotes((prev) => ({ ...prev, [file.id]: event.target.value }))}
+                    placeholder="Optional review note"
+                  />
+                  <div className="flex items-center gap-2">
+                    <Button loading={Boolean(submitting[file.id])} onClick={() => updateFile(file.id, "VERIFIED")}>
+                      Verify as Expert
+                    </Button>
+                    <Button
+                      variant="danger"
+                      loading={Boolean(submitting[file.id])}
+                      onClick={() => updateFile(file.id, "REJECTED")}
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <p className="text-xs text-[var(--muted)]">
+                  {file.verificationStatus === "VERIFIED"
+                    ? `Verified by expert ${file.verifiedBy?.name ?? "reviewer"}`
+                    : "Rejected by expert reviewer"}
+                  {file.verificationNotes ? ` | Note: ${file.verificationNotes}` : ""}
+                </p>
+              )}
             </div>
           </article>
         ))}

@@ -19,8 +19,8 @@ export default async function TeacherReviewPage() {
   return (
     <>
       <PageHeader
-        title="File Verification Queue"
-        description="Review uploaded public files to keep the shared library accurate and trustworthy."
+        title="Expert File Verification Queue"
+        description="Teacher reviewers validate student-uploaded public files. Verified files are marked as verified by expert."
       />
       <TeacherFileReviewClient />
     </>
