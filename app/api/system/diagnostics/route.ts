@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/require-user";
+import { isAdminUser } from "@/lib/admin";
 import { getGoogleOAuthConfig, resolveRequestOrigin } from "@/lib/google-auth-config";
 
 export async function GET(request: Request) {
   const userId = await getCurrentUserId();
   if (!userId) {
     return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  }
+  if (!(await isAdminUser(userId))) {
+    return NextResponse.json({ ok: false, error: "FORBIDDEN" }, { status: 403 });
   }
 
   const origin = resolveRequestOrigin(request);

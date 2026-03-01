@@ -7,8 +7,8 @@ import { failure, success } from "@/lib/api/response";
 import { logError, logInfo } from "@/lib/api/logger";
 import { uploadObject } from "@/lib/supabase-storage";
 
-const MAX_FILE_SIZE_MB = Number(process.env.FILE_UPLOAD_MAX_MB ?? 4);
-const MAX_FILE_SIZE = Math.max(1, Math.min(MAX_FILE_SIZE_MB, 25)) * 1024 * 1024;
+const MAX_FILE_SIZE_MB = Number(process.env.FILE_UPLOAD_MAX_MB ?? 20);
+const MAX_FILE_SIZE = Math.max(1, Math.min(MAX_FILE_SIZE_MB, 100)) * 1024 * 1024;
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
   "application/msword",
@@ -111,9 +111,9 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     logError("files.upload_failed", error);
-    const details = error instanceof Error ? error.message : "Unknown upload error";
-    const upstreamFailure = details.toLowerCase().includes("supabase");
-    return NextResponse.json(failure("INTERNAL_ERROR", "Unable to upload file", { details }), {
+    const details = error instanceof Error ? error.message.toLowerCase() : "";
+    const upstreamFailure = details.includes("supabase") || details.includes("storage request failed");
+    return NextResponse.json(failure("INTERNAL_ERROR", "Unable to upload file right now"), {
       status: upstreamFailure ? 502 : 503,
     });
   }

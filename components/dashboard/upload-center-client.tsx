@@ -50,8 +50,8 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
   const [fetching, setFetching] = useState(false);
   const [makePublic, setMakePublic] = useState(true);
   const { pushToast } = useToast();
-  const uploadLimitMb = Number(process.env.NEXT_PUBLIC_FILE_UPLOAD_MAX_MB ?? 4);
-  const uploadLimitBytes = Math.max(1, Math.min(uploadLimitMb, 25)) * 1024 * 1024;
+  const uploadLimitMb = Number(process.env.NEXT_PUBLIC_FILE_UPLOAD_MAX_MB ?? 20);
+  const uploadLimitBytes = Math.max(1, Math.min(uploadLimitMb, 100)) * 1024 * 1024;
 
   const visible = useMemo(
     () =>
@@ -96,19 +96,13 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
       }
 
       if (!response.ok || !payload?.ok || !payload.data) {
-        const detailText =
-          typeof payload?.error?.details === "object" && payload?.error?.details && "details" in payload.error.details
-            ? String((payload.error.details as { details?: string }).details || "")
-            : typeof payload?.error?.details === "string"
-              ? payload.error.details
-              : "";
         const fallback =
           response.status === 413
             ? "Upload payload too large for deployment function. Use a smaller file."
             : response.status >= 500
               ? `Server error (${response.status}).`
               : `Request failed (${response.status}).`;
-        setMessage([payload?.error?.message ?? fallback, detailText].filter(Boolean).join(" | "));
+        setMessage(payload?.error?.message ?? fallback);
         setLoading(false);
         return;
       }

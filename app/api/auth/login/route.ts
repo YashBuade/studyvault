@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     try {
       user = await withDbRetry(() => prisma.user.findUnique({ where: { email } }));
     } catch (dbError) {
-      console.error("Database connection failed:", dbError);
+      logError("auth.login_db_error", dbError, { email });
       return NextResponse.json(
         failure(
           "INTERNAL_ERROR",

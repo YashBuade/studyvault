@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
+import { Space_Grotesk, Sora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/src/components/ui/toast-provider";
+
+const headingFont = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const bodyFont = Sora({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
   title: "StudyVault",
@@ -33,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${GeistSans.variable} font-sans antialiased`}>
+      <body className={`${headingFont.variable} ${bodyFont.variable} font-sans antialiased`}>
         <ThemeScript />
         <ThemeProvider>
           <ToastProvider>{children}</ToastProvider>
