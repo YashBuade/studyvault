@@ -22,8 +22,9 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-[rgb(var(--background))]">
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-500/15" />
-        <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-indigo-300/20 blur-3xl dark:bg-indigo-500/15" />
+        <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-sky-300/25 blur-3xl dark:bg-sky-500/18" />
+        <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-indigo-300/22 blur-3xl dark:bg-indigo-500/18" />
+        <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-emerald-300/15 blur-3xl dark:bg-emerald-500/12" />
       </div>
 
       <DashboardSidebar
@@ -48,7 +49,7 @@ export default async function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="hidden rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] sm:block">
+              <div className="hidden rounded-full border border-[rgb(var(--border))] bg-gradient-to-r from-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] sm:block">
                 {user.role === "ADMIN"
                   ? "Admin"
                   : user.role === "TEACHER"
