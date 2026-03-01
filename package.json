@@ -14,6 +14,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "admin:create": "node scripts/create-admin.mjs",
+    "admin:create:many": "node scripts/create-admins.mjs",
     "git:sync": "powershell -ExecutionPolicy Bypass -File scripts/git-sync.ps1"
   },
   "dependencies": {
