@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
+import { withDbRetry } from "@/lib/db-safe";
 import { PageHeader } from "@/components/dashboard/page-header";
 import {
   getFocusSuggestion,
@@ -30,10 +31,12 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
-  const accessUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { role: true },
-  });
+  const accessUser = await withDbRetry(() =>
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    }),
+  );
 
   if (accessUser?.role === "TEACHER") {
     redirect("/dashboard/teacher");
@@ -55,37 +58,43 @@ export default async function DashboardPage() {
     inProgressPlanner,
     recentNoteCount,
   ] = await Promise.all([
-    prisma.note.count({ where: { userId, deletedAt: null } }),
-    prisma.file.count({ where: { userId, deletedAt: null } }),
-    prisma.assignment.count({ where: { userId } }),
-    prisma.exam.count({ where: { userId } }),
-    prisma.note.count({ where: { userId, deletedAt: null, isPublic: true } }),
-    prisma.assignment.count({ where: { userId, status: "COMPLETED" } }),
-    prisma.assignment.count({ where: { userId, status: { not: "COMPLETED" }, dueDate: { lt: now } } }),
-    prisma.plannerItem.count({ where: { userId, status: "TODO" } }),
-    prisma.plannerItem.count({ where: { userId, status: "IN_PROGRESS" } }),
-    prisma.note.count({ where: { userId, deletedAt: null, createdAt: { gte: weekAgo } } }),
+    withDbRetry(() => prisma.note.count({ where: { userId, deletedAt: null } })),
+    withDbRetry(() => prisma.file.count({ where: { userId, deletedAt: null } })),
+    withDbRetry(() => prisma.assignment.count({ where: { userId } })),
+    withDbRetry(() => prisma.exam.count({ where: { userId } })),
+    withDbRetry(() => prisma.note.count({ where: { userId, deletedAt: null, isPublic: true } })),
+    withDbRetry(() => prisma.assignment.count({ where: { userId, status: "COMPLETED" } })),
+    withDbRetry(() => prisma.assignment.count({ where: { userId, status: { not: "COMPLETED" }, dueDate: { lt: now } } })),
+    withDbRetry(() => prisma.plannerItem.count({ where: { userId, status: "TODO" } })),
+    withDbRetry(() => prisma.plannerItem.count({ where: { userId, status: "IN_PROGRESS" } })),
+    withDbRetry(() => prisma.note.count({ where: { userId, deletedAt: null, createdAt: { gte: weekAgo } } })),
   ]);
 
   const [upcomingAssignments, upcomingExams, recentNotes] = await Promise.all([
-    prisma.assignment.findMany({
+    withDbRetry(() =>
+      prisma.assignment.findMany({
       where: { userId, dueDate: { not: null, gt: now } },
       orderBy: { dueDate: "asc" },
       take: 5,
       select: { id: true, title: true, dueDate: true, priority: true },
-    }),
-    prisma.exam.findMany({
+      }),
+    ),
+    withDbRetry(() =>
+      prisma.exam.findMany({
       where: { userId },
       orderBy: { date: "asc" },
       take: 3,
       select: { id: true, subject: true, date: true, status: true },
-    }),
-    prisma.note.findMany({
+      }),
+    ),
+    withDbRetry(() =>
+      prisma.note.findMany({
       where: { userId, deletedAt: null },
       orderBy: { createdAt: "desc" },
       take: 5,
       select: { id: true, title: true, createdAt: true },
-    }),
+      }),
+    ),
   ]);
 
   const completionRate = assignmentsCount > 0 ? Math.round((completedAssignments / assignmentsCount) * 100) : 0;
