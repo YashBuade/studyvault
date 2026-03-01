@@ -63,7 +63,7 @@ export default function LoginPage() {
       }
 
       setSuccess("Signed in successfully.");
-      router.push("/dashboard");
+      router.push(isAdminLogin ? "/dashboard/admin/teachers" : isTeacherLogin ? "/dashboard/teacher" : "/dashboard");
       router.refresh();
     } catch {
       setError("Unable to login right now. Please try again.");
