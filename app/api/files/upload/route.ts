@@ -97,7 +97,8 @@ export async function POST(request: Request) {
           mimeType,
           size: file.size,
           isPublic,
-          verificationStatus: isPublic ? "PENDING" : "VERIFIED",
+          // New uploads are never auto-verified; teacher/admin review decides status.
+          verificationStatus: "PENDING",
           userId,
         },
       });
