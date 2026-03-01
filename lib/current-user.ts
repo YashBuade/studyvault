@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getSessionFromCookies } from "@/lib/auth";
+import { logError } from "@/lib/api/logger";
 
 export async function getCurrentUser() {
   const session = await getSessionFromCookies();
@@ -14,21 +15,26 @@ export async function getCurrentUser() {
     return null;
   }
 
-  return prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      avatarUrl: true,
-      createdAt: true,
-      onboardingSeen: true,
-      role: true,
-      collegeId: true,
-      department: true,
-      teacherVerificationStatus: true,
-      teacherReviewNotes: true,
-      teacherVerifiedAt: true,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUrl: true,
+        createdAt: true,
+        onboardingSeen: true,
+        role: true,
+        collegeId: true,
+        department: true,
+        teacherVerificationStatus: true,
+        teacherReviewNotes: true,
+        teacherVerifiedAt: true,
+      },
+    });
+  } catch (error) {
+    logError("auth.current_user_lookup_failed", error, { userId });
+    return null;
+  }
 }
