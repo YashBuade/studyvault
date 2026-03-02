@@ -10,7 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: "mysql://user:password@127.0.0.1:3306/studyvault"
+      DATABASE_URL: "postgresql://ci_user:ci_password@127.0.0.1:5432/studyvault?sslmode=disable"
+      DIRECT_URL: "postgresql://ci_user:ci_password@127.0.0.1:5432/studyvault?sslmode=disable"
       AUTH_SECRET: "ci-placeholder-secret"
     steps:
       - uses: actions/checkout@v4
