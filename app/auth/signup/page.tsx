@@ -8,7 +8,7 @@ import { ModernButton } from "@/components/ui/modern-button";
 import { ModernInput } from "@/components/ui/modern-input";
 import { Logo } from "@/components/ui/logo";
 import { GoogleAuthButton } from "@/google-auth-button";
-import { TEACHER_EXPERTISE_FIELDS } from "@/lib/teacher-validation";
+import { CUSTOM_TEACHER_EXPERTISE, TEACHER_EXPERTISE_FIELDS } from "@/lib/teacher-validation";
 
 type AuthErrorResponse = {
   error?: string | { message?: string };
@@ -30,6 +30,8 @@ export default function SignupPage() {
   const [role, setRole] = useState<"STUDENT" | "TEACHER">(isTeacherSignup ? "TEACHER" : "STUDENT");
   const [collegeId, setCollegeId] = useState("");
   const [department, setDepartment] = useState("");
+  const [customExpertise, setCustomExpertise] = useState("");
+  const [isCustomExpertiseSelected, setIsCustomExpertiseSelected] = useState(false);
   const [teacherIdPhoto, setTeacherIdPhoto] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,12 +42,7 @@ export default function SignupPage() {
   const [googleEnabled, setGoogleEnabled] = useState(false);
   const [googleStatusMessage, setGoogleStatusMessage] = useState("Checking Google OAuth configuration...");
   const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
-
-  useEffect(() => {
-    if (isTeacherSignup) {
-      setRole("TEACHER");
-    }
-  }, [isTeacherSignup]);
+  const usingCustomExpertise = isCustomExpertiseSelected;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -318,8 +315,16 @@ export default function SignupPage() {
                         <select
                           id="expertise"
                           className="input"
-                          value={department}
-                          onChange={(event) => setDepartment(event.target.value)}
+                          value={usingCustomExpertise ? CUSTOM_TEACHER_EXPERTISE : department}
+                          onChange={(event) => {
+                            if (event.target.value === CUSTOM_TEACHER_EXPERTISE) {
+                              setIsCustomExpertiseSelected(true);
+                              setDepartment(customExpertise);
+                              return;
+                            }
+                            setIsCustomExpertiseSelected(false);
+                            setDepartment(event.target.value);
+                          }}
                           required
                         >
                           <option value="">Select expertise</option>
@@ -328,8 +333,23 @@ export default function SignupPage() {
                               {item}
                             </option>
                           ))}
+                          <option value={CUSTOM_TEACHER_EXPERTISE}>Other (enter manually)</option>
                         </select>
                       </div>
+                      {usingCustomExpertise ? (
+                        <ModernInput
+                          id="customExpertise"
+                          label="Custom Expertise"
+                          type="text"
+                          value={customExpertise}
+                          onChange={(event) => {
+                            setCustomExpertise(event.target.value);
+                            setDepartment(event.target.value);
+                          }}
+                          placeholder="e.g., Data Science, Law, Architecture"
+                          required
+                        />
+                      ) : null}
                       <p className="text-xs text-[rgb(var(--text-secondary))]">
                         Teacher profile remains pending until admin verifies your College ID and expertise.
                       </p>

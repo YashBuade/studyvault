@@ -16,8 +16,10 @@ export const TEACHER_EXPERTISE_FIELDS = [
 ] as const;
 
 export type TeacherExpertise = (typeof TEACHER_EXPERTISE_FIELDS)[number];
+export const CUSTOM_TEACHER_EXPERTISE = "__CUSTOM__";
 
 const COLLEGE_ID_REGEX = /^[A-Z0-9-]{6,20}$/;
+const EXPERTISE_TEXT_REGEX = /^[A-Za-z0-9&(),.\-+/\s]{2,120}$/;
 
 export function normalizeCollegeId(raw: string) {
   return raw.trim().toUpperCase();
@@ -36,12 +38,16 @@ export function validateCollegeId(raw: string) {
 
 export function validateTeacherExpertise(raw: string) {
   const normalized = raw.trim();
-  const valid = TEACHER_EXPERTISE_FIELDS.includes(normalized as TeacherExpertise);
-  if (!valid) {
+  const isListed = TEACHER_EXPERTISE_FIELDS.includes(normalized as TeacherExpertise);
+  if (isListed) {
+    return { ok: true as const, value: normalized as TeacherExpertise };
+  }
+
+  if (!EXPERTISE_TEXT_REGEX.test(normalized)) {
     return {
       ok: false as const,
-      message: "Select a valid field of expertise from the allowed list.",
+      message: "Enter a valid field of expertise (2-120 chars; letters, numbers, spaces, and basic punctuation).",
     };
   }
-  return { ok: true as const, value: normalized as TeacherExpertise };
+  return { ok: true as const, value: normalized };
 }

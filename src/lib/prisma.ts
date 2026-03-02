@@ -9,7 +9,7 @@ function asValidConnectionString(value: string | undefined) {
   const trimmed = value.trim();
   if (!trimmed) return undefined;
   if (trimmed.includes("${")) return undefined;
-  if (!trimmed.startsWith("postgresql://")) return undefined;
+  if (!trimmed.startsWith("postgresql://") && !trimmed.startsWith("postgres://")) return undefined;
   return trimmed;
 }
 
