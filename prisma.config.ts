@@ -7,7 +7,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Prefer direct URL for migrations; fallback to pooled URL if direct is unavailable.
-    url: process.env.DIRECT_URL || env("DATABASE_URL"),
+    // Prefer pooled URL by default to avoid local/network DNS blocks on direct hosts.
+    // Use DIRECT_URL only if DATABASE_URL is not set.
+    url: env("DATABASE_URL") || process.env.DIRECT_URL,
   },
 });
