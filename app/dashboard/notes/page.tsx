@@ -1,6 +1,7 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
+import { withDbRetry } from "@/lib/db-safe";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { NotesClient } from "@/components/dashboard/notes-client";
 import { ModuleShell } from "@/components/dashboard/module-shell";
@@ -26,30 +27,32 @@ export default async function NotesPage() {
     redirect("/auth/login");
   }
 
-  const notes = (await prisma.note.findMany({
-    where: { userId, deletedAt: null },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      subject: true,
-      semester: true,
-      tags: true,
-      isPublic: true,
-      slug: true,
-      createdAt: true,
-      deletedAt: true,
-      attachments: {
-        select: {
-          file: {
-            select: { id: true, originalName: true },
+  const notes = (await withDbRetry(() =>
+    prisma.note.findMany({
+      where: { userId, deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        subject: true,
+        semester: true,
+        tags: true,
+        isPublic: true,
+        slug: true,
+        createdAt: true,
+        deletedAt: true,
+        attachments: {
+          select: {
+            file: {
+              select: { id: true, originalName: true },
+            },
           },
         },
       },
-    },
-  })) as NoteRecord[];
+    }),
+  )) as NoteRecord[];
 
   const initialNotes = notes.map((note) => ({
     id: note.id,
