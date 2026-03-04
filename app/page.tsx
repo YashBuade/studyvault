@@ -54,7 +54,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/auth/signup"
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[rgb(var(--primary))] px-5 text-sm font-semibold text-[rgb(var(--text-inverse))] transition hover:bg-[rgb(var(--primary-hover))]"
+              className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[rgb(var(--primary))] px-5 text-sm font-semibold text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] transition hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--surface))]"
             >
               Get Started
             </Link>
@@ -76,7 +76,7 @@ export default async function HomePage() {
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row animate-slide-up animate-stagger-2">
               <Link
                 href="/auth/signup"
-                className="inline-flex h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[rgb(var(--primary))] px-7 text-base font-semibold text-[rgb(var(--text-inverse))] transition hover:bg-[rgb(var(--primary-hover))]"
+                className="inline-flex h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[rgb(var(--primary))] px-7 text-base font-semibold text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] transition hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--surface))]"
               >
                 Create Account <ArrowRight className="h-4 w-4" />
               </Link>
