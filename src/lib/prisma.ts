@@ -8,9 +8,19 @@ function asValidConnectionString(value: string | undefined) {
   if (!value) return undefined;
   const trimmed = value.trim();
   if (!trimmed) return undefined;
-  if (trimmed.includes("${")) return undefined;
-  if (!trimmed.startsWith("postgresql://") && !trimmed.startsWith("postgres://")) return undefined;
-  return trimmed;
+  const unquoted = trimmed.replace(/^['"]|['"]$/g, "").trim();
+  if (!unquoted) return undefined;
+  if (unquoted.includes("${")) return undefined;
+  if (!unquoted.startsWith("postgresql://") && !unquoted.startsWith("postgres://")) return undefined;
+  return unquoted;
+}
+
+function shouldForceTls(connectionString: string) {
+  const normalized = connectionString.toLowerCase();
+  if (normalized.includes("sslmode=")) {
+    return false;
+  }
+  return normalized.includes("supabase.com") || normalized.includes("neon.tech");
 }
 
 function createPrismaClient() {
@@ -31,6 +41,7 @@ function createPrismaClient() {
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl: shouldForceTls(process.env.DATABASE_URL) ? { rejectUnauthorized: false } : undefined,
     max: 10,
     connectionTimeoutMillis: 15000,
     idleTimeoutMillis: 60000,
