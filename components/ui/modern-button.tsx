@@ -27,18 +27,18 @@ export const ModernButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center gap-2 font-semibold rounded-[var(--radius-md)] transition-all duration-[var(--transition-base)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.99] motion-safe:hover:-translate-y-0.5";
+      "inline-flex items-center justify-center gap-2 font-semibold rounded-[var(--radius-md)] transition-all duration-[var(--transition-base)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--surface))] active:scale-[0.99] motion-safe:hover:-translate-y-0.5";
 
     const variants = {
       primary:
-        "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary))]/40",
+        "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary))]/40",
       secondary:
-        "bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--surface-active))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30",
+        "bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--surface-active))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30",
       outline:
-        "border border-[rgb(var(--border))] bg-transparent text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30",
+        "border border-[rgb(var(--border))] bg-transparent text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30",
       ghost: "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))]",
       danger:
-        "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:opacity-95 hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error))]/35",
+        "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:opacity-95 hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error))]/35",
     };
 
     const sizes = {

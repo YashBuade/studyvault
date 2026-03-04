@@ -314,7 +314,7 @@
   /* Button Variants */
   .btn-primary {
     @apply bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))];
-    @apply hover:bg-[rgb(var(--primary-hover))] shadow-md hover:shadow-lg;
+    @apply hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] shadow-md hover:shadow-lg;
     background-image: linear-gradient(140deg, rgb(var(--primary)) 0%, rgb(var(--primary-hover)) 100%);
     @apply focus-visible:ring-[rgb(var(--primary))];
   }
@@ -325,26 +325,26 @@
 
   .btn-secondary {
     @apply bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-primary))];
-    @apply hover:bg-[rgb(var(--surface-active))] border border-[rgb(var(--border))];
+    @apply hover:bg-[rgb(var(--surface-active))] hover:text-[rgb(var(--text-primary))] border border-[rgb(var(--border))];
     @apply focus-visible:ring-[rgb(var(--primary))];
   }
 
   .btn-outline {
     @apply border-2 border-[rgb(var(--border))] bg-transparent;
     @apply text-[rgb(var(--text-primary))];
-    @apply hover:bg-[rgb(var(--surface-hover))] hover:border-[rgb(var(--border-hover))];
+    @apply hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))];
     @apply focus-visible:ring-[rgb(var(--primary))];
   }
 
   .btn-ghost {
     @apply bg-transparent text-[rgb(var(--text-primary))];
-    @apply hover:bg-[rgb(var(--surface-hover))];
+    @apply hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))];
     @apply focus-visible:ring-[rgb(var(--primary))];
   }
 
   .btn-danger {
     @apply bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))];
-    @apply hover:opacity-90 shadow-md;
+    @apply hover:opacity-90 hover:text-[rgb(var(--text-inverse))] shadow-md;
     @apply focus-visible:ring-[rgb(var(--error))];
   }
 

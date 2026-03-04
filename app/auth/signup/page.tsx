@@ -186,9 +186,9 @@ export default function SignupPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-100 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900" />
           <div className="absolute right-16 top-16 h-64 w-64 rounded-full bg-indigo-300/20 blur-3xl dark:bg-indigo-500/20" />
           <div className="absolute bottom-20 left-10 h-72 w-72 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-600/20" />
-          <div className="relative z-10 flex w-full flex-col gap-8 p-12 xl:p-16">
+          <div className="relative z-10 flex w-full flex-col gap-4 p-12 xl:p-16">
             <Logo size="lg" />
-            <div className="max-w-xl space-y-8">
+            <div className="max-w-xl space-y-6 pt-1">
               <div className="space-y-3">
                 <h1 className="text-5xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Create your workspace</h1>
                 <p className="text-lg text-[rgb(var(--text-secondary))]">

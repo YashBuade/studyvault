@@ -153,9 +153,9 @@ export default function LoginPage() {
           <div className="absolute bottom-10 right-28 h-44 w-44 rounded-3xl bg-gradient-to-br from-blue-500/30 to-indigo-600/30 shadow-[var(--shadow-lg)] backdrop-blur-xl rotate-12" />
           <div className="absolute bottom-24 right-56 h-28 w-28 rounded-2xl bg-gradient-to-br from-cyan-300/25 to-blue-500/30 shadow-[var(--shadow-md)] -rotate-12" />
 
-          <div className="relative z-10 flex w-full flex-col justify-between p-12 xl:p-16">
+          <div className="relative z-10 flex w-full flex-col items-start gap-4 p-12 xl:p-16">
             <Logo size="lg" />
-            <div className="max-w-xl">
+            <div className="max-w-xl pt-1">
               <h1 className="text-5xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Welcome back to your study cockpit</h1>
               <p className="mt-5 text-lg leading-relaxed text-[rgb(var(--text-secondary))]">
                 Notes, planner, assignments, exams, and files in one workflow built for focused academic execution.
