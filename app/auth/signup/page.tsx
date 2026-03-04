@@ -206,15 +206,15 @@ export default function SignupPage() {
           </div>
         </section>
 
-        <section className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
+        <section className="flex items-center justify-center px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
           <div className="w-full max-w-md space-y-6">
             <div className="lg:hidden">
               <Logo size="md" />
             </div>
-            <div className="card p-6 sm:p-8">
+            <div className="card p-5 sm:p-8">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <h2 className="text-3xl font-bold text-[rgb(var(--text-primary))]">
+                  <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))] sm:text-3xl">
                     {isTeacherSignup ? "Teacher signup" : "Create account"}
                   </h2>
                   <p className="text-sm text-[rgb(var(--text-secondary))]">

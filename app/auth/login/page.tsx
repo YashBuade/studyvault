@@ -171,7 +171,7 @@ export default function LoginPage() {
           </div>
         </section>
 
-        <section className="relative flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
+        <section className="relative flex items-center justify-center px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
           <div className="absolute inset-0 lg:hidden">
             <div className="absolute -left-8 top-12 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl" />
             <div className="absolute -right-8 bottom-12 h-40 w-40 rounded-full bg-indigo-400/20 blur-3xl" />
@@ -180,10 +180,10 @@ export default function LoginPage() {
             <div className="lg:hidden">
               <Logo size="md" />
             </div>
-            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 p-6 shadow-[var(--shadow-lg)] backdrop-blur sm:p-8">
+            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 p-5 shadow-[var(--shadow-lg)] backdrop-blur sm:p-8">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))]">
+                  <h2 className="text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))] sm:text-3xl">
                     {isAdminLogin ? "Admin sign in" : "Sign in"}
                   </h2>
                   <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
