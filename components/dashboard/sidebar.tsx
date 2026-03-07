@@ -73,7 +73,10 @@ export function DashboardSidebar({
     ? [
         {
           label: "Admin Control",
-          items: [{ href: "/dashboard/admin", label: "Admin Panel", icon: Shield }],
+          items: [
+            { href: "/dashboard/admin", label: "Admin Panel", icon: Shield },
+            { href: "/admin/analytics", label: "Admin Analytics", icon: BarChart3 },
+          ],
         },
         {
           label: "Admin Verification",

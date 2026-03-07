@@ -83,6 +83,12 @@ export default async function AdminPage() {
               Open Teacher Validation Desk
             </Link>
             <Link
+              href="/admin/analytics"
+              className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-hover))]"
+            >
+              Open Admin Analytics
+            </Link>
+            <Link
               href="/dashboard/teacher/review"
               className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-hover))]"
             >
@@ -90,12 +96,18 @@ export default async function AdminPage() {
             </Link>
           </div>
         </section>
-        <section className="mb-5 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 sm:grid-cols-2">
+        <section className="mb-5 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 sm:grid-cols-3">
           <Link
             href="/dashboard/admin/teachers"
             className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
           >
             Open Teacher Verification Queue
+          </Link>
+          <Link
+            href="/admin/analytics"
+            className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+          >
+            Open Admin Analytics Dashboard
           </Link>
           <Link
             href="/dashboard/teacher/review"
