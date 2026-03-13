@@ -5,7 +5,6 @@ import { useState } from "react";
 import {
   Archive,
   BarChart3,
-  Bell,
   Calendar,
   ClipboardList,
   FileText,
@@ -23,6 +22,7 @@ import {
 } from "lucide-react";
 import { NavItem } from "@/src/components/ui/nav-item";
 import { Logo } from "@/components/ui/logo";
+import { NotificationBadge } from "@/components/dashboard/notification-badge";
 
 const navSections = [
   {
@@ -47,7 +47,7 @@ const navSections = [
     label: "Explore & Account",
     items: [
       { href: "/notes", label: "Public Library", icon: Globe },
-      { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
+      { href: "/dashboard/notifications", label: "Notifications", icon: NotificationBadge },
       { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/profile", label: "Profile", icon: User },
       { href: "/dashboard/settings", label: "Settings", icon: Settings },
@@ -69,6 +69,12 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const teacherStatusMap = {
+    NONE: { label: "Not submitted", className: "text-[rgb(var(--text-tertiary))]" },
+    PENDING: { label: "Awaiting admin approval", className: "text-amber-600" },
+    APPROVED: { label: "Verified ✓", className: "text-emerald-600" },
+    REJECTED: { label: "Verification rejected", className: "text-red-600" },
+  } as const;
   const adminSections = isAdmin
     ? [
         {
@@ -165,14 +171,11 @@ export function DashboardSidebar({
                 <Shield size={16} />
                 {isVerifiedTeacher ? "File Verification" : "Verification Pending"}
               </NavItem>
-              <p className="mt-2 text-[11px] text-[rgb(var(--text-tertiary))]">Status: {teacherStatus}</p>
+              <p className={`mt-2 text-[11px] ${teacherStatusMap[teacherStatus].className}`}>Status: {teacherStatusMap[teacherStatus].label}</p>
             </div>
           </div>
         ) : null}
-
-        <div className="mt-6 rounded-[var(--radius-xl)] border border-[rgb(var(--primary))]/18 bg-gradient-to-br from-[rgb(var(--primary-soft))] to-[rgb(var(--surface))] p-4 text-xs leading-relaxed text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)]">
-          Build stronger routines with organized notes, timed deadlines, and one searchable study hub.
-        </div>
+        <div className="pb-8" />
       </aside>
     </>
   );

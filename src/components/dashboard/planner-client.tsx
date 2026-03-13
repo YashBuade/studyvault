@@ -246,17 +246,17 @@ export function PlannerClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-sky-500/15 to-blue-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-sky-500/15 to-blue-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Focus Queue</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.todo}</p>
           <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Tasks waiting to start</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-violet-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-violet-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">In Motion</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.inProgress}</p>
           <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Currently active tasks</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completion</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.completion}%</p>
           <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">{plannerStats.done} completed tasks</p>
@@ -279,7 +279,7 @@ export function PlannerClient() {
             {[{ id: null, name: "Unassigned", color: "var(--muted)" }, ...categories].map((cat) => (
               <div
                 key={cat.id ?? "unassigned"}
-                className="rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3"
+                className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-3 shadow-[var(--shadow-xs)]"
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {
                   const itemId = Number(event.dataTransfer.getData("text/plain"));
@@ -307,7 +307,7 @@ export function PlannerClient() {
                       key={item.id}
                       draggable
                       onDragStart={(event) => event.dataTransfer.setData("text/plain", String(item.id))}
-                      className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-sm"
+                      className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div>
@@ -339,7 +339,7 @@ export function PlannerClient() {
               items
                 .filter((item) => item.dueDate)
                 .map((item) => (
-                  <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+                  <div key={item.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold">{item.title}</p>
@@ -357,7 +357,7 @@ export function PlannerClient() {
       </Card>
 
       <div className="space-y-4">
-        <Card title="New Item" description="Add tasks with priorities and optional due dates.">
+        <Card title="New Item" description="Add tasks with priorities and optional due dates." className="lg:sticky lg:top-24">
           <form onSubmit={addItem} className="space-y-2">
             <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Item title" />
             <Textarea value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Details" rows={4} />

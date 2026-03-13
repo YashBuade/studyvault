@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoutButton } from "@/components/dashboard/logout-button";
@@ -7,6 +6,10 @@ import { Logo } from "@/components/ui/logo";
 import { getCurrentUser } from "@/lib/current-user";
 import { PageTransition } from "@/src/components/ui/page-transition";
 import { OnboardingModal } from "@/src/components/dashboard/onboarding-modal";
+import { QuickStartPanel } from "@/components/dashboard/quick-start-panel";
+import { DismissibleBanner } from "@/components/dashboard/dismissible-banner";
+import { MobilePageTitle } from "@/components/dashboard/mobile-page-title";
+import { Breadcrumbs } from "@/components/dashboard/breadcrumbs";
 
 export default async function DashboardLayout({
   children,
@@ -38,7 +41,11 @@ export default async function DashboardLayout({
         <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/80 backdrop-blur-2xl">
           <div className="flex min-h-16 items-center justify-between gap-4 px-4 py-3 sm:px-6 md:px-8">
             <div className="md:hidden">
-              <Logo size="sm" showText={false} />
+              <div className="grid grid-cols-[40px_1fr_40px] items-center gap-2">
+                <Logo size="sm" showText={false} />
+                <MobilePageTitle />
+                <span aria-hidden="true" />
+              </div>
             </div>
 
             <div className="hidden items-center gap-3 md:flex">
@@ -70,26 +77,13 @@ export default async function DashboardLayout({
 
         <main className="px-4 py-6 sm:px-6 md:px-8 md:py-8">
           <div className="mx-auto max-w-7xl">
+            <Breadcrumbs />
             {user.role === "TEACHER" && user.teacherVerificationStatus !== "APPROVED" ? (
-              <div className="mb-4 rounded-[var(--radius-md)] border border-amber-300/70 bg-amber-50/80 px-4 py-3 text-sm text-amber-800">
+              <DismissibleBanner>
                 Teacher verification is pending admin approval. Reviewer tools unlock after approval.
-              </div>
+              </DismissibleBanner>
             ) : null}
-            <section className="panel-shell mb-5 rounded-[var(--radius-xl)] p-4">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[rgb(var(--text-tertiary))]">Quick Start</p>
-                  <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Core actions most students complete every week.</p>
-                </div>
-                <div className="section-kicker">Fast path</div>
-              </div>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                <Link href="/dashboard/notes" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">1. Capture notes</Link>
-                <Link href="/dashboard/upload-center" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">2. Upload files</Link>
-                <Link href="/dashboard/planner" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">3. Plan your week</Link>
-                <Link href="/notes" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">4. Explore public library</Link>
-              </div>
-            </section>
+            <QuickStartPanel />
             <PageTransition>{children}</PageTransition>
           </div>
         </main>

@@ -302,7 +302,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_1.2fr]">
-      <Card title="New Note" description="Capture ideas quickly with rich, searchable notes.">
+      <Card title="New Note" description="Capture ideas quickly with rich, searchable notes." className="lg:sticky lg:top-24">
         <form onSubmit={createNote} className="space-y-3">
           <Input required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Note title" />
           <div className="grid gap-2 sm:grid-cols-2">
@@ -319,7 +319,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
               { label: "Private", value: "private" },
             ]}
           />
-          <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+          <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover))]/80 p-3 shadow-[var(--shadow-xs)]">
             <p className="text-xs font-semibold text-[var(--muted)]">Upload files for this note</p>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
@@ -416,7 +416,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
             <p className="text-sm text-[var(--muted)]">No notes in this view.</p>
           ) : (
             list.map((note) => (
-              <article key={note.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
+              <article key={note.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold">{note.title}</h3>
@@ -497,7 +497,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
         ) : (
           <div className="space-y-2">
             {recentFiles.map((file) => (
-              <div key={file.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+              <div key={file.id} className="flex items-center justify-between rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover))]/80 p-3 shadow-[var(--shadow-xs)]">
                 <p className="text-sm font-medium">{file.originalName}</p>
                 <a
                   href={`/api/files/${file.id}/download`}

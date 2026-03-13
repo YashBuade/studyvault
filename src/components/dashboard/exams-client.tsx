@@ -164,11 +164,11 @@ export function ExamsClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-blue-600/10 p-4">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-blue-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Upcoming Exams</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{examSummary.upcoming}</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completed Exams</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{examSummary.completed}</p>
         </div>
@@ -204,7 +204,7 @@ export function ExamsClient() {
                         : "Upcoming";
 
                 return (
-                  <div key={item.id} className="rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
+                  <div key={item.id} className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <p className="text-base font-semibold">{item.subject}</p>
@@ -245,7 +245,7 @@ export function ExamsClient() {
         </Card>
       </div>
 
-      <Card title="New Exam" description="Add subject, date, and notes.">
+      <Card title="New Exam" description="Add subject, date, and notes." className="lg:sticky lg:top-24">
         <form onSubmit={addExam} className="space-y-2">
           <Input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Subject" />
           <Input value={date} onChange={(event) => setDate(event.target.value)} placeholder="dd-mm-yyyy" />

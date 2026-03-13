@@ -11,7 +11,7 @@ import {
   Flame,
   Lightbulb,
   Target,
-  TrendingUp,
+  Upload,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/require-user";
@@ -218,7 +218,7 @@ export default async function DashboardPage() {
 
   const quickActions = [
     { label: "Create Note", href: "/dashboard/notes", hint: "Capture a fresh concept summary", icon: FileText },
-    { label: "Upload Files", href: "/dashboard/upload-center", hint: "Add PDFs, slides, and diagrams", icon: BookOpen },
+    { label: "Upload Files", href: "/dashboard/upload-center", hint: "Add PDFs, slides, and diagrams", icon: Upload },
     { label: "Plan Week", href: "/dashboard/planner", hint: "Schedule focused study blocks", icon: Calendar },
     { label: "Open Analytics", href: "/dashboard/analytics", hint: "Review consistency and risks", icon: BarChart3 },
   ] as const;
@@ -228,6 +228,27 @@ export default async function DashboardPage() {
     { label: "Productivity", value: productivityScore, tone: "from-emerald-500 to-teal-500" },
     { label: "Focus", value: focusHealth, tone: "from-sky-500 to-cyan-500" },
   ] as const;
+  const isNewWorkspace = notesCount === 0 && assignmentsCount === 0 && filesCount === 0;
+  const isNeutralScoreState = assignmentsCount === 0 && notesCount === 0;
+
+  if (isNewWorkspace) {
+    return (
+      <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 px-6 py-12 text-center shadow-[var(--shadow-sm)]">
+        <h1 className="text-3xl font-semibold text-[rgb(var(--text-primary))]">Welcome to StudyVault 👋</h1>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-[rgb(var(--text-secondary))]">
+          Your workspace is ready. Start by creating your first note or uploading a file.
+        </p>
+        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link href="/dashboard/notes" className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(var(--primary))] px-5 text-sm font-semibold text-[rgb(var(--text-inverse))] hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))]">
+            Create your first note
+          </Link>
+          <Link href="/dashboard/upload-center" className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] px-5 text-sm font-semibold text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))]">
+            Upload a file
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-7">
@@ -250,11 +271,10 @@ export default async function DashboardPage() {
                 href={stat.href}
                 className="group rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 transition-all duration-[var(--transition-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
               >
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4">
                   <div className="rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] p-2.5 text-[rgb(var(--primary))]">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <TrendingUp className="h-4 w-4 text-[rgb(var(--success))]" />
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">{stat.label}</p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-[rgb(var(--text-primary))]">{stat.value}</p>
@@ -299,7 +319,6 @@ export default async function DashboardPage() {
                       <Icon className="h-4 w-4 text-[rgb(var(--primary))]" />
                       {action.label}
                     </span>
-                    <TrendingUp className="h-4 w-4 text-[rgb(var(--success))]" />
                   </div>
                   <p className="mt-2 text-xs text-[rgb(var(--text-secondary))]">{action.hint}</p>
                 </Link>
@@ -311,19 +330,25 @@ export default async function DashboardPage() {
         <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Performance Breakdown</h3>
           <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Live indicators generated from your workload and completion behavior.</p>
-          <div className="mt-4 space-y-3">
-            {scoreBreakdown.map((item) => (
-              <div key={item.label}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="text-[rgb(var(--text-secondary))]">{item.label}</span>
-                  <strong className="text-[rgb(var(--text-primary))]">{item.value}%</strong>
+          {isNeutralScoreState ? (
+            <div className="mt-6 rounded-[var(--radius-md)] bg-[rgb(var(--surface-hover))] px-4 py-8 text-center text-sm text-[rgb(var(--text-secondary))]">
+              Scores generate as you add notes and assignments.
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {scoreBreakdown.map((item) => (
+                <div key={item.label}>
+                  <div className="mb-1 flex items-center justify-between text-sm">
+                    <span className="text-[rgb(var(--text-secondary))]">{item.label}</span>
+                    <strong className="text-[rgb(var(--text-primary))]">{item.value}%</strong>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
+                    <div className={`h-full rounded-full bg-gradient-to-r ${item.tone}`} style={{ width: `${item.value}%` }} />
+                  </div>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
-                  <div className={`h-full rounded-full bg-gradient-to-r ${item.tone}`} style={{ width: `${item.value}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </article>
       </section>
 
@@ -336,10 +361,16 @@ export default async function DashboardPage() {
           <p className="text-sm text-[rgb(var(--text-secondary))]">
             {completedAssignments} of {assignmentsCount} completed
           </p>
-          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
-            <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${completionRate}%` }} />
-          </div>
-          <p className="mt-3 text-xs font-medium text-[rgb(var(--text-tertiary))]">{completionRate}% completion rate</p>
+          {assignmentsCount === 0 ? (
+            <p className="mt-4 text-sm text-[rgb(var(--text-tertiary))]">No assignments added yet.</p>
+          ) : (
+            <>
+              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
+                <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${completionRate}%` }} />
+              </div>
+              <p className="mt-3 text-xs font-medium text-[rgb(var(--text-tertiary))]">{completionRate}% completion rate</p>
+            </>
+          )}
         </article>
 
         <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
@@ -421,7 +452,7 @@ export default async function DashboardPage() {
               <p className="px-5 py-6 text-sm text-[rgb(var(--text-secondary))]">No notes yet.</p>
             ) : (
               recentNotes.map((note) => (
-                <div key={note.id} className="px-5 py-4">
+                <Link key={note.id} href="/dashboard/notes" className="block px-5 py-4 hover:bg-[rgb(var(--surface-hover))]">
                   <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{note.title}</p>
                   <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">
                     {new Date(note.createdAt).toLocaleDateString("en-US", {
@@ -431,7 +462,7 @@ export default async function DashboardPage() {
                       minute: "2-digit",
                     })}
                   </p>
-                </div>
+                </Link>
               ))
             )}
           </div>

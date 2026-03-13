@@ -164,7 +164,7 @@ export function ResourcesClient() {
         ) : (
           <div className="space-y-3">
             {visible.map((item) => (
-              <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+              <div key={item.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-3 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-semibold">{item.title}</p>
@@ -196,7 +196,7 @@ export function ResourcesClient() {
       </Card>
 
       <div className="space-y-4">
-        <Card title="New Resource" description="Add links, notes, and tags.">
+        <Card title="New Resource" description="Add links, notes, and tags." className="lg:sticky lg:top-24">
           <form onSubmit={createItem} className="space-y-2">
             <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Resource title" />
             <Input value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://" />
@@ -222,7 +222,7 @@ export function ResourcesClient() {
               <p className="text-xs text-[var(--muted)]">No folders yet.</p>
             ) : (
               folders.map((folder) => (
-                <div key={folder.id} className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-2">
+                <div key={folder.id} className="flex items-center justify-between rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface-hover))]/80 p-2 shadow-[var(--shadow-xs)]">
                   <p className="text-sm font-medium">{folder.name}</p>
                   <Button variant="secondary" onClick={() => startEditFolder(folder)}>
                     <Pencil size={14} /> Edit

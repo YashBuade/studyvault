@@ -31,10 +31,12 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-      <div className="w-full max-w-md rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-lg)] animate-page-in">
-        <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
-        {description ? <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">{description}</p> : null}
-        {children ? <div className="mt-3">{children}</div> : null}
+      <div className="w-full max-w-md rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-xl)] animate-page-in">
+        <div className="border-b border-[rgb(var(--border))]/70 pb-3">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
+          {description ? <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">{description}</p> : null}
+        </div>
+        {children ? <div className="mt-4">{children}</div> : null}
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>
             {cancelLabel}

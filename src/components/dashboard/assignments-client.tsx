@@ -153,15 +153,15 @@ export function AssignmentsClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-amber-500/15 to-orange-600/10 p-4">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-amber-500/15 to-orange-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Pending</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.pending}</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-green-600/10 p-4">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-green-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completed</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.completed}</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-gradient-to-br from-rose-500/15 to-red-600/10 p-4">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-rose-500/15 to-red-600/10 p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Overdue</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.overdue}</p>
         </div>
@@ -188,7 +188,7 @@ export function AssignmentsClient() {
         ) : (
           <div className="space-y-3">
             {visible.map((item) => (
-              <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+              <div key={item.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-3 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold">{item.title}</p>
@@ -210,7 +210,7 @@ export function AssignmentsClient() {
         )}
       </Card>
 
-      <Card title="New Assignment" description="Add tasks with priority and status.">
+      <Card title="New Assignment" description="Add tasks with priority and status." className="lg:sticky lg:top-24">
         <form onSubmit={addAssignment} className="space-y-2">
           <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Assignment title" />
           <Textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Description" rows={4} />
