@@ -93,7 +93,7 @@ export function DashboardSidebar({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-4 z-40 inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-2 text-[rgb(var(--text-primary))] shadow-[var(--shadow-sm)] md:hidden"
+        className="panel-shell fixed left-4 top-4 z-40 inline-flex items-center justify-center rounded-[var(--radius-md)] p-2 text-[rgb(var(--text-primary))] md:hidden"
         aria-label="Open menu"
       >
         <Menu size={20} />
@@ -102,25 +102,37 @@ export function DashboardSidebar({
       {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" /> : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 p-5 backdrop-blur-xl transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-[rgb(var(--border))]/70 bg-[rgb(var(--surface))]/90 p-5 backdrop-blur-2xl transition-transform duration-300 md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         } md:block`}
       >
-        <div className="mb-6 flex items-center justify-between">
-          <Logo size="md" showText href="/dashboard" />
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-[var(--radius-sm)] p-2 text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] md:hidden"
-            aria-label="Close menu"
-          >
-            <X size={18} />
-          </button>
+        <div className="mb-6 rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/60 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center justify-between">
+            <Logo size="md" showText href="/dashboard" />
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-[var(--radius-sm)] p-2 text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] md:hidden"
+              aria-label="Close menu"
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-[var(--radius-md)] bg-[rgb(var(--surface-hover))] px-3 py-2">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">Workspace</p>
+              <p className="mt-1 font-semibold text-[rgb(var(--text-primary))]">Unified study hub</p>
+            </div>
+            <div className="rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] px-3 py-2">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--primary-hover))]">Focus</p>
+              <p className="mt-1 font-semibold text-[rgb(var(--text-primary))]">Keep every deadline visible</p>
+            </div>
+          </div>
         </div>
 
         <nav className="space-y-4">
           {[...navSections, ...adminSections].map((section) => (
-            <div key={section.label}>
+            <div key={section.label} className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/55 bg-[rgb(var(--surface))]/72 p-3 shadow-[var(--shadow-xs)]">
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">
                 {section.label}
               </p>
@@ -142,7 +154,7 @@ export function DashboardSidebar({
         </nav>
 
         {isTeacher ? (
-          <div className="mt-4 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-3">
+          <div className="mt-4 rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/60 bg-gradient-to-br from-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Teacher</p>
             <div className="mt-2">
               <NavItem href="/dashboard/teacher" active={pathname === "/dashboard/teacher"}>
@@ -158,7 +170,7 @@ export function DashboardSidebar({
           </div>
         ) : null}
 
-        <div className="mt-6 rounded-[var(--radius-md)] border border-[rgb(var(--primary))]/20 bg-[rgb(var(--primary-soft))] p-4 text-xs leading-relaxed text-[rgb(var(--text-secondary))]">
+        <div className="mt-6 rounded-[var(--radius-xl)] border border-[rgb(var(--primary))]/18 bg-gradient-to-br from-[rgb(var(--primary-soft))] to-[rgb(var(--surface))] p-4 text-xs leading-relaxed text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)]">
           Build stronger routines with organized notes, timed deadlines, and one searchable study hub.
         </div>
       </aside>

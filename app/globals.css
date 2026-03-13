@@ -30,11 +30,12 @@
 
     /* Surfaces & Backgrounds */
     --surface: 255 255 255;
-    --surface-hover: 249 252 255;
-    --surface-active: 242 248 252;
-    --surface-elevated: 255 252 248;
-    --background: 244 247 244;
-    --background-alt: 235 241 238;
+    --surface-hover: 245 249 251;
+    --surface-active: 235 243 246;
+    --surface-elevated: 255 251 245;
+    --surface-strong: 232 241 238;
+    --background: 241 245 242;
+    --background-alt: 228 236 232;
 
     /* Borders */
     --border: 192 203 198;
@@ -42,12 +43,12 @@
     --border-focus: 0 122 102;
 
     /* Shadows - Light Mode (subtle and elegant) */
-    --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.05);
-    --shadow-sm: 0 5px 14px rgb(16 24 40 / 0.05);
-    --shadow-md: 0 14px 28px -12px rgb(16 24 40 / 0.14), 0 10px 18px -14px rgb(16 24 40 / 0.14);
-    --shadow-lg: 0 24px 40px -16px rgb(16 24 40 / 0.2);
-    --shadow-xl: 0 30px 50px -20px rgb(16 24 40 / 0.24);
-    --shadow-hover: 0 34px 58px -22px rgb(16 24 40 / 0.28);
+    --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.04);
+    --shadow-sm: 0 14px 28px -22px rgb(15 23 42 / 0.22), 0 12px 16px -22px rgb(15 23 42 / 0.18);
+    --shadow-md: 0 24px 42px -26px rgb(15 23 42 / 0.3), 0 20px 30px -30px rgb(15 23 42 / 0.18);
+    --shadow-lg: 0 28px 54px -26px rgb(15 23 42 / 0.34), 0 18px 24px -18px rgb(15 23 42 / 0.18);
+    --shadow-xl: 0 36px 72px -32px rgb(15 23 42 / 0.38), 0 26px 34px -24px rgb(15 23 42 / 0.16);
+    --shadow-hover: 0 40px 84px -30px rgb(15 23 42 / 0.42), 0 20px 26px -20px rgb(15 23 42 / 0.2);
 
     /* Border Radius */
     --radius-sm: 6px;
@@ -127,12 +128,13 @@
     --text-inverse: 15 23 42;
 
     /* Surfaces & Backgrounds */
-    --surface: 15 19 27;
-    --surface-hover: 25 32 43;
-    --surface-active: 34 42 55;
-    --surface-elevated: 20 25 33;
-    --background: 9 12 20;
-    --background-alt: 15 19 30;
+    --surface: 14 18 26;
+    --surface-hover: 20 28 38;
+    --surface-active: 28 36 49;
+    --surface-elevated: 18 23 32;
+    --surface-strong: 32 41 56;
+    --background: 7 11 19;
+    --background-alt: 12 18 28;
 
     /* Borders */
     --border: 56 68 84;
@@ -140,12 +142,12 @@
     --border-focus: 94 231 205;
 
     /* Shadows - Dark Mode (softer, sophisticated) */
-    --shadow-xs: 0 1px 3px rgb(0 0 0 / 0.16);
-    --shadow-sm: 0 8px 20px rgb(0 0 0 / 0.2);
-    --shadow-md: 0 16px 30px rgb(0 0 0 / 0.26);
-    --shadow-lg: 0 24px 44px rgb(0 0 0 / 0.3);
-    --shadow-xl: 0 34px 56px rgb(0 0 0 / 0.34);
-    --shadow-hover: 0 40px 64px rgb(0 0 0 / 0.38);
+    --shadow-xs: 0 1px 3px rgb(0 0 0 / 0.18);
+    --shadow-sm: 0 16px 28px -20px rgb(0 0 0 / 0.42);
+    --shadow-md: 0 24px 40px -20px rgb(0 0 0 / 0.48);
+    --shadow-lg: 0 32px 52px -22px rgb(0 0 0 / 0.54);
+    --shadow-xl: 0 40px 70px -26px rgb(0 0 0 / 0.58);
+    --shadow-hover: 0 48px 86px -30px rgb(0 0 0 / 0.62);
 
     /* Legacy CSS variables */
     --foreground: 248 250 252;
@@ -190,11 +192,25 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image:
-      radial-gradient(circle at 10% 12%, rgb(var(--primary-light) / 0.34) 0, transparent 32%),
-      radial-gradient(circle at 88% 6%, rgb(255 158 61 / 0.18) 0, transparent 30%),
-      radial-gradient(circle at 78% 82%, rgb(0 121 191 / 0.14) 0, transparent 36%),
-      linear-gradient(180deg, rgb(255 255 255 / 0.48), transparent 45%);
+      radial-gradient(circle at 12% 10%, rgb(var(--primary-light) / 0.28) 0, transparent 32%),
+      radial-gradient(circle at 85% 8%, rgb(251 191 36 / 0.14) 0, transparent 28%),
+      radial-gradient(circle at 78% 78%, rgb(14 165 233 / 0.12) 0, transparent 34%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.52), transparent 42%);
     background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgb(var(--border) / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--border) / 0.06) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(circle at center, black 38%, transparent 85%);
+    opacity: 0.5;
+    z-index: -1;
   }
 
   /* Focus States - Accessible & Beautiful */
@@ -410,6 +426,7 @@
     @apply shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)];
     @apply transition-all duration-[var(--transition-base)];
     @apply p-6;
+    background-image: linear-gradient(180deg, rgb(var(--surface)) 0%, rgb(var(--surface-hover)) 100%);
   }
 
   .card-elevated {
@@ -774,6 +791,30 @@
     background: rgb(var(--surface) / 0.5);
     backdrop-filter: blur(12px);
     border: 1px solid rgb(var(--border) / 0.3);
+  }
+
+  .panel-shell {
+    background:
+      linear-gradient(180deg, rgb(var(--surface) / 0.96), rgb(var(--surface-hover) / 0.96));
+    border: 1px solid rgb(var(--border) / 0.85);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(18px);
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(rgb(var(--border) / 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--border) / 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: center;
+  }
+
+  .section-kicker {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em];
+    background: rgb(var(--surface) / 0.78);
+    border: 1px solid rgb(var(--border) / 0.75);
+    color: rgb(var(--text-secondary));
+    backdrop-filter: blur(12px);
   }
 }
 

@@ -25,6 +25,7 @@ export default async function DashboardLayout({
         <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-sky-300/25 blur-3xl dark:bg-sky-500/18" />
         <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-indigo-300/22 blur-3xl dark:bg-indigo-500/18" />
         <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-emerald-300/15 blur-3xl dark:bg-emerald-500/12" />
+        <div className="hero-grid absolute inset-0 opacity-20" />
       </div>
 
       <DashboardSidebar
@@ -34,8 +35,8 @@ export default async function DashboardLayout({
         isVerifiedTeacher={user.role === "TEACHER" && user.teacherVerificationStatus === "APPROVED"}
       />
       <div className="md:pl-72">
-        <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/90 backdrop-blur-xl">
-          <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
+        <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/80 backdrop-blur-2xl">
+          <div className="flex min-h-16 items-center justify-between gap-4 px-4 py-3 sm:px-6 md:px-8">
             <div className="md:hidden">
               <Logo size="sm" showText={false} />
             </div>
@@ -49,7 +50,7 @@ export default async function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="hidden rounded-full border border-[rgb(var(--border))] bg-gradient-to-r from-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] sm:block">
+              <div className="hidden rounded-full border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] sm:block">
                 {user.role === "ADMIN"
                   ? "Admin"
                   : user.role === "TEACHER"
@@ -58,7 +59,7 @@ export default async function DashboardLayout({
                       : "Teacher Pending"
                     : "Student"}
               </div>
-              <div className="hidden rounded-full bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs font-medium text-[rgb(var(--text-secondary))] sm:block">
+              <div className="hidden rounded-full border border-[rgb(var(--border))]/60 bg-[rgb(var(--surface-hover))]/80 px-3 py-1 text-xs font-medium text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] sm:block">
                 {user.name || user.email}
               </div>
               <ThemeToggle />
@@ -74,8 +75,14 @@ export default async function DashboardLayout({
                 Teacher verification is pending admin approval. Reviewer tools unlock after approval.
               </div>
             ) : null}
-            <section className="mb-5 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-xs)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[rgb(var(--text-tertiary))]">Quick Start</p>
+            <section className="panel-shell mb-5 rounded-[var(--radius-xl)] p-4">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[rgb(var(--text-tertiary))]">Quick Start</p>
+                  <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Core actions most students complete every week.</p>
+                </div>
+                <div className="section-kicker">Fast path</div>
+              </div>
               <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 <Link href="/dashboard/notes" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">1. Capture notes</Link>
                 <Link href="/dashboard/upload-center" className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]">2. Upload files</Link>

@@ -231,7 +231,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-7">
-      <section className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] to-[rgb(var(--surface-hover))] p-6 shadow-[var(--shadow-sm)] md:p-8">
+      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-sm)] md:p-8">
+        <div className="hero-grid absolute inset-0 opacity-35" />
+        <div className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-emerald-300/20 blur-3xl dark:bg-emerald-500/15" />
+        <div className="pointer-events-none absolute left-10 top-10 h-28 w-28 rounded-full bg-sky-300/15 blur-3xl dark:bg-sky-500/15" />
+        <div className="relative">
         <PageHeader
           title="Welcome back"
           description="Track your progress, keep deadlines visible, and keep all study materials in one calm workspace."
@@ -258,13 +262,14 @@ export default async function DashboardPage() {
             );
           })}
         </div>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
         {smartInsights.map((insight) => {
           const Icon = insight.icon;
           return (
-            <article key={insight.title} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+            <article key={insight.title} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">{insight.title}</h3>
                 <Icon className={`h-5 w-5 ${insight.tone}`} />
@@ -277,7 +282,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Action Center</h3>
           <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">High-impact shortcuts to keep your study workflow moving.</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -303,7 +308,7 @@ export default async function DashboardPage() {
           </div>
         </article>
 
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Performance Breakdown</h3>
           <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Live indicators generated from your workload and completion behavior.</p>
           <div className="mt-4 space-y-3">
@@ -323,7 +328,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Assignment Progress</h3>
             <CheckCircle2 className="h-5 w-5 text-[rgb(var(--success))]" />
@@ -337,7 +342,7 @@ export default async function DashboardPage() {
           <p className="mt-3 text-xs font-medium text-[rgb(var(--text-tertiary))]">{completionRate}% completion rate</p>
         </article>
 
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="mb-4 text-base font-semibold text-[rgb(var(--text-primary))]">Study Library</h3>
           <div className="space-y-2.5 text-sm">
             <div className="flex items-center justify-between rounded-[var(--radius-md)] bg-[rgb(var(--surface-hover))] px-3 py-2.5">
@@ -355,7 +360,7 @@ export default async function DashboardPage() {
           </div>
         </article>
 
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="mb-4 text-base font-semibold text-[rgb(var(--text-primary))]">Risk Monitor</h3>
           <div className="space-y-2.5 text-sm">
             <div className="flex items-center justify-between rounded-[var(--radius-md)] bg-[rgb(var(--surface-hover))] px-3 py-2.5">
@@ -375,7 +380,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)]">
+        <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 shadow-[var(--shadow-sm)] backdrop-blur">
           <div className="flex items-center gap-3 border-b border-[rgb(var(--border))] px-5 py-4">
             <Clock3 className="h-5 w-5 text-[rgb(var(--warning))]" />
             <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Upcoming Deadlines</h3>
@@ -406,7 +411,7 @@ export default async function DashboardPage() {
           </div>
         </article>
 
-        <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)]">
+        <article className="overflow-hidden rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 shadow-[var(--shadow-sm)] backdrop-blur">
           <div className="flex items-center gap-3 border-b border-[rgb(var(--border))] px-5 py-4">
             <FileText className="h-5 w-5 text-[rgb(var(--primary))]" />
             <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">Recent Notes</h3>
@@ -434,7 +439,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="flex items-center gap-2 text-base font-semibold text-[rgb(var(--text-primary))]">
             <Lightbulb className="h-4 w-4 text-[rgb(var(--warning))]" />
             Smart Suggestions
@@ -445,7 +450,7 @@ export default async function DashboardPage() {
             ))}
           </ul>
         </article>
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="flex items-center gap-2 text-base font-semibold text-[rgb(var(--text-primary))]">
             <Flame className="h-4 w-4 text-[rgb(var(--primary))]" />
             This Week Targets
@@ -459,7 +464,7 @@ export default async function DashboardPage() {
             ))}
           </div>
         </article>
-        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
+        <article className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
           <h3 className="flex items-center gap-2 text-base font-semibold text-[rgb(var(--text-primary))]">
             {overdueAssignments > 0 ? (
               <AlertTriangle className="h-4 w-4 text-[rgb(var(--error))]" />
