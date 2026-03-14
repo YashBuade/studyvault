@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
 
@@ -53,6 +53,10 @@ function getSnapshot(): Theme {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const theme = useSyncExternalStore<Theme>(subscribe, getSnapshot, () => "light");
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
 
   const setTheme = (nextTheme: Theme) => {
     localStorage.setItem(STORAGE_KEY, nextTheme);
