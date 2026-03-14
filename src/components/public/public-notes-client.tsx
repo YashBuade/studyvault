@@ -575,34 +575,34 @@ export function PublicNotesClient() {
         </div>
       </Card>
 
-      <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))]">
+      <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))] dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700">
         <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-center">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full bg-[rgb(var(--primary-soft))] px-3 py-1 text-xs font-semibold text-[rgb(var(--primary))]">
               <Sparkles size={14} />
               Student-first public knowledge hub
             </p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))]">Public Notes Library</h2>
-            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100">Public Notes Library</h2>
+            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">
               Discover notes, formulas, summaries, and resources shared by students and verified teachers.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{notes.length}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))]">Visible Notes</p>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{notes.length}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Visible Notes</p>
             </div>
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{files.length}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))]">Public Files</p>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{files.length}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Public Files</p>
             </div>
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{recentNotesCount}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))]">Last 3 Days</p>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{recentNotesCount}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Last 3 Days</p>
             </div>
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{tagsList.length}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))]">Active Topics</p>
+            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{tagsList.length}</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Active Topics</p>
             </div>
           </div>
         </div>
@@ -624,15 +624,15 @@ export function PublicNotesClient() {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             rows={5}
-            className="w-full rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2.5 text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] transition-all duration-[var(--transition-base)] focus-visible:outline-none focus-visible:border-[rgb(var(--border-focus))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/20"
+            className="w-full rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2.5 text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] transition-all duration-[var(--transition-base)] focus-visible:outline-none focus-visible:border-[rgb(var(--border-focus))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:shadow-none dark:ring-1 dark:ring-slate-700"
             placeholder="Description / note content (key concepts, formulas, important points)."
           />
           <div className="grid gap-3 sm:grid-cols-2">
             <Input value={newSemester} onChange={(event) => setNewSemester(event.target.value)} placeholder="Semester (e.g., Sem 4)" />
             <Input value={newTags} onChange={(event) => setNewTags(event.target.value)} placeholder="Tags (comma-separated: dsa, revision, exam)" />
           </div>
-          <div className="rounded-xl border border-dashed border-[rgb(var(--border-hover))] bg-[rgb(var(--surface-hover))] p-3">
-            <label className="mb-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
+          <div className="rounded-xl border border-dashed border-[rgb(var(--border-hover))] bg-[rgb(var(--surface-hover))] p-3 dark:border-slate-700 dark:bg-slate-800">
+            <label className="mb-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:text-slate-400">
               <FileUp size={14} />
               Attach Files or Images
             </label>
@@ -641,15 +641,15 @@ export function PublicNotesClient() {
               multiple
               accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg,.txt"
               onChange={(event) => setUploadFiles(Array.from(event.target.files ?? []))}
-              className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             />
-            <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">
+            <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">
               Max {Math.round(CLIENT_UPLOAD_MAX_BYTES / (1024 * 1024))}MB per file.
             </p>
             {uploadFiles.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-2">
                 {uploadFiles.map((file) => (
-                  <span key={`${file.name}-${file.size}`} className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--surface))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))]">
+                  <span key={`${file.name}-${file.size}`} className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--surface))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))] dark:bg-slate-900 dark:text-slate-300">
                     {file.type.startsWith("image/") ? <ImageIcon size={12} /> : <FileUp size={12} />}
                     {file.name} ({formatFileSize(file.size)})
                   </span>
@@ -665,7 +665,7 @@ export function PublicNotesClient() {
               Sign in required for upload
             </Link>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             <Info size={12} />
             Uploaded public files will show up after expert verification.
           </div>
@@ -791,13 +791,13 @@ export function PublicNotesClient() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))]">
+            <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             <Settings2 size={14} />
             Preferences are saved on this device and automatically applied to upload forms and filters.
           </div>
         </div>
         ) : (
-          <p className="text-sm text-[rgb(var(--text-secondary))]">
+            <p className="text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">
             Keep this collapsed if you just want to upload and browse without extra setup.
           </p>
         )}
@@ -857,11 +857,11 @@ export function PublicNotesClient() {
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))]">
-            <span className="font-semibold text-[rgb(var(--text-primary))]">{visibleNotes.length}</span>
+          <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+            <span className="font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{visibleNotes.length}</span>
             matching notes
-            <span className="text-[rgb(var(--text-tertiary))]">|</span>
-            <span className="font-semibold text-[rgb(var(--text-primary))]">{activeFiltersCount}</span>
+            <span className="text-[rgb(var(--text-tertiary))] dark:text-slate-400">|</span>
+            <span className="font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{activeFiltersCount}</span>
             active filters
             <button
               type="button"
@@ -884,13 +884,13 @@ export function PublicNotesClient() {
                 setSort("latest");
                 setTeacherOnly(false);
               }}
-              className="ml-auto rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2.5 py-1 font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+              className="ml-auto rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2.5 py-1 font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
             >
               Clear all
             </button>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">View</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:text-slate-400">View</span>
             <button
               type="button"
               onClick={() => setNoteView("grid")}
@@ -918,7 +918,7 @@ export function PublicNotesClient() {
           </div>
           {topTags.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">Trending Tags</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:text-slate-400">Trending Tags</span>
               {topTags.map((item) => (
                 <button
                   key={item}
@@ -943,8 +943,8 @@ export function PublicNotesClient() {
       {libraryMode !== "share" && visibleNotes.length === 0 ? (
         <Card>
           <div className="py-6 text-center">
-            <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">No notes match these filters yet.</p>
-            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">Try another subject, clear a few filters, or switch to Share mode to publish the first note in this topic.</p>
+            <p className="text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">No notes match these filters yet.</p>
+            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">Try another subject, clear a few filters, or switch to Share mode to publish the first note in this topic.</p>
           </div>
         </Card>
       ) : libraryMode !== "share" ? (
@@ -973,11 +973,11 @@ export function PublicNotesClient() {
                       )}
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
-                  <p className={`mt-2 text-sm text-[rgb(var(--text-secondary))] ${noteView === "grid" ? "line-clamp-3" : "line-clamp-2 sm:max-w-2xl"}`}>{note.content.replace(/<[^>]+>/g, "")}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-tertiary))]">
+                  <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{note.title}</h3>
+                  <p className={`mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300 ${noteView === "grid" ? "line-clamp-3" : "line-clamp-2 sm:max-w-2xl"}`}>{note.content.replace(/<[^>]+>/g, "")}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">
                     <span>By {note.user.name}</span>
-                    {note.semester ? <span className="rounded-full bg-[rgb(var(--surface-hover))] px-2 py-0.5">{note.semester}</span> : null}
+                    {note.semester ? <span className="rounded-full bg-[rgb(var(--surface-hover))] px-2 py-0.5 dark:bg-slate-900">{note.semester}</span> : null}
                     {isVerifiedTeacher(note.user) ? <span className="rounded-full px-2 py-0.5 text-[var(--color-success)]" style={{ backgroundColor: "var(--color-success-light)" }}>Teacher Contributor</span> : null}
                   </div>
                   {note.tags ? (
@@ -988,7 +988,7 @@ export function PublicNotesClient() {
                         .filter(Boolean)
                         .slice(0, 4)
                         .map((item) => (
-                          <span key={item} className="inline-flex items-center gap-1 rounded-full border border-[rgb(var(--border))] px-2 py-0.5 text-[11px] text-[rgb(var(--text-secondary))]">
+                          <span key={item} className="inline-flex items-center gap-1 rounded-full border border-[rgb(var(--border))] px-2 py-0.5 text-[11px] text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:text-slate-300">
                             <Tag size={10} />
                             {item}
                           </span>
@@ -1002,7 +1002,7 @@ export function PublicNotesClient() {
                           <a
                             key={attachment.file.id}
                             href={`/api/notes/public/files/${attachment.file.id}`}
-                            className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+                            className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
                           >
                             {attachment.file.originalName}
                           </a>
@@ -1065,18 +1065,18 @@ export function PublicNotesClient() {
           </div>
         </div>
         {visibleFiles.length === 0 ? (
-          <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] px-4 py-6 text-center text-sm text-[rgb(var(--text-secondary))]">
+          <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] px-4 py-6 text-center text-sm text-[rgb(var(--text-secondary))] dark:bg-slate-800 dark:text-slate-300">
             No public files found for the current search.
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {visibleFiles.map((file) => (
-              <div key={file.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
+              <div key={file.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/95 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                 <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{file.originalName}</p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))]">{formatFileSize(file.size)}</p>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                  <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{file.originalName}</p>
+                  <p className="text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">{formatFileSize(file.size)}</p>
+                  <p className="text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">
                     By {file.user.name}
                     {isVerifiedTeacher(file.user) ? " | Teacher Contributor" : ""}
                   </p>
@@ -1086,13 +1086,13 @@ export function PublicNotesClient() {
                       Verified by expert {file.verifiedBy.name}
                     </p>
                   ) : null}
-                  <p className="mt-1 inline-flex rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
+                  <p className="mt-1 inline-flex rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
                     {inferFileKind(file.originalName)}
                   </p>
                 </div>
                 <a
                   href={`/api/files/public/${file.id}/download`}
-                  className="inline-flex items-center gap-1 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
                 >
                   <Download size={12} />
                   Get

@@ -118,23 +118,23 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
       <div className="space-y-4">
         <Card title="Profile" description="Update your account identity.">
           <form onSubmit={updateProfile} className="space-y-3">
-            <div className="flex items-center gap-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 p-4">
+            <div className="flex items-center gap-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 p-4 dark:border-slate-700 dark:bg-slate-800/80">
               {avatarUrl ? (
                 <Image
                   src={avatarUrl}
                   alt="Profile avatar"
                   width={64}
                   height={64}
-                  className="h-16 w-16 rounded-2xl border border-[rgb(var(--border))] object-cover"
+                  className="h-16 w-16 rounded-2xl border border-[rgb(var(--border))] object-cover dark:border-slate-700"
                 />
               ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--primary-soft))] text-lg font-semibold text-[rgb(var(--primary))]">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--primary-soft))] text-lg font-semibold text-[rgb(var(--primary))] dark:border-slate-700">
                   {initials}
                 </div>
               )}
               <div>
-                <p className="text-sm font-semibold text-[var(--text)]">{name}</p>
-                <p className="text-xs text-[var(--muted)]">{email}</p>
+                <p className="text-sm font-semibold text-[var(--text)] dark:text-slate-100">{name}</p>
+                <p className="text-xs text-[var(--muted)] dark:text-slate-400">{email}</p>
               </div>
             </div>
             <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Full name" />
@@ -147,9 +147,9 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
 
         <Card title="Profile Picture" description="Upload an image avatar.">
           <form onSubmit={uploadAvatar} className="space-y-3">
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 px-5 py-10 text-center transition hover:border-[rgb(var(--primary))]/35 hover:bg-[rgb(var(--surface))]">
-              <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Choose a profile image</p>
-              <p className="mt-1 text-xs text-[var(--muted)]">PNG, JPG, or WEBP avatars work best.</p>
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 px-5 py-10 text-center transition hover:border-[rgb(var(--primary))]/35 hover:bg-[rgb(var(--surface))] dark:border-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-900">
+              <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Choose a profile image</p>
+              <p className="mt-1 text-xs text-[var(--muted)] dark:text-slate-400">PNG, JPG, or WEBP avatars work best.</p>
               <input
                 type="file"
                 accept="image/*"
@@ -157,7 +157,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
                 className="sr-only"
               />
             </label>
-            {avatar ? <p className="text-xs text-[var(--muted)]">Selected: {avatar.name}</p> : null}
+            {avatar ? <p className="text-xs text-[var(--muted)] dark:text-slate-400">Selected: {avatar.name}</p> : null}
             <Button type="submit" variant="secondary">
               Upload Avatar
             </Button>
@@ -187,14 +187,14 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
         </Card>
 
         <Card title="Account Status" description="Your workspace access and security.">
-          <div className="space-y-2 text-sm text-[var(--muted)]">
-            <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+          <div className="space-y-2 text-sm text-[var(--muted)] dark:text-slate-400">
+            <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 dark:border-slate-700 dark:bg-slate-800">
               <span>Workspace access</span>
-              <span className="text-[var(--text)]">Active</span>
+              <span className="text-[var(--text)] dark:text-slate-100">Active</span>
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+            <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 dark:border-slate-700 dark:bg-slate-800">
               <span>Session status</span>
-              <span className="text-[var(--text)]">Secure</span>
+              <span className="text-[var(--text)] dark:text-slate-100">Secure</span>
             </div>
           </div>
         </Card>
