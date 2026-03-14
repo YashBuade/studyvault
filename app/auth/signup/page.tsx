@@ -212,9 +212,9 @@ export default function SignupPage() {
     <div className="min-h-screen w-full bg-[rgb(var(--background))]">
       <div className="mx-auto grid min-h-screen w-full max-w-[1280px] lg:grid-cols-[1.1fr_0.9fr]">
         <section className="relative hidden border-r border-[rgb(var(--border))] lg:flex">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-100 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900" />
-          <div className="absolute right-16 top-16 h-64 w-64 rounded-full bg-indigo-300/20 blur-3xl dark:bg-indigo-500/20" />
-          <div className="absolute bottom-20 left-10 h-72 w-72 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-600/20" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--color-surface))_48%,rgb(var(--color-info-light))_100%)]" />
+          <div className="absolute right-16 top-16 h-64 w-64 rounded-full bg-[rgb(var(--color-primary))]/14 blur-3xl" />
+          <div className="absolute bottom-20 left-10 h-72 w-72 rounded-full bg-[rgb(var(--color-info))]/14 blur-3xl" />
           <div className="hero-grid absolute inset-0 opacity-35" />
           <div className="relative z-10 flex w-full flex-col gap-4 p-12 xl:p-16">
             <Logo size="lg" />
@@ -254,7 +254,7 @@ export default function SignupPage() {
                   <p className="text-sm text-[rgb(var(--text-secondary))]">
                     {isTeacherSignup
                       ? "Register a teacher profile. Admin approval is required before file review access."
-                      : "Set up your StudyVault account."}
+                      : "Create your StudyVault account and start organizing your semester."}
                   </p>
                 </div>
 
@@ -272,7 +272,7 @@ export default function SignupPage() {
                 )}
 
                 {isTeacherSignup ? (
-                  <div className="rounded-[var(--radius-lg)] border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                  <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--color-warning))]/30 bg-[rgb(var(--color-warning-light))] px-4 py-3 text-sm text-[rgb(var(--color-warning))]">
                     <div className="flex items-start gap-3">
                       <span className="text-base" aria-hidden="true">⏱</span>
                       <div>
@@ -526,6 +526,20 @@ export default function SignupPage() {
                     {!loading && <ArrowRight className="h-4 w-4" />}
                     <span>{loading ? "Creating account..." : "Create account"}</span>
                   </ModernButton>
+
+                  {!isTeacherSignup ? (
+                    <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
+                      By signing up you agree to our{" "}
+                      <Link href="/terms" className="font-semibold">
+                        Terms
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/privacy" className="font-semibold">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </p>
+                  ) : null}
                 </form>
 
                 <p className="text-center text-sm text-[rgb(var(--text-secondary))]">

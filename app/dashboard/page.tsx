@@ -224,17 +224,20 @@ export default async function DashboardPage() {
   ] as const;
 
   const scoreBreakdown = [
-    { label: "Workload", value: workloadScore, tone: "from-amber-500 to-orange-500" },
-    { label: "Productivity", value: productivityScore, tone: "from-emerald-500 to-teal-500" },
-    { label: "Focus", value: focusHealth, tone: "from-sky-500 to-cyan-500" },
+    { label: "Workload", value: workloadScore, tone: "linear-gradient(90deg, rgb(var(--color-warning)) 0%, rgb(var(--color-danger)) 100%)" },
+    { label: "Productivity", value: productivityScore, tone: "linear-gradient(90deg, rgb(var(--color-success)) 0%, rgb(var(--color-accent)) 100%)" },
+    { label: "Focus", value: focusHealth, tone: "linear-gradient(90deg, rgb(var(--color-info)) 0%, rgb(var(--color-accent)) 100%)" },
   ] as const;
   const isNewWorkspace = notesCount === 0 && assignmentsCount === 0 && filesCount === 0;
   const isNeutralScoreState = assignmentsCount === 0 && notesCount === 0;
 
   if (isNewWorkspace) {
     return (
-      <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 px-6 py-12 text-center shadow-[var(--shadow-sm)]">
+      <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_48%,rgb(var(--color-info-light))_100%)] px-6 py-12 text-center shadow-[var(--shadow-md)]">
         <h1 className="text-3xl font-semibold text-[rgb(var(--text-primary))]">Welcome to StudyVault 👋</h1>
+        <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[rgb(var(--surface))] text-sm font-semibold text-[rgb(var(--primary))] shadow-[var(--shadow-sm)]">
+          SV
+        </div>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-[rgb(var(--text-secondary))]">
           Your workspace is ready. Start by creating your first note or uploading a file.
         </p>
@@ -252,10 +255,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-7">
-      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-sm)] md:p-8">
+      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[linear-gradient(135deg,rgb(var(--surface))_0%,rgb(var(--surface-hover))_58%,rgb(var(--color-primary-light))_100%)] p-6 shadow-[var(--shadow-sm)] md:p-8">
         <div className="hero-grid absolute inset-0 opacity-35" />
-        <div className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-emerald-300/20 blur-3xl dark:bg-emerald-500/15" />
-        <div className="pointer-events-none absolute left-10 top-10 h-28 w-28 rounded-full bg-sky-300/15 blur-3xl dark:bg-sky-500/15" />
+        <div className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
+        <div className="pointer-events-none absolute left-10 top-10 h-28 w-28 rounded-full bg-[rgb(var(--color-success))]/10 blur-3xl" />
         <div className="relative">
         <PageHeader
           title="Welcome back"
@@ -343,7 +346,7 @@ export default async function DashboardPage() {
                     <strong className="text-[rgb(var(--text-primary))]">{item.value}%</strong>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
-                    <div className={`h-full rounded-full bg-gradient-to-r ${item.tone}`} style={{ width: `${item.value}%` }} />
+                  <div className="h-full rounded-full" style={{ width: `${item.value}%`, background: item.tone }} />
                   </div>
                 </div>
               ))}
@@ -366,7 +369,10 @@ export default async function DashboardPage() {
           ) : (
             <>
               <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
-                <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${completionRate}%` }} />
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${completionRate}%`, background: "linear-gradient(90deg, rgb(var(--color-success)) 0%, rgb(var(--color-accent)) 100%)" }}
+                />
               </div>
               <p className="mt-3 text-xs font-medium text-[rgb(var(--text-tertiary))]">{completionRate}% completion rate</p>
             </>

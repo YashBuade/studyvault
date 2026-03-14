@@ -13,6 +13,12 @@ type AuthErrorResponse = {
   error?: string | { message?: string };
 };
 
+const roleTabs = [
+  { href: "/auth/login", label: "Student" },
+  { href: "/auth/teacher/login", label: "Teacher" },
+  { href: "/auth/admin/login", label: "Admin" },
+] as const;
+
 export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -135,11 +141,11 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[rgb(var(--background))]">
       <div className="mx-auto grid min-h-screen max-w-[1320px] lg:grid-cols-[1.12fr_0.88fr]">
         <section className="relative hidden overflow-hidden border-r border-[rgb(var(--border))] lg:flex">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-sky-100 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900" />
-          <div className="absolute -right-20 top-14 h-72 w-72 rounded-full bg-sky-400/25 blur-3xl dark:bg-sky-500/30" />
-          <div className="absolute left-8 top-52 h-64 w-64 rounded-full bg-indigo-400/20 blur-3xl dark:bg-indigo-500/25" />
-          <div className="absolute bottom-10 right-28 h-44 w-44 rounded-3xl bg-gradient-to-br from-blue-500/30 to-indigo-600/30 shadow-[var(--shadow-lg)] backdrop-blur-xl rotate-12" />
-          <div className="absolute bottom-24 right-56 h-28 w-28 rounded-2xl bg-gradient-to-br from-cyan-300/25 to-blue-500/30 shadow-[var(--shadow-md)] -rotate-12" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--color-surface))_45%,rgb(var(--color-info-light))_100%)]" />
+          <div className="absolute -right-20 top-14 h-72 w-72 rounded-full bg-[rgb(var(--color-info))]/20 blur-3xl" />
+          <div className="absolute left-8 top-52 h-64 w-64 rounded-full bg-[rgb(var(--color-primary))]/14 blur-3xl" />
+          <div className="absolute bottom-10 right-28 h-44 w-44 rounded-3xl bg-[linear-gradient(135deg,rgb(var(--color-primary))_0%,rgb(var(--color-accent))_100%)] opacity-18 shadow-[var(--shadow-lg)] backdrop-blur-xl rotate-12" />
+          <div className="absolute bottom-24 right-56 h-28 w-28 rounded-2xl bg-[linear-gradient(135deg,rgb(var(--color-accent))_0%,rgb(var(--color-info))_100%)] opacity-20 shadow-[var(--shadow-md)] -rotate-12" />
           <div className="hero-grid absolute inset-0 opacity-35" />
 
           <div className="relative z-10 flex w-full flex-col items-start gap-4 p-12 xl:p-16">
@@ -150,14 +156,14 @@ export default function LoginPage() {
                 Secure workspace access
               </div>
               <h1 className="mt-5 text-5xl font-bold tracking-tight text-[rgb(var(--text-primary))]">
-                {isAdminLogin ? "Control the platform with confidence" : isTeacherLogin ? "Step into your review workspace" : "Welcome back to your study cockpit"}
+                {isAdminLogin ? "Admin tools, without the clutter" : isTeacherLogin ? "Review resources in one focused teacher space" : "Pick up your semester where you left off"}
               </h1>
               <p className="mt-5 text-lg leading-relaxed text-[rgb(var(--text-secondary))]">
                 {isAdminLogin
-                  ? "Review approvals, moderate content, and keep the platform healthy from one reliable control layer."
+                  ? "Review approvals, manage platform workflows, and keep the project running smoothly from one clear control layer."
                   : isTeacherLogin
-                    ? "Your teacher tools stay connected to verification, review queues, and the same calm workspace students trust."
-                    : "Notes, planner, assignments, exams, and files in one workflow built for focused academic execution."}
+                    ? "Your teacher tools stay connected to verification, review queues, and a calmer workspace for academic publishing."
+                    : "Notes, planner, assignments, exams, and files stay connected so your study flow feels lighter every day."}
               </p>
               <div className="mt-8 grid gap-3">
                 {featureCards.map((item) => (
@@ -189,7 +195,29 @@ export default function LoginPage() {
                 <div className="space-y-3">
                   <div className="section-kicker">Access portal</div>
                   <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))] sm:text-3xl">{title}</h2>
+                    <div className="mb-4 grid grid-cols-3 gap-2 rounded-[var(--radius-full)] bg-[rgb(var(--surface-2))] p-1">
+                      {roleTabs.map((tab) => {
+                        const active =
+                          (tab.href === "/auth/login" && !isTeacherLogin && !isAdminLogin) ||
+                          (tab.href === "/auth/teacher/login" && isTeacherLogin) ||
+                          (tab.href === "/auth/admin/login" && isAdminLogin);
+
+                        return (
+                          <Link
+                            key={tab.href}
+                            href={tab.href}
+                            className={`inline-flex min-h-10 items-center justify-center rounded-[var(--radius-full)] px-3 text-sm font-semibold ${
+                              active
+                                ? "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))]"
+                                : "text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]"
+                            }`}
+                          >
+                            {tab.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <h2 className="text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))] sm:text-3xl">{isAdminLogin || isTeacherLogin ? title : "Welcome back"}</h2>
                     <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">{subtitle}</p>
                   </div>
                 </div>
@@ -208,7 +236,7 @@ export default function LoginPage() {
                 )}
 
                 {isTeacherLogin || isAdminLogin ? (
-                  <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-sky-200 bg-sky-50 px-3 py-3 text-sm text-sky-900">
+                  <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[rgb(var(--color-info))]/20 bg-[rgb(var(--color-info-light))] px-3 py-3 text-sm text-[rgb(var(--color-info))]">
                     <Info className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>{isAdminLogin ? "Google sign-in is not available for admin accounts." : "Google sign-in is not available for teacher accounts."}</span>
                   </div>
@@ -289,18 +317,25 @@ export default function LoginPage() {
                 </form>
 
                 {!isAdminLogin ? (
-                  <p className="text-center text-sm text-[rgb(var(--text-secondary))]">
-                    New to StudyVault?{" "}
-                    <Link href={isTeacherLogin ? "/auth/teacher/signup" : "/auth/signup"} className="font-semibold">
-                      {isTeacherLogin ? "Teacher signup" : "Create account"}
+                  <div className="border-t border-[rgb(var(--border))] pt-5 text-center text-sm text-[rgb(var(--text-secondary))]">
+                    <Link href={isTeacherLogin ? "/auth/teacher/signup" : "/auth/signup"} className="btn btn-ghost w-full">
+                      {isTeacherLogin ? "Pending approval? Check your status" : "Create a student account"}
                     </Link>
-                  </p>
+                  </div>
                 ) : null}
                 {!isTeacherLogin && !isAdminLogin ? (
                   <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
                     Teacher account?{" "}
                     <Link href="/auth/teacher/login" className="font-semibold">
                       Use dedicated teacher sign in
+                    </Link>
+                  </p>
+                ) : null}
+                {isTeacherLogin ? (
+                  <p className="text-center text-xs text-[rgb(var(--text-tertiary))]">
+                    Pending approval?{" "}
+                    <Link href="/auth/teacher/status" className="font-semibold">
+                      Check your status
                     </Link>
                   </p>
                 ) : null}
