@@ -138,12 +138,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--background))] dark:bg-slate-950">
+    <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--text-primary))] dark:bg-slate-950 dark:text-slate-100">
       <div className="mx-auto grid min-h-screen max-w-[1320px] lg:grid-cols-[1.12fr_0.88fr]">
-        <section className="relative hidden overflow-hidden border-r border-[rgb(var(--border))] lg:flex">
+        <section className="relative hidden overflow-hidden border-r border-[rgb(var(--border))] dark:border-slate-800 lg:flex">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--color-surface))_45%,rgb(var(--color-info-light))_100%)]" />
-          <div className="absolute -right-20 top-14 h-72 w-72 rounded-full bg-[rgb(var(--color-info))]/20 blur-3xl" />
-          <div className="absolute left-8 top-52 h-64 w-64 rounded-full bg-[rgb(var(--color-primary))]/14 blur-3xl" />
+          <div className="absolute -right-20 top-14 h-72 w-72 rounded-full bg-[rgb(var(--color-info)/0.2)] blur-3xl" />
+          <div className="absolute left-8 top-52 h-64 w-64 rounded-full bg-[rgb(var(--color-primary)/0.14)] blur-3xl" />
           <div className="absolute bottom-10 right-28 h-44 w-44 rounded-3xl bg-[linear-gradient(135deg,rgb(var(--color-primary))_0%,rgb(var(--color-accent))_100%)] opacity-18 shadow-[var(--shadow-lg)] backdrop-blur-xl rotate-12" />
           <div className="absolute bottom-24 right-56 h-28 w-28 rounded-2xl bg-[linear-gradient(135deg,rgb(var(--color-accent))_0%,rgb(var(--color-info))_100%)] opacity-20 shadow-[var(--shadow-md)] -rotate-12" />
           <div className="hero-grid absolute inset-0 opacity-35" />
@@ -167,15 +167,15 @@ export default function LoginPage() {
               </p>
               <div className="mt-8 grid gap-3">
                 {featureCards.map((item) => (
-                  <div key={item} className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/85 px-4 py-3 shadow-[var(--shadow-xs)] backdrop-blur">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{item}</p>
+                  <div key={item} className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.85)] px-4 py-3 shadow-[var(--shadow-xs)] backdrop-blur dark:border-slate-700 dark:bg-slate-900/80 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))] dark:text-slate-100">{item}</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-8 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/80 p-4 shadow-[var(--shadow-xs)]">
+              <div className="mt-8 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.8)] p-4 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-900/80 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                 <LockKeyhole className="h-5 w-5 text-[rgb(var(--primary))]" />
-                <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Protected sessions</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Role-specific portals remain unchanged while the UI feels more polished and clear.</p>
+                <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Protected sessions</p>
+                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Role-specific portals remain unchanged while the UI feels more polished and clear.</p>
               </div>
             </div>
           </div>
@@ -190,12 +190,12 @@ export default function LoginPage() {
             <div className="lg:hidden">
               <Logo size="md" />
             </div>
-            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/92 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:p-8">
+            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border)/0.8)] bg-[rgb(var(--surface)/0.92)] p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/92 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:p-8">
               <div className="space-y-6">
                 <div className="space-y-3">
                   <div className="section-kicker">Access portal</div>
                   <div>
-                    <div className="mb-4 grid grid-cols-3 gap-2 rounded-[var(--radius-full)] bg-[rgb(var(--surface-2))] p-1">
+                    <div className="mb-4 grid grid-cols-3 gap-2 rounded-[var(--radius-full)] bg-[rgb(var(--surface-2))] p-1 dark:bg-slate-800">
                       {roleTabs.map((tab) => {
                         const active =
                           (tab.href === "/auth/login" && !isTeacherLogin && !isAdminLogin) ||
@@ -209,7 +209,7 @@ export default function LoginPage() {
                             className={`inline-flex min-h-10 items-center justify-center rounded-[var(--radius-full)] px-3 text-sm font-semibold ${
                               active
                                 ? "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))]"
-                                : "text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]"
+                                : "text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] dark:text-slate-300 dark:hover:text-slate-100"
                             }`}
                           >
                             {tab.label}
@@ -236,7 +236,7 @@ export default function LoginPage() {
                 )}
 
                 {isTeacherLogin || isAdminLogin ? (
-                  <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[rgb(var(--color-info))]/20 bg-[rgb(var(--color-info-light))] px-3 py-3 text-sm text-[rgb(var(--color-info))]">
+                  <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[rgb(var(--color-info)/0.2)] bg-[rgb(var(--color-info-light))] px-3 py-3 text-sm text-[rgb(var(--color-info))] dark:border-slate-700 dark:bg-slate-900 dark:text-sky-300">
                     <Info className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>{isAdminLogin ? "Google sign-in is not available for admin accounts." : "Google sign-in is not available for teacher accounts."}</span>
                   </div>
@@ -248,7 +248,7 @@ export default function LoginPage() {
                         <div className="w-full border-t border-[rgb(var(--border))]" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="bg-[rgb(var(--surface))] px-3 text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">or use email</span>
+                        <span className="bg-[rgb(var(--surface))] px-3 text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:bg-slate-900 dark:text-slate-400">or use email</span>
                       </div>
                     </div>
                   </>
@@ -284,7 +284,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={() => setShowPassword((value) => !value)}
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors hover:text-[rgb(var(--text-primary))]"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors hover:text-[rgb(var(--text-primary))] dark:text-slate-400 dark:hover:text-slate-100"
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -300,6 +300,7 @@ export default function LoginPage() {
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(event) => setRememberMe(event.target.checked)}
+                      className="h-4 w-4 rounded border border-[rgb(var(--border))] bg-[rgb(var(--surface))] dark:border-slate-600 dark:bg-slate-800"
                     />
                     <label htmlFor="rememberMe" className="mb-0 text-sm font-normal text-[rgb(var(--text-secondary))]">
                       Remember me for 30 days
@@ -317,7 +318,7 @@ export default function LoginPage() {
                 </form>
 
                 {!isAdminLogin ? (
-                  <div className="border-t border-[rgb(var(--border))] pt-5 text-center text-sm text-[rgb(var(--text-secondary))]">
+                  <div className="border-t border-[rgb(var(--border))] pt-5 text-center text-sm text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:text-slate-300">
                     <Link href={isTeacherLogin ? "/auth/teacher/signup" : "/auth/signup"} className="btn btn-ghost w-full">
                       {isTeacherLogin ? "Pending approval? Check your status" : "Create a student account"}
                     </Link>

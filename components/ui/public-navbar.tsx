@@ -16,7 +16,7 @@ export function PublicNavbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
+    <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.95)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
       <div className="page-shell flex h-16 items-center justify-between gap-4">
         <Logo size="sm" />
 
