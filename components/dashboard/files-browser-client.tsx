@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BadgeCheck, Clock3, Pencil, Search, XCircle } from "lucide-react";
+import { BadgeCheck, Clock3, FileArchive, FileImage, FileText, Pencil, Search, XCircle } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
@@ -30,6 +30,12 @@ function formatBytes(size: number) {
   if (size < 1024) return `${size} B`;
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getFileIcon(mimeType: string) {
+  if (mimeType.includes("pdf")) return FileText;
+  if (mimeType.includes("image")) return FileImage;
+  return FileArchive;
 }
 
 export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] }) {
@@ -94,15 +100,28 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
       </div>
 
       {visible.length === 0 ? (
-        <p className="text-sm text-[var(--muted)]">No files uploaded yet.</p>
+        <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+            <FileArchive size={24} />
+          </div>
+          <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No files yet</h3>
+          <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Upload PDFs, docs, and images so your study files are always easy to find.</p>
+        </div>
       ) : (
         <div className="space-y-3">
-          {visible.map((file) => (
+          {visible.map((file) => {
+            const FileIcon = getFileIcon(file.mimeType);
+
+            return (
             <article
               key={file.id}
-              className="flex flex-col gap-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
+              <div className="flex items-start gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+                  <FileIcon size={20} />
+                </div>
+                <div>
                 <p className="text-sm font-medium">{file.originalName}</p>
                 <p className="text-xs text-[var(--muted)]">{file.mimeType} - {formatBytes(file.size)}</p>
                 <p className="mt-1 text-xs text-[var(--muted)]">
@@ -124,6 +143,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
                   )}
                 </p>
                 {file.verificationNotes ? <p className="mt-1 text-xs text-[var(--muted)]">Reviewer note: {file.verificationNotes}</p> : null}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="secondary" onClick={() => startEdit(file)}>
@@ -137,7 +157,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
                 </a>
               </div>
             </article>
-          ))}
+          )})}
         </div>
       )}
 

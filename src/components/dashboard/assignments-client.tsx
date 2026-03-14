@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Pencil } from "lucide-react";
+import { CheckCircle2, ClipboardList, Pencil } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -153,15 +153,15 @@ export function AssignmentsClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-amber-500/15 to-orange-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-warning-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Pending</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.pending}</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-green-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-success-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completed</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.completed}</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-rose-500/15 to-red-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-danger-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Overdue</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{summary.overdue}</p>
         </div>
@@ -184,7 +184,13 @@ export function AssignmentsClient() {
         {loading ? (
           <p className="text-sm text-[var(--muted)]">Loading assignments...</p>
         ) : visible.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">No assignments yet.</p>
+          <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+              <ClipboardList size={24} />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No assignments yet</h3>
+            <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Add your first assignment to keep deadlines visible and under control.</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {visible.map((item) => (
@@ -193,11 +199,16 @@ export function AssignmentsClient() {
                   <div>
                     <p className="text-sm font-semibold">{item.title}</p>
                     <p className="text-xs text-[var(--muted)]">{item.dueDate ? new Date(item.dueDate).toLocaleDateString() : "No due date"}</p>
+                    {item.description ? <p className="mt-1 line-clamp-2 text-xs text-[var(--muted)]">{item.description}</p> : null}
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={item.priority === "HIGH" ? "danger" : item.priority === "LOW" ? "info" : "neutral"}>
                       {item.priority}
                     </Badge>
+                    <span className={`badge ${item.status === "COMPLETED" ? "badge-success" : item.status === "OVERDUE" ? "badge-error" : ""}`}>
+                      {item.status === "COMPLETED" ? <CheckCircle2 size={12} /> : null}
+                      {item.status}
+                    </span>
                     <Button variant="secondary" onClick={() => startEdit(item)}>
                       <Pencil size={14} /> Edit
                     </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -246,17 +246,17 @@ export function PlannerClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-sky-500/15 to-blue-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-info-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Focus Queue</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.todo}</p>
           <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Tasks waiting to start</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-violet-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">In Motion</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.inProgress}</p>
           <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Currently active tasks</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-success-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completion</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.completion}%</p>
           <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">{plannerStats.done} completed tasks</p>
@@ -334,7 +334,13 @@ export function PlannerClient() {
         ) : (
           <div className="mt-4 space-y-3">
             {items.length === 0 ? (
-              <p className="text-sm text-[var(--muted)]">No planner items yet.</p>
+              <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+                  <CalendarDays size={24} />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">Nothing planned yet</h3>
+                <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Add your first task so your week starts to take shape.</p>
+              </div>
             ) : (
               items
                 .filter((item) => item.dueDate)

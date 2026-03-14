@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Copy, Download, Pencil, RotateCcw, Search, Trash2 } from "lucide-react";
+import { Copy, Download, FileText, Pencil, RotateCcw, Search, Trash2, UploadCloud } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -299,6 +299,8 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
     .filter((note) => (filterSubject ? note.subject === filterSubject : true))
     .filter((note) => (filterSemester ? note.semester === filterSemester : true))
     .filter((note) => (filterTag ? (note.tags ?? "").includes(filterTag) : true));
+  const activeCount = notes.filter((note) => !note.deletedAt).length;
+  const trashCount = notes.filter((note) => Boolean(note.deletedAt)).length;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_1.2fr]">
@@ -357,7 +359,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                     onClick={() => setSelectedAttachments((prev) => prev.filter((item) => item !== id))}
                     className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs text-[var(--muted)]"
                   >
-                    {file?.originalName ?? `File ${id}`} ×
+                    {file?.originalName ?? `File ${id}`} x
                   </button>
                 );
               })}
@@ -372,18 +374,32 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
       </Card>
 
       <Card title="Your Notes" description="Search, filter, and restore notes from trash.">
-        <div className="mb-3 flex flex-col gap-2">
-          <div className="relative w-full sm:max-w-xs">
+        <div className="mb-4 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              <span className="badge badge-primary">{activeCount} active</span>
+              <span className="badge">{trashCount} in trash</span>
+            </div>
+            <div className="inline-flex rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-1">
+              <Button variant={view === "active" ? "primary" : "ghost"} className="btn-sm" onClick={() => setView("active")}>
+                Active
+              </Button>
+              <Button variant={view === "trash" ? "primary" : "ghost"} className="btn-sm" onClick={() => setView("trash")}>
+                Trash
+              </Button>
+            </div>
+          </div>
+          <div className="grid gap-2 md:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
+          <div className="relative w-full">
             <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)]" />
             <Input
               aria-label="Search notes"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search notes"
+              placeholder="Search by title or content"
               className="pl-9"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-2">
             <Select
               label="Subject"
               value={filterSubject}
@@ -402,33 +418,42 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
               onChange={(event) => setFilterTag(event.target.value)}
               options={[{ label: "All", value: "" }, ...tagsList.map((item) => ({ label: item, value: item }))]}
             />
-            <Button variant={view === "active" ? "primary" : "secondary"} onClick={() => setView("active")}>
-              Active
-            </Button>
-            <Button variant={view === "trash" ? "primary" : "secondary"} onClick={() => setView("trash")}>
-              Trash
-            </Button>
           </div>
-        </div>
+          </div>
 
         <div className="space-y-3">
           {list.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No notes in this view.</p>
+            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+                <FileText size={24} />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">
+                {view === "trash" ? "Trash is empty" : "No notes yet"}
+              </h3>
+              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">
+                {view === "trash"
+                  ? "Deleted notes show up here so you can restore them later."
+                  : "Start capturing lectures, summaries, and study ideas in one searchable place."}
+              </p>
+            </div>
           ) : (
             list.map((note) => (
               <article key={note.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="font-semibold">{note.title}</h3>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
+                      <span className={`badge ${note.isPublic ? "badge-primary" : ""}`}>{note.isPublic ? "Public" : "Private"}</span>
+                      {note.subject ? <span className="badge">{note.subject}</span> : null}
+                    </div>
                     <div
                       className="mt-2 line-clamp-3 text-sm text-[var(--muted)]"
                       dangerouslySetInnerHTML={{ __html: note.content }}
                     />
                     <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--muted)]">
-                      {note.subject ? <span>Subject: {note.subject}</span> : null}
                       {note.semester ? <span>Semester: {note.semester}</span> : null}
                       {note.tags ? <span>Tags: {note.tags}</span> : null}
-                      {note.isPublic ? <span className="text-[var(--brand)]">Public</span> : <span>Private</span>}
+                      <span>Updated {new Date(note.createdAt).toLocaleDateString()}</span>
                     </div>
                     {note.attachments?.length ? (
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -449,20 +474,18 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                       <RotateCcw size={14} /> Restore
                     </Button>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <>
-                        <Button variant="secondary" onClick={() => setShareNote(note)}>
-                          <Copy size={14} /> Share
-                        </Button>
-                        {note.isPublic ? (
-                          <a
-                            href={`/api/notes/${note.id}/download`}
-                            className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-sm"
-                          >
-                            <Download size={14} /> Download
-                          </a>
-                        ) : null}
-                      </>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button variant="secondary" onClick={() => setShareNote(note)}>
+                        <Copy size={14} /> Share
+                      </Button>
+                      {note.isPublic ? (
+                        <a
+                          href={`/api/notes/${note.id}/download`}
+                          className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-sm"
+                        >
+                          <Download size={14} /> Download
+                        </a>
+                      ) : null}
                       <Button variant="secondary" onClick={() => startEdit(note)}>
                         <Pencil size={14} /> Edit
                       </Button>
@@ -493,7 +516,13 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
       <Card title="Recent Uploads" description="Attach files from your Upload Center to keep notes complete.">
         {recentFiles.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">No uploads yet. Add PDFs, DOCs, PPTs, or images.</p>
+          <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+              <UploadCloud size={24} />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No uploads yet</h3>
+            <p className="mt-2 text-sm text-[var(--muted)]">Add PDFs, slides, docs, or images so they are ready to attach to your notes.</p>
+          </div>
         ) : (
           <div className="space-y-2">
             {recentFiles.map((file) => (
@@ -575,7 +604,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                     onClick={() => setEditAttachments((prev) => prev.filter((item) => item !== id))}
                     className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs text-[var(--muted)]"
                   >
-                    {file?.originalName ?? `File ${id}`} ×
+                    {file?.originalName ?? `File ${id}`} x
                   </button>
                 );
               })}
