@@ -475,7 +475,7 @@ export function PublicNotesClient() {
 
   return (
     <div className="space-y-5">
-      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-lg)]">
+      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-lg)] dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700">
         <div className="hero-grid absolute inset-0 opacity-35" />
         <div className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-[rgb(var(--color-success))]/12 blur-3xl" />
         <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
@@ -485,45 +485,45 @@ export function PublicNotesClient() {
               <Sparkles className="mr-2 h-3.5 w-3.5" />
               Curated study discovery
             </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))]">
+            <h2 className="mt-4 text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100">
               Discover strong notes, clean uploads, and trusted student contributions.
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[rgb(var(--text-secondary))] sm:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[rgb(var(--text-secondary))] dark:text-slate-300 sm:text-base">
               Browse by subject, semester, or tag, switch between note and file views, and focus on verified teacher content when you want higher-signal material fast.
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">Recent activity</p>
-                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))]">{recentNotesCount}</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">notes added in the last 3 days</p>
+              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/88 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Recent activity</p>
+                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{recentNotesCount}</p>
+                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">notes added in the last 3 days</p>
               </div>
-              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">Verified notes</p>
-                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))]">{verifiedNotesCount}</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">already reviewed and surfaced clearly</p>
+              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/88 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Verified notes</p>
+                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{verifiedNotesCount}</p>
+                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">already reviewed and surfaced clearly</p>
               </div>
-              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">Topic spread</p>
-                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))]">{subjects.length}</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">active subject paths to explore</p>
+              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/88 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Topic spread</p>
+                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{subjects.length}</p>
+                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">active subject paths to explore</p>
               </div>
             </div>
           </div>
           <div className="grid gap-3">
-            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/92 p-4 shadow-[var(--shadow-sm)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">How it works</p>
+            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/92 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/92 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">How it works</p>
               <div className="mt-3 space-y-3">
-                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">1. Browse by topic</p>
-                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Use search, trending tags, and category chips to narrow the library quickly.</p>
+                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3 dark:bg-slate-900">
+                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">1. Browse by topic</p>
+                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Use search, trending tags, and category chips to narrow the library quickly.</p>
                 </div>
-                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">2. Open the best version</p>
-                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Verified notes and reviewed files stand out visually so you can trust what you open.</p>
+                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3 dark:bg-slate-900">
+                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">2. Open the best version</p>
+                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Verified notes and reviewed files stand out visually so you can trust what you open.</p>
                 </div>
-                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">3. Share your own notes</p>
-                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Publish a clean title, summary, and files when you want to contribute back.</p>
+                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3 dark:bg-slate-900">
+                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">3. Share your own notes</p>
+                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Publish a clean title, summary, and files when you want to contribute back.</p>
                 </div>
               </div>
             </div>
