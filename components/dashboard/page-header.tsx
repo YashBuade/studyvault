@@ -6,7 +6,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, description, insight }: PageHeaderProps) {
   return (
-    <div className="relative mb-6 overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface-elevated))] via-[rgb(var(--surface))] to-[rgb(var(--surface-hover))] p-5 shadow-[var(--shadow-md)] md:mb-7 md:p-6">
+    <div className="relative mb-6 overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface-elevated))] via-[rgb(var(--surface))] to-[rgb(var(--surface-hover))] p-5 shadow-[var(--shadow-md)] dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700 md:mb-7 md:p-6">
       <div className="hero-grid absolute inset-0 opacity-45" />
       <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-[rgb(var(--color-success))]/12 blur-3xl" />
       <div className="pointer-events-none absolute -right-10 -top-8 h-32 w-32 rounded-full bg-[rgb(var(--color-info))]/14 blur-3xl" />
@@ -18,11 +18,11 @@ export function PageHeader({ title, description, insight }: PageHeaderProps) {
         <p className="inline-flex rounded-full border border-[rgb(var(--primary))]/35 bg-[rgb(var(--primary-soft))] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--primary-hover))]">
           StudyVault Workspace
         </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[rgb(var(--text-primary))] sm:text-3xl md:text-4xl">{title}</h1>
-        <p className="mt-3 max-w-3xl text-sm text-[rgb(var(--text-secondary))] md:text-base">{description}</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100 sm:text-3xl md:text-4xl">{title}</h1>
+        <p className="mt-3 max-w-3xl text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300 md:text-base">{description}</p>
         </div>
         {insight ? (
-          <p className="inline-flex max-w-3xl rounded-full border border-[rgb(var(--primary))]/30 bg-[rgb(var(--surface-hover))]/90 px-4 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))] shadow-[var(--shadow-xs)]">
+          <p className="inline-flex max-w-3xl rounded-full border border-[rgb(var(--primary))]/30 bg-[rgb(var(--surface-hover))]/90 px-4 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))] shadow-[var(--shadow-xs)] dark:bg-slate-800 dark:text-slate-100 dark:shadow-none dark:ring-1 dark:ring-slate-700">
             {insight}
           </p>
         ) : null}

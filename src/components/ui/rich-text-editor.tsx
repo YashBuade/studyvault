@@ -34,8 +34,8 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   }
 
   return (
-    <div className="rounded-2xl border border-[rgb(var(--border))] bg-[var(--panel)] shadow-sm">
-      <div className="flex flex-wrap gap-2 border-b border-[rgb(var(--border))] p-2">
+    <div className="rounded-2xl border border-[rgb(var(--border))] bg-[var(--panel)] shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+      <div className="flex flex-wrap gap-2 border-b border-[rgb(var(--border))] p-2 dark:border-slate-700">
         <Button type="button" variant="secondary" onClick={() => exec("formatBlock", "h1")}>
           <Heading1 size={14} /> H1
         </Button>
@@ -63,7 +63,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         contentEditable
         onInput={handleInput}
         data-placeholder={placeholder}
-        className="min-h-[180px] px-4 py-3 text-sm text-[var(--text)] outline-none [&:empty:before]:text-[var(--muted)] [&:empty:before]:content-[attr(data-placeholder)]"
+        className="min-h-[180px] px-4 py-3 text-sm text-[var(--text)] outline-none dark:text-slate-100 [&:empty:before]:text-[var(--muted)] dark:[&:empty:before]:text-slate-500 [&:empty:before]:content-[attr(data-placeholder)]"
       />
     </div>
   );

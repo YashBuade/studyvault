@@ -48,11 +48,11 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(15_23_42_/_0.45)] p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-      <div className="w-full max-w-md rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-lg)] animate-fade-in">
-        <div className="flex items-start justify-between gap-4 border-b border-[rgb(var(--border))] pb-3">
+      <div className="w-full max-w-md rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-lg)] animate-fade-in dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+        <div className="flex items-start justify-between gap-4 border-b border-[rgb(var(--border))] pb-3 dark:border-slate-700">
           <div>
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{title}</h3>
-          {description ? <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">{description}</p> : null}
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{title}</h3>
+          {description ? <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">{description}</p> : null}
           </div>
           <button type="button" aria-label="Close dialog" className="icon-button shrink-0" onClick={onClose}>
             <X size={16} />
