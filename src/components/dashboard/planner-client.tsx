@@ -246,20 +246,20 @@ export function PlannerClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-info-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Focus Queue</p>
-          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.todo}</p>
-          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Tasks waiting to start</p>
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-info-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Focus Queue</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{plannerStats.todo}</p>
+          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Tasks waiting to start</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">In Motion</p>
-          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.inProgress}</p>
-          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Currently active tasks</p>
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">In Motion</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{plannerStats.inProgress}</p>
+          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Currently active tasks</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-success-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completion</p>
-          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{plannerStats.completion}%</p>
-          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">{plannerStats.done} completed tasks</p>
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-success-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Completion</p>
+          <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{plannerStats.completion}%</p>
+          <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">{plannerStats.done} completed tasks</p>
         </div>
       </div>
 
@@ -279,7 +279,7 @@ export function PlannerClient() {
             {[{ id: null, name: "Unassigned", color: "var(--muted)" }, ...categories].map((cat) => (
               <div
                 key={cat.id ?? "unassigned"}
-                className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-3 shadow-[var(--shadow-xs)]"
+                className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800/92 dark:shadow-none dark:ring-1 dark:ring-slate-700"
                 onDragOver={(event) => event.preventDefault()}
                 onDrop={(event) => {
                   const itemId = Number(event.dataTransfer.getData("text/plain"));
@@ -294,7 +294,7 @@ export function PlannerClient() {
                     <button
                       type="button"
                       onClick={() => startEditCategory(cat)}
-                      className="rounded-lg p-1 text-[var(--muted)] hover:text-[var(--brand)]"
+                      className="rounded-lg p-1 text-[var(--muted)] hover:text-[var(--brand)] dark:text-slate-400"
                       aria-label="Edit category"
                     >
                       <Pencil size={14} />
@@ -307,14 +307,14 @@ export function PlannerClient() {
                       key={item.id}
                       draggable
                       onDragStart={(event) => event.dataTransfer.setData("text/plain", String(item.id))}
-                      className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]"
+                      className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div>
-                          <p className="text-sm font-semibold">{item.title}</p>
-                          <p className="text-xs text-[var(--muted)]">{item.priority} - {item.status}</p>
+                          <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{item.title}</p>
+                          <p className="text-xs text-[var(--muted)] dark:text-slate-400">{item.priority} - {item.status}</p>
                         </div>
-                        <div className="flex items-center gap-2 text-[var(--muted)]">
+                        <div className="flex items-center gap-2 text-[var(--muted)] dark:text-slate-400">
                           <GripVertical size={14} />
                           <button onClick={() => startEditItem(item)} className="rounded-lg p-1 hover:text-[var(--brand)]" aria-label="Edit">
                             <Pencil size={14} />
@@ -324,7 +324,7 @@ export function PlannerClient() {
                           </button>
                         </div>
                       </div>
-                      {item.dueDate ? <p className="mt-2 text-xs text-[var(--muted)]">Due {new Date(item.dueDate).toLocaleDateString()}</p> : null}
+                      {item.dueDate ? <p className="mt-2 text-xs text-[var(--muted)] dark:text-slate-400">Due {new Date(item.dueDate).toLocaleDateString()}</p> : null}
                     </div>
                   ))}
                 </div>
@@ -334,22 +334,22 @@ export function PlannerClient() {
         ) : (
           <div className="mt-4 space-y-3">
             {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+              <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-800/80">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
                   <CalendarDays size={24} />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">Nothing planned yet</h3>
-                <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Add your first task so your week starts to take shape.</p>
+                <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Nothing planned yet</h3>
+                <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">Add your first task so your week starts to take shape.</p>
               </div>
             ) : (
               items
                 .filter((item) => item.dueDate)
                 .map((item) => (
-                  <div key={item.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
+                  <div key={item.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-semibold">{item.title}</p>
-                        <p className="text-xs text-[var(--muted)]">Due {new Date(item.dueDate ?? "").toLocaleDateString()}</p>
+                        <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{item.title}</p>
+                        <p className="text-xs text-[var(--muted)] dark:text-slate-400">Due {new Date(item.dueDate ?? "").toLocaleDateString()}</p>
                       </div>
                       <Button variant="secondary" onClick={() => startEditItem(item)}>
                         <Pencil size={14} /> Edit

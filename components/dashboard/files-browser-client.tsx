@@ -100,12 +100,12 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
       </div>
 
       {visible.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+        <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-800/80">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
             <FileArchive size={24} />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No files yet</h3>
-          <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Upload PDFs, docs, and images so your study files are always easy to find.</p>
+          <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">No files yet</h3>
+          <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">Upload PDFs, docs, and images so your study files are always easy to find.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -115,16 +115,16 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
             return (
             <article
               key={file.id}
-              className="flex flex-col gap-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
                   <FileIcon size={20} />
                 </div>
                 <div>
-                <p className="text-sm font-medium">{file.originalName}</p>
-                <p className="text-xs text-[var(--muted)]">{file.mimeType} - {formatBytes(file.size)}</p>
-                <p className="mt-1 text-xs text-[var(--muted)]">
+                <p className="text-sm font-medium text-[rgb(var(--text-primary))] dark:text-slate-100">{file.originalName}</p>
+                <p className="text-xs text-[var(--muted)] dark:text-slate-400">{file.mimeType} - {formatBytes(file.size)}</p>
+                <p className="mt-1 text-xs text-[var(--muted)] dark:text-slate-400">
                   {file.verificationStatus === "VERIFIED" ? (
                     <span className="inline-flex items-center gap-1 text-[rgb(var(--color-success))]">
                       <BadgeCheck size={12} />
@@ -142,7 +142,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
                     </span>
                   )}
                 </p>
-                {file.verificationNotes ? <p className="mt-1 text-xs text-[var(--muted)]">Reviewer note: {file.verificationNotes}</p> : null}
+                {file.verificationNotes ? <p className="mt-1 text-xs text-[var(--muted)] dark:text-slate-400">Reviewer note: {file.verificationNotes}</p> : null}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] 
                 </Button>
                 <a
                   href={`/api/files/${file.id}/download`}
-                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-sm font-medium hover:-translate-y-0.5 hover:shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-sm font-medium hover:-translate-y-0.5 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:shadow-none dark:ring-1 dark:ring-slate-700"
                 >
                   Download
                 </a>

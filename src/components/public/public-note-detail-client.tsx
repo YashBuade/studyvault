@@ -154,7 +154,7 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
   if (!note) {
     return (
       <Card>
-        <p className="text-sm text-[var(--muted)]">Loading note...</p>
+        <p className="text-sm text-[var(--muted)] dark:text-slate-400">Loading note...</p>
       </Card>
     );
   }
@@ -179,7 +179,7 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
       </div>
 
       <Card>
-        <h1 className="text-2xl font-semibold text-[var(--text)]">{note.title}</h1>
+        <h1 className="text-2xl font-semibold text-[var(--text)] dark:text-slate-100">{note.title}</h1>
         <div className="mt-2">
           {note.noteVerificationStatus === "VERIFIED" ? (
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/60 bg-emerald-100/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
@@ -210,7 +210,7 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
                   <a
                     key={attachment.file.id}
                     href={`/api/files/public/${attachment.file.id}/download`}
-                    className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline"
+                    className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline dark:border-slate-700 dark:bg-slate-800"
                   >
                     <Paperclip size={12} />
                     {attachment.file.originalName}
@@ -252,12 +252,12 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
         </form>
         <div className="mt-4 space-y-3">
           {comments.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No comments yet.</p>
+            <p className="text-sm text-[var(--muted)] dark:text-slate-400">No comments yet.</p>
           ) : (
             comments.map((item) => (
-              <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
-                <p className="text-sm font-semibold">{item.user.name}</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">{item.body}</p>
+              <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{item.user.name}</p>
+                <p className="mt-1 text-sm text-[var(--muted)] dark:text-slate-400">{item.body}</p>
               </div>
             ))
           )}

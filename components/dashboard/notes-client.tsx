@@ -321,13 +321,13 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
               { label: "Private", value: "private" },
             ]}
           />
-          <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover))]/80 p-3 shadow-[var(--shadow-xs)]">
-            <p className="text-xs font-semibold text-[var(--muted)]">Upload files for this note</p>
+          <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover))]/80 p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800/90 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+            <p className="text-xs font-semibold text-[var(--muted)] dark:text-slate-400">Upload files for this note</p>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
                 type="file"
                 onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
-                className="w-full rounded-lg border border-[rgb(var(--border))] bg-transparent px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-[rgb(var(--border))] bg-transparent px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <Button type="button" variant="secondary" loading={uploading} onClick={() => void uploadAttachment()}>
                 Upload
@@ -423,14 +423,14 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
         <div className="space-y-3">
           {list.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-800/80">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
                 <FileText size={24} />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">
+              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
                 {view === "trash" ? "Trash is empty" : "No notes yet"}
               </h3>
-              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">
+              <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">
                 {view === "trash"
                   ? "Deleted notes show up here so you can restore them later."
                   : "Start capturing lectures, summaries, and study ideas in one searchable place."}
@@ -438,19 +438,19 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
             </div>
           ) : (
             list.map((note) => (
-              <article key={note.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)]">
+              <article key={note.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/95 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
+                      <h3 className="font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{note.title}</h3>
                       <span className={`badge ${note.isPublic ? "badge-primary" : ""}`}>{note.isPublic ? "Public" : "Private"}</span>
                       {note.subject ? <span className="badge">{note.subject}</span> : null}
                     </div>
                     <div
-                      className="mt-2 line-clamp-3 text-sm text-[var(--muted)]"
+                      className="mt-2 line-clamp-3 text-sm text-[var(--muted)] dark:text-slate-400"
                       dangerouslySetInnerHTML={{ __html: note.content }}
                     />
-                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--muted)]">
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--muted)] dark:text-slate-400">
                       {note.semester ? <span>Semester: {note.semester}</span> : null}
                       {note.tags ? <span>Tags: {note.tags}</span> : null}
                       <span>Updated {new Date(note.createdAt).toLocaleDateString()}</span>
@@ -461,7 +461,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                           <a
                             key={attachment.file.id}
                             href={`/api/files/${attachment.file.id}/download`}
-                            className="rounded-full border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline"
+                            className="rounded-full border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline dark:border-slate-700 dark:bg-slate-800"
                           >
                             {attachment.file.originalName}
                           </a>
@@ -520,7 +520,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
               <UploadCloud size={24} />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No uploads yet</h3>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">No uploads yet</h3>
             <p className="mt-2 text-sm text-[var(--muted)]">Add PDFs, slides, docs, or images so they are ready to attach to your notes.</p>
           </div>
         ) : (
@@ -530,7 +530,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                 <p className="text-sm font-medium">{file.originalName}</p>
                 <a
                   href={`/api/files/${file.id}/download`}
-                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold hover:-translate-y-0.5 hover:shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold hover:-translate-y-0.5 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:shadow-none dark:ring-1 dark:ring-slate-700"
                 >
                   Download
                 </a>
