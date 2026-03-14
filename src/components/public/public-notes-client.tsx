@@ -477,8 +477,8 @@ export function PublicNotesClient() {
     <div className="space-y-5">
       <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-lg)]">
         <div className="hero-grid absolute inset-0 opacity-35" />
-        <div className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-emerald-300/20 blur-3xl dark:bg-emerald-500/12" />
-        <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-sky-300/18 blur-3xl dark:bg-sky-500/14" />
+        <div className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-[rgb(var(--color-success))]/12 blur-3xl" />
+        <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
         <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <div className="section-kicker">
@@ -966,7 +966,7 @@ export function PublicNotesClient() {
                           Verified
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-100/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                        <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-warning)]" style={{ borderColor: "color-mix(in srgb, var(--color-warning) 50%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}>
                           <Info size={10} />
                           Unverified
                         </span>
@@ -978,7 +978,7 @@ export function PublicNotesClient() {
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-tertiary))]">
                     <span>By {note.user.name}</span>
                     {note.semester ? <span className="rounded-full bg-[rgb(var(--surface-hover))] px-2 py-0.5">{note.semester}</span> : null}
-                    {isVerifiedTeacher(note.user) ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700">Teacher Contributor</span> : null}
+                    {isVerifiedTeacher(note.user) ? <span className="rounded-full px-2 py-0.5 text-[var(--color-success)]" style={{ backgroundColor: "var(--color-success-light)" }}>Teacher Contributor</span> : null}
                   </div>
                   {note.tags ? (
                     <div className="mt-3 flex flex-wrap gap-1.5">
@@ -1009,7 +1009,8 @@ export function PublicNotesClient() {
                         ) : (
                           <span
                             key={attachment.file.id}
-                            className="inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-800"
+                            className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold text-[var(--color-warning)]"
+                            style={{ borderColor: "color-mix(in srgb, var(--color-warning) 45%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}
                           >
                             <Info size={10} />
                             {attachment.file.originalName} (Pending verification)

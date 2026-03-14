@@ -6,23 +6,23 @@ export function TrustSignals() {
   const signals = [
     {
       icon: Shield,
-      title: "Secure & Private",
-      description: "Your data is encrypted and stored securely",
+      title: "Private by default",
+      description: "Choose what stays private and what gets shared publicly.",
     },
     {
       icon: Users,
-      title: "Trusted by 10K+ Students",
-      description: "Join thousands of students already using StudyVault",
+      title: "Built for classmates",
+      description: "Public notes are meant to be useful, not crowded with fluff.",
     },
     {
       icon: Zap,
-      title: "Always Available",
-      description: "Access your notes and files anytime, anywhere",
+      title: "Fast workspace",
+      description: "Notes, files, and tasks stay in one focused flow.",
     },
     {
       icon: CheckCircle2,
-      title: "100% Free",
-      description: "No hidden fees or premium walls",
+      title: "Student project",
+      description: "StudyVault is a college-built project, not a commercial app.",
     },
   ];
 
@@ -33,12 +33,12 @@ export function TrustSignals() {
         return (
           <div
             key={i}
-            className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+            className="flex items-start gap-3 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-2))] p-3 transition-colors hover:border-[rgb(var(--color-info))]/35"
           >
-            <Icon className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[rgb(var(--color-info))]" />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-slate-900 dark:text-white text-sm">{signal.title}</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{signal.description}</p>
+              <p className="text-sm font-semibold text-[rgb(var(--color-text-primary))]">{signal.title}</p>
+              <p className="mt-1 text-xs text-[rgb(var(--color-text-secondary))]">{signal.description}</p>
             </div>
           </div>
         );

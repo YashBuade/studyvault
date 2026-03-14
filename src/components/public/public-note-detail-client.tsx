@@ -187,7 +187,7 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
               Verified note
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+            <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-warning)]" style={{ borderColor: "color-mix(in srgb, var(--color-warning) 50%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}>
               <Info size={12} />
               Unverified note
             </span>
@@ -218,7 +218,8 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
                 ) : (
                   <span
                     key={attachment.file.id}
-                    className="inline-flex items-center gap-2 rounded-full border border-amber-300/70 bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-800"
+                    className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold text-[var(--color-warning)]"
+                    style={{ borderColor: "color-mix(in srgb, var(--color-warning) 45%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}
                   >
                     <Info size={12} />
                     {attachment.file.originalName} (Pending verification)

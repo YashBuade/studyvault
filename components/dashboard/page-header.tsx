@@ -8,10 +8,10 @@ export function PageHeader({ title, description, insight }: PageHeaderProps) {
   return (
     <div className="relative mb-6 overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface-elevated))] via-[rgb(var(--surface))] to-[rgb(var(--surface-hover))] p-5 shadow-[var(--shadow-md)] md:mb-7 md:p-6">
       <div className="hero-grid absolute inset-0 opacity-45" />
-      <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-emerald-300/18 blur-3xl dark:bg-emerald-500/18" />
-      <div className="pointer-events-none absolute -right-10 -top-8 h-32 w-32 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-500/22" />
-      <div className="pointer-events-none absolute right-16 top-8 h-10 w-10 rotate-12 rounded-lg bg-gradient-to-br from-amber-300/35 to-orange-500/35 shadow-[var(--shadow-sm)]" />
-      <div className="pointer-events-none absolute right-8 top-20 h-7 w-7 -rotate-6 rounded-md bg-gradient-to-br from-cyan-300/30 to-teal-500/30 shadow-[var(--shadow-sm)]" />
+      <div className="pointer-events-none absolute -left-16 top-8 h-36 w-36 rounded-full bg-[rgb(var(--color-success))]/12 blur-3xl" />
+      <div className="pointer-events-none absolute -right-10 -top-8 h-32 w-32 rounded-full bg-[rgb(var(--color-info))]/14 blur-3xl" />
+      <div className="pointer-events-none absolute right-16 top-8 h-10 w-10 rotate-12 rounded-lg bg-[linear-gradient(135deg,rgb(var(--color-warning))_0%,rgb(var(--color-danger))_100%)] opacity-20 shadow-[var(--shadow-sm)]" />
+      <div className="pointer-events-none absolute right-8 top-20 h-7 w-7 -rotate-6 rounded-md bg-[linear-gradient(135deg,rgb(var(--color-accent))_0%,rgb(var(--color-info))_100%)] opacity-20 shadow-[var(--shadow-sm)]" />
 
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>

@@ -277,7 +277,7 @@ export default function SignupPage() {
                       <span className="text-base" aria-hidden="true">⏱</span>
                       <div>
                         <p className="font-semibold">Teacher profile remains pending until admin verifies your College ID and expertise.</p>
-                        <p className="mt-1 text-xs text-amber-800">Approval typically takes 1–2 business days.</p>
+                        <p className="mt-1 text-xs text-[rgb(var(--color-warning))]">Approval typically takes 1-2 business days.</p>
                       </div>
                     </div>
                   </div>

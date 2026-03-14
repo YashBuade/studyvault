@@ -64,9 +64,9 @@ export default async function HomePage() {
       <PublicNavbar />
 
       <main className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -left-28 top-12 h-80 w-80 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-500/20" />
-        <div className="pointer-events-none absolute -right-24 top-40 h-96 w-96 rounded-full bg-indigo-300/20 blur-3xl dark:bg-indigo-500/20" />
-        <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-emerald-300/15 blur-3xl dark:bg-emerald-500/15" />
+        <div className="pointer-events-none absolute -left-28 top-12 h-80 w-80 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 top-40 h-96 w-96 rounded-full bg-[rgb(var(--color-primary))]/12 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-[rgb(var(--color-success))]/10 blur-3xl" />
         <section className="px-4 pb-14 pt-16 sm:px-6 sm:pt-24 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
             <div className="animate-fade-in">
@@ -118,15 +118,15 @@ export default async function HomePage() {
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-[var(--radius-xl)] bg-gradient-to-br from-slate-950 via-sky-950 to-emerald-950 p-5 text-white shadow-[var(--shadow-lg)]">
+                  <div className="rounded-[var(--radius-xl)] bg-[linear-gradient(135deg,rgb(var(--color-text-primary))_0%,rgb(var(--color-primary))_58%,rgb(var(--color-accent))_100%)] p-5 text-[rgb(var(--color-text-inverse))] shadow-[var(--shadow-lg)]">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-xs uppercase tracking-[0.18em] text-white/70">Weekly focus</p>
-                      <span className="text-sm font-semibold text-emerald-200">82%</span>
+                      <p className="text-xs uppercase tracking-[0.18em] text-[rgb(var(--color-text-inverse))]/70">Weekly focus</p>
+                      <span className="text-sm font-semibold text-[rgb(var(--color-success-light))]">82%</span>
                     </div>
-                    <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/15">
+                    <div className="mt-4 h-3 overflow-hidden rounded-full bg-[rgb(var(--color-text-inverse))]/15">
                       <div className="h-full w-[82%] rounded-full bg-gradient-to-r from-emerald-400 to-green-300" />
                     </div>
-                    <p className="mt-3 text-sm text-white/80">Strong momentum across notes, deadlines, and file organization.</p>
+                    <p className="mt-3 text-sm text-[rgb(var(--color-text-inverse))]/80">Strong momentum across notes, deadlines, and file organization.</p>
                   </div>
                   <div className="space-y-3">
                     <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-4">
@@ -139,7 +139,7 @@ export default async function HomePage() {
                           <p className="text-sm text-[rgb(var(--text-secondary))]">Physics assignment</p>
                           <p className="text-xs text-[rgb(var(--text-tertiary))]">Due in 2 days</p>
                         </div>
-                        <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">2 days</span>
+                        <span className="rounded-full bg-[rgb(var(--color-warning-light))] px-2.5 py-1 text-xs font-semibold text-[rgb(var(--color-warning))]">2 days</span>
                       </div>
                     </div>
                     <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-4">

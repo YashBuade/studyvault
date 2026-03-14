@@ -266,17 +266,17 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                     <p className="text-xs text-[var(--muted)]">{formatBytes(file.size)}</p>
                     <p className="mt-1 text-xs text-[var(--muted)]">
                       {file.verificationStatus === "VERIFIED" ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-600">
+                        <span className="inline-flex items-center gap-1 text-[rgb(var(--color-success))]">
                           <BadgeCheck size={12} />
                           Verified by expert {file.verifiedBy?.name ?? "reviewer"}
                         </span>
                       ) : file.verificationStatus === "REJECTED" ? (
-                        <span className="inline-flex items-center gap-1 text-rose-600">
+                        <span className="inline-flex items-center gap-1 text-[rgb(var(--color-danger))]">
                           <XCircle size={12} />
                           Rejected by reviewer
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-amber-600">
+                        <span className="inline-flex items-center gap-1 text-[rgb(var(--color-warning))]">
                           <Clock3 size={12} />
                           Awaiting teacher verification
                         </span>

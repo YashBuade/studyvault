@@ -138,7 +138,7 @@ export function AdminTeachersClient() {
                 <p className="text-xs text-[var(--muted)]">Status: {item.teacherVerificationStatus}</p>
               </div>
               {item.teacherVerificationStatus === "PENDING" ? (
-                <span className="rounded-full border border-amber-400/70 bg-amber-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                <span className="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-warning)]" style={{ borderColor: "color-mix(in srgb, var(--color-warning) 50%, var(--color-border))", backgroundColor: "var(--color-warning-light)" }}>
                   Needs validation
                 </span>
               ) : null}

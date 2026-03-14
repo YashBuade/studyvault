@@ -24,10 +24,13 @@ export const metadata: Metadata = {
 
 function ThemeScript() {
   const code = `(() => {
-    const stored = localStorage.getItem("studyvault-theme");
-    const theme = stored === "dark" || stored === "light" ? stored : "light";
-    document.documentElement.setAttribute("data-theme", theme);
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    try {
+      const saved = localStorage.getItem("sv-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = saved || (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    } catch (e) {}
   })();`;
 
   return <script dangerouslySetInnerHTML={{ __html: code }} />;
@@ -40,8 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
-      <body className={`${uiFont.variable} font-sans antialiased`}>
+      <head>
         <ThemeScript />
+      </head>
+      <body className={`${uiFont.variable} font-sans antialiased`}>
         <ThemeProvider>
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
