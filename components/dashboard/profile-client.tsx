@@ -31,6 +31,12 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { pushToast } = useToast();
+  const initials = (name || email)
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
 
   async function updateProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -112,7 +118,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
       <div className="space-y-4">
         <Card title="Profile" description="Update your account identity.">
           <form onSubmit={updateProfile} className="space-y-3">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 p-4">
               {avatarUrl ? (
                 <Image
                   src={avatarUrl}
@@ -122,8 +128,8 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
                   className="h-16 w-16 rounded-2xl border border-[rgb(var(--border))] object-cover"
                 />
               ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-lg font-semibold">
-                  {name.slice(0, 1).toUpperCase()}
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--primary-soft))] text-lg font-semibold text-[rgb(var(--primary))]">
+                  {initials}
                 </div>
               )}
               <div>
@@ -141,12 +147,17 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
 
         <Card title="Profile Picture" description="Upload an image avatar.">
           <form onSubmit={uploadAvatar} className="space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(event) => setAvatar(event.target.files?.[0] ?? null)}
-              className="w-full rounded-lg border border-[rgb(var(--border))] bg-transparent px-3 py-2.5 text-sm"
-            />
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 px-5 py-10 text-center transition hover:border-[rgb(var(--primary))]/35 hover:bg-[rgb(var(--surface))]">
+              <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Choose a profile image</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">PNG, JPG, or WEBP avatars work best.</p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => setAvatar(event.target.files?.[0] ?? null)}
+                className="sr-only"
+              />
+            </label>
+            {avatar ? <p className="text-xs text-[var(--muted)]">Selected: {avatar.name}</p> : null}
             <Button type="submit" variant="secondary">
               Upload Avatar
             </Button>
@@ -178,7 +189,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
         <Card title="Account Status" description="Your workspace access and security.">
           <div className="space-y-2 text-sm text-[var(--muted)]">
             <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
-              <span>Subscription</span>
+              <span>Workspace access</span>
               <span className="text-[var(--text)]">Active</span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">

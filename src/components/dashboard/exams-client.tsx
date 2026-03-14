@@ -164,11 +164,11 @@ export function ExamsClient() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-indigo-500/15 to-blue-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Upcoming Exams</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{examSummary.upcoming}</p>
         </div>
-        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-emerald-500/15 to-teal-600/10 p-4 shadow-[var(--shadow-sm)]">
+        <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-success-light))_0%,rgb(var(--surface))_100%)] p-4 shadow-[var(--shadow-sm)]">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[rgb(var(--text-tertiary))]">Completed Exams</p>
           <p className="mt-2 text-3xl font-semibold text-[rgb(var(--text-primary))]">{examSummary.completed}</p>
         </div>
@@ -188,7 +188,13 @@ export function ExamsClient() {
           {loading ? (
             <p className="text-sm text-[var(--muted)]">Loading exams...</p>
           ) : visible.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No exams yet. Add your first one to start tracking.</p>
+            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+                <CalendarDays size={24} />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No exams yet</h3>
+              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Add your first exam date so revision windows and urgency stay visible.</p>
+            </div>
           ) : (
             <div className="space-y-3">
               {visible.map((item) => {

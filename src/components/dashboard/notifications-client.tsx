@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Bell, BellOff } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 
@@ -50,12 +51,23 @@ export function NotificationsClient() {
         {loading ? (
           <p className="text-sm text-[var(--muted)]">Loading notifications...</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">No notifications yet.</p>
+          <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+              <BellOff size={24} />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No notifications yet</h3>
+            <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Likes, comments, moderation updates, and workspace alerts will appear here when they happen.</p>
+          </div>
         ) : (
           items.map((item) => (
-            <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+            <div key={item.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-xs)]">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{item.message}</p>
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+                    <Bell size={16} />
+                  </div>
+                  <p className="text-sm font-medium">{item.message}</p>
+                </div>
                 <span className="text-xs text-[var(--muted)]">{new Date(item.createdAt).toLocaleDateString()}</span>
               </div>
               {item.link ? (

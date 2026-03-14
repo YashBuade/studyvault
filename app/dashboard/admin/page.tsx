@@ -47,7 +47,7 @@ export default async function AdminPage() {
           { label: "Recent Teacher Requests", value: String(recentTeacherRequests.length) },
         ]}
       >
-        <section className="mb-5 rounded-[var(--radius-lg)] border border-[rgb(var(--primary))]/45 bg-[rgb(var(--surface-elevated))] p-4 shadow-[var(--shadow-md)]">
+        <section className="mb-5 rounded-[var(--radius-lg)] border border-[rgb(var(--primary))]/30 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_52%,rgb(var(--color-info-light))_100%)] p-4 shadow-[var(--shadow-md)]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--primary))]">Dedicated Teacher Verification Section</p>
@@ -55,7 +55,7 @@ export default async function AdminPage() {
                 Admin must manually verify each teacher by college ID, expertise, and ID photo before reviewer access is granted.
               </p>
             </div>
-            <span className="inline-flex items-center rounded-full border border-amber-400/60 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+            <span className="inline-flex items-center rounded-full border border-[rgb(var(--color-warning))]/30 bg-[rgb(var(--color-warning-light))] px-3 py-1 text-xs font-semibold text-[rgb(var(--color-warning))]">
               {pendingTeacherCount} Pending
             </span>
           </div>

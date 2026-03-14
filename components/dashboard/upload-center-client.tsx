@@ -62,6 +62,8 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
       }),
     [files, search, view],
   );
+  const activeCount = files.filter((file) => !file.deletedAt).length;
+  const trashCount = files.filter((file) => Boolean(file.deletedAt)).length;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -176,12 +178,17 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_1.1fr]">
       <Card title="Upload File" description="Upload and organize study assets by file name and size.">
         <form onSubmit={onSubmit}>
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg,.txt"
-            onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-            className="w-full rounded-xl border border-[rgb(var(--border))] bg-transparent px-3 py-2.5 text-sm"
-          />
+          <label className="flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 px-5 py-10 text-center transition hover:border-[rgb(var(--primary))]/35 hover:bg-[rgb(var(--surface))]">
+            <UploadCloud className="h-8 w-8 text-[rgb(var(--primary))]" />
+            <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Drop files here or click to browse</p>
+            <p className="mt-1 text-xs text-[var(--muted)]">PDF, DOC, PPT, image, text, or spreadsheet files up to {uploadLimitMb}MB.</p>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg,.txt"
+              onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+              className="sr-only"
+            />
+          </label>
           <p className="mt-2 text-xs text-[var(--muted)]">
             Accepted size: up to {uploadLimitMb}MB per file (deployment-safe limit).
           </p>
@@ -208,7 +215,21 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
       </Card>
 
       <Card title="Files" description="Search files, load more, and restore from trash.">
-        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              <span className="badge badge-primary">{activeCount} active</span>
+              <span className="badge">{trashCount} in trash</span>
+            </div>
+            <div className="inline-flex rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-1">
+              <Button variant={view === "active" ? "primary" : "ghost"} className="btn-sm" onClick={() => setView("active")}>
+                Active
+              </Button>
+              <Button variant={view === "trash" ? "primary" : "ghost"} className="btn-sm" onClick={() => setView("trash")}>
+                Trash
+              </Button>
+            </div>
+          </div>
           <div className="relative w-full sm:max-w-xs">
             <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)]" />
             <Input
@@ -219,19 +240,23 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
               className="pl-9"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant={view === "active" ? "primary" : "secondary"} onClick={() => setView("active")}>
-              Active
-            </Button>
-            <Button variant={view === "trash" ? "primary" : "secondary"} onClick={() => setView("trash")}>
-              Trash
-            </Button>
-          </div>
         </div>
 
         <div className="space-y-3">
           {visible.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No files in this view.</p>
+            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+                <UploadCloud size={24} />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">
+                {view === "trash" ? "Trash is empty" : "No files yet"}
+              </h3>
+              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">
+                {view === "trash"
+                  ? "Files you remove from the workspace will appear here until you restore them."
+                  : "Upload your first study file to keep reference material available across notes and planning."}
+              </p>
+            </div>
           ) : (
             visible.map((file) => (
               <article key={file.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">

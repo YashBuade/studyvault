@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BadgeCheck, Clock3 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ModuleShell } from "@/components/dashboard/module-shell";
@@ -27,10 +28,20 @@ export default async function TeacherDashboardPage() {
         checklist={["Wait for admin approval", "Review files in queue", "Mark only valid files as verified"]}
         highlights={[{ label: "Current Status", value: user.teacherVerificationStatus }]}
       >
-        <section className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-5 shadow-[var(--shadow-sm)]">
-          <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-            Verification status: {user.teacherVerificationStatus}
-          </p>
+        <section className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--surface))_0%,rgb(var(--surface-hover))_100%)] p-5 shadow-[var(--shadow-sm)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
+              {approved ? <BadgeCheck size={22} /> : <Clock3 size={22} />}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                Verification status: {user.teacherVerificationStatus}
+              </p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                {approved ? "Reviewer access is enabled." : "Reviewer access unlocks after admin approval."}
+              </p>
+            </div>
+          </div>
           <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
             {approved
               ? "Your teacher account is approved. You can now review uploaded public files."
