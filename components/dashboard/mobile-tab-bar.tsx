@@ -53,7 +53,7 @@ export function MobileTabBar() {
         </div>
       ) : null}
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))]/98 px-2 py-2 backdrop-blur-xl md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.98)] px-2 py-2 backdrop-blur-xl md:hidden">
         <div className="grid grid-cols-5 gap-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;

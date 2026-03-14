@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, ClipboardList, Pencil } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { CheckCircle2, ClipboardList, Pencil, Search } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -38,6 +39,8 @@ function fromIsoDate(input?: string | null) {
 }
 
 export function AssignmentsClient() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") ?? "";
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -45,6 +48,7 @@ export function AssignmentsClient() {
   const [status, setStatus] = useState<Assignment["status"]>("PENDING");
   const [priority, setPriority] = useState<Assignment["priority"]>("MEDIUM");
   const [filter, setFilter] = useState("ALL");
+  const [search, setSearch] = useState(initialSearch);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [editing, setEditing] = useState<Assignment | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -67,6 +71,10 @@ export function AssignmentsClient() {
 
     void load();
   }, []);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
 
   async function addAssignment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -139,8 +147,17 @@ export function AssignmentsClient() {
   }
 
   const visible = useMemo(
-    () => assignments.filter((item) => (filter === "ALL" ? true : item.status === filter)),
-    [assignments, filter],
+    () =>
+      assignments
+        .filter((item) => (filter === "ALL" ? true : item.status === filter))
+        .filter((item) => {
+          if (!search.trim()) return true;
+          const normalized = search.toLowerCase();
+          return [item.title, item.description ?? "", item.status, item.priority].some((value) =>
+            value.toLowerCase().includes(normalized),
+          );
+        }),
+    [assignments, filter, search],
   );
 
   const summary = useMemo(() => {
@@ -169,7 +186,12 @@ export function AssignmentsClient() {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
       <Card title="Assignments" description="Track deadlines, status, and priority.">
-        <div className="mb-3 flex flex-wrap gap-2">
+        <div className="mb-3 flex flex-col gap-3">
+          <div className="relative max-w-md">
+            <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)] dark:text-slate-400" />
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search assignments" className="pl-9" />
+          </div>
+          <div className="flex flex-wrap gap-2">
           {["ALL", "PENDING", "COMPLETED", "OVERDUE"].map((option) => (
             <Button
               key={option}
@@ -179,6 +201,7 @@ export function AssignmentsClient() {
               {option}
             </Button>
           ))}
+          </div>
         </div>
 
         {loading ? (
@@ -188,8 +211,10 @@ export function AssignmentsClient() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
               <ClipboardList size={24} />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No assignments yet</h3>
-            <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Add your first assignment to keep deadlines visible and under control.</p>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">{search.trim() ? "No matching assignments" : "No assignments yet"}</h3>
+            <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">
+              {search.trim() ? "Try a different keyword or clear the search." : "Add your first assignment to keep deadlines visible and under control."}
+            </p>
           </div>
         ) : (
           <div className="space-y-3">

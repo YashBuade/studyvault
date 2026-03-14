@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CalendarDays, MapPin, Pencil, Sparkles } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { CalendarDays, MapPin, Pencil, Search, Sparkles } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -38,6 +39,8 @@ function fromIsoDate(input?: string | null) {
 }
 
 export function ExamsClient() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") ?? "";
   const [today, setToday] = useState<Date>(() => new Date());
   const [exams, setExams] = useState<Exam[]>([]);
   const [subject, setSubject] = useState("");
@@ -46,6 +49,7 @@ export function ExamsClient() {
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<Exam["status"]>("UPCOMING");
   const [filter, setFilter] = useState("ALL");
+  const [search, setSearch] = useState(initialSearch);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [editing, setEditing] = useState<Exam | null>(null);
   const [editSubject, setEditSubject] = useState("");
@@ -77,6 +81,10 @@ export function ExamsClient() {
     const id = window.setInterval(() => setToday(new Date()), 60_000);
     return () => window.clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
 
   async function addExam(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -151,8 +159,17 @@ export function ExamsClient() {
   }
 
   const visible = useMemo(
-    () => exams.filter((item) => (filter === "ALL" ? true : item.status === filter)),
-    [exams, filter],
+    () =>
+      exams
+        .filter((item) => (filter === "ALL" ? true : item.status === filter))
+        .filter((item) => {
+          if (!search.trim()) return true;
+          const normalized = search.toLowerCase();
+          return [item.subject, item.location ?? "", item.notes ?? "", item.status].some((value) =>
+            value.toLowerCase().includes(normalized),
+          );
+        }),
+    [exams, filter, search],
   );
 
   const examSummary = useMemo(() => {
@@ -177,12 +194,18 @@ export function ExamsClient() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="space-y-4">
         <Card title="Exams" description="Keep exam prep visible and prioritized.">
-          <div className="mb-3 flex flex-wrap gap-2">
+          <div className="mb-3 flex flex-col gap-3">
+            <div className="relative max-w-md">
+              <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)] dark:text-slate-400" />
+              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search exams" className="pl-9" />
+            </div>
+            <div className="flex flex-wrap gap-2">
             {["ALL", "UPCOMING", "COMPLETED"].map((option) => (
               <Button key={option} variant={filter === option ? "primary" : "secondary"} onClick={() => setFilter(option)}>
                 {option}
               </Button>
             ))}
+            </div>
           </div>
 
           {loading ? (
@@ -192,8 +215,10 @@ export function ExamsClient() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
                 <CalendarDays size={24} />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No exams yet</h3>
-              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">Add your first exam date so revision windows and urgency stay visible.</p>
+              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">{search.trim() ? "No matching exams" : "No exams yet"}</h3>
+              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">
+                {search.trim() ? "Try another keyword or clear the search." : "Add your first exam date so revision windows and urgency stay visible."}
+              </p>
             </div>
           ) : (
             <div className="space-y-3">

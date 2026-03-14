@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CalendarDays, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { CalendarDays, GripVertical, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -47,9 +48,12 @@ function fromIsoDate(input?: string | null) {
 }
 
 export function PlannerClient() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") ?? "";
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [view, setView] = useState<"board" | "calendar">("board");
+  const [search, setSearch] = useState(initialSearch);
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [priority, setPriority] = useState<Item["priority"]>("MEDIUM");
@@ -82,6 +86,10 @@ export function PlannerClient() {
 
     void load();
   }, []);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
 
   async function addCategory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -221,18 +229,26 @@ export function PlannerClient() {
     });
   }
 
+  const filteredItems = useMemo(() => {
+    if (!search.trim()) return items;
+    const normalized = search.toLowerCase();
+    return items.filter((item) =>
+      [item.title, item.details ?? "", item.status, item.priority].some((value) => value.toLowerCase().includes(normalized)),
+    );
+  }, [items, search]);
+
   const grouped = useMemo(() => {
     const map = new Map<number | null, Item[]>();
     map.set(null, []);
     categories.forEach((cat) => map.set(cat.id, []));
-    items.forEach((item) => {
+    filteredItems.forEach((item) => {
       const key = item.categoryId ?? null;
       const list = map.get(key) ?? [];
       list.push(item);
       map.set(key, list);
     });
     return map;
-  }, [categories, items]);
+  }, [categories, filteredItems]);
 
   const plannerStats = useMemo(() => {
     const todo = items.filter((item) => item.status === "TODO").length;
@@ -265,6 +281,13 @@ export function PlannerClient() {
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
       <Card title="Planner" description="Drag and drop tasks between categories, add due dates, and priorities.">
+        <div className="mb-4 max-w-md">
+          <div className="relative">
+            <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)] dark:text-slate-400" />
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search planner tasks" className="pl-9" />
+          </div>
+        </div>
+
         <Tabs
           tabs={[
             { id: "board", label: "Board" },
@@ -333,16 +356,20 @@ export function PlannerClient() {
           </div>
         ) : (
           <div className="mt-4 space-y-3">
-            {items.length === 0 ? (
+            {filteredItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-800/80">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
                   <CalendarDays size={24} />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Nothing planned yet</h3>
-                <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">Add your first task so your week starts to take shape.</p>
+                <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
+                  {search.trim() ? "No matching tasks" : "Nothing planned yet"}
+                </h3>
+                <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">
+                  {search.trim() ? "Try a shorter keyword or clear the search." : "Add your first task so your week starts to take shape."}
+                </p>
               </div>
             ) : (
-              items
+              filteredItems
                 .filter((item) => item.dueDate)
                 .map((item) => (
                   <div key={item.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">

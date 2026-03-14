@@ -156,7 +156,7 @@ export function DashboardSidebar({
       {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={closeSidebar} aria-hidden="true" /> : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 border-r border-[rgb(var(--border))] bg-[rgb(var(--color-bg))]/98 backdrop-blur-2xl transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900/98 ${
+        className={`fixed inset-y-0 left-0 z-50 border-r border-[rgb(var(--border))] bg-[rgb(var(--color-bg)/0.98)] backdrop-blur-2xl transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900/98 ${
           open ? "translate-x-0" : "-translate-x-full"
         } ${collapsed ? "w-20" : "w-72"} md:translate-x-0`}
       >

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Copy, Download, FileText, Pencil, RotateCcw, Search, Trash2, UploadCloud } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
@@ -50,6 +51,8 @@ type NotesClientProps = {
 };
 
 export function NotesClient({ initialNotes }: NotesClientProps) {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") ?? "";
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -60,7 +63,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
   const [selectedAttachments, setSelectedAttachments] = useState<number[]>([]);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [filterSubject, setFilterSubject] = useState("");
   const [filterSemester, setFilterSemester] = useState("");
   const [filterTag, setFilterTag] = useState("");
@@ -96,6 +99,10 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
     void loadFiles();
   }, []);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
 
   const filteredNotes = useMemo(
     () =>

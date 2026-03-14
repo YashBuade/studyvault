@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { BadgeCheck, Clock3, FileArchive, FileImage, FileText, Pencil, Search, XCircle } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -39,14 +40,20 @@ function getFileIcon(mimeType: string) {
 }
 
 export function FilesBrowserClient({ initialFiles }: { initialFiles: UserFile[] }) {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") ?? "";
   const [files, setFiles] = useState(initialFiles);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [cursor, setCursor] = useState<number | null>(initialFiles.at(-1)?.id ?? null);
   const [hasMore, setHasMore] = useState(initialFiles.length >= 10);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<UserFile | null>(null);
   const [editName, setEditName] = useState("");
   const { pushToast } = useToast();
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
 
   const visible = useMemo(
     () => files.filter((file) => !file.deletedAt && file.originalName.toLowerCase().includes(search.toLowerCase())),
