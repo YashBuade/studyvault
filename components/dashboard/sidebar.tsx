@@ -6,6 +6,8 @@ import {
   Archive,
   BarChart3,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   FileText,
   FolderOpen,
@@ -23,30 +25,34 @@ import {
 import { NavItem } from "@/src/components/ui/nav-item";
 import { Logo } from "@/components/ui/logo";
 import { NotificationBadge } from "@/components/dashboard/notification-badge";
+import { LogoutButton } from "@/components/dashboard/logout-button";
 
 const navSections = [
   {
-    label: "Core",
+    label: "Workspace",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: Gauge },
       { href: "/dashboard/notes", label: "Notes", icon: FileText },
-      { href: "/dashboard/my-files", label: "My Files", icon: FolderOpen },
-      { href: "/dashboard/upload-center", label: "Upload Center", icon: Upload },
+      { href: "/dashboard/my-files", label: "Files", icon: FolderOpen },
+      { href: "/dashboard/planner", label: "Planner", icon: Calendar },
     ],
   },
   {
-    label: "Study Planning",
+    label: "Study",
     items: [
       { href: "/dashboard/assignments", label: "Assignments", icon: ClipboardList },
-      { href: "/dashboard/planner", label: "Planner", icon: Calendar },
       { href: "/dashboard/exams", label: "Exams", icon: GraduationCap },
+      { href: "/dashboard/upload-center", label: "Upload Center", icon: Upload },
       { href: "/dashboard/resources", label: "Resources", icon: Library },
     ],
   },
   {
-    label: "Explore & Account",
+    label: "Community",
+    items: [{ href: "/notes", label: "Public Notes", icon: Globe }],
+  },
+  {
+    label: "Account",
     items: [
-      { href: "/notes", label: "Public Library", icon: Globe },
       { href: "/dashboard/notifications", label: "Notifications", icon: NotificationBadge },
       { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/profile", label: "Profile", icon: User },
@@ -56,43 +62,85 @@ const navSections = [
   },
 ] as const;
 
+function getInitials(nameOrEmail: string) {
+  return nameOrEmail
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function SidebarUserCard({
+  collapsed,
+  name,
+  email,
+}: {
+  collapsed: boolean;
+  name: string | null;
+  email: string;
+}) {
+  const displayName = name || email;
+
+  return (
+    <div className="mt-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
+      <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
+        <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-xs font-semibold text-[rgb(var(--text-inverse))]">
+          {getInitials(displayName)}
+        </div>
+        {!collapsed ? (
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{displayName}</p>
+            <p className="truncate text-xs text-[rgb(var(--text-tertiary))]">{email}</p>
+          </div>
+        ) : null}
+      </div>
+      <div className={`mt-3 ${collapsed ? "flex justify-center" : ""}`}>
+        <LogoutButton />
+      </div>
+    </div>
+  );
+}
+
 export function DashboardSidebar({
   isAdmin,
   isTeacher,
   teacherStatus,
   isVerifiedTeacher,
+  name,
+  email,
 }: {
   isAdmin: boolean;
   isTeacher: boolean;
   teacherStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
   isVerifiedTeacher: boolean;
+  name: string | null;
+  email: string;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
   const teacherStatusMap = {
     NONE: { label: "Not submitted", className: "text-[rgb(var(--text-tertiary))]" },
-    PENDING: { label: "Awaiting admin approval", className: "text-amber-600" },
-    APPROVED: { label: "Verified ✓", className: "text-emerald-600" },
-    REJECTED: { label: "Verification rejected", className: "text-red-600" },
+    PENDING: { label: "Awaiting admin approval", className: "text-[rgb(var(--color-warning))]" },
+    APPROVED: { label: "Verified \u2713", className: "text-[rgb(var(--color-success))]" },
+    REJECTED: { label: "Verification rejected", className: "text-[rgb(var(--color-danger))]" },
   } as const;
+
   const adminSections = isAdmin
     ? [
         {
-          label: "Admin Control",
+          label: "Admin",
           items: [
             { href: "/dashboard/admin", label: "Admin Panel", icon: Shield },
-            { href: "/admin/analytics", label: "Admin Analytics", icon: BarChart3 },
-          ],
-        },
-        {
-          label: "Admin Verification",
-          items: [
-            { href: "/dashboard/admin/teachers", label: "Teacher Verification", icon: User },
-            { href: "/dashboard/teacher/review", label: "File Verification Queue", icon: Shield },
+            { href: "/dashboard/admin/teachers", label: "Teacher Approvals", icon: User },
           ],
         },
       ]
     : [];
+
+  const closeSidebar = () => setOpen(false);
 
   return (
     <>
@@ -105,77 +153,87 @@ export function DashboardSidebar({
         <Menu size={20} />
       </button>
 
-      {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" /> : null}
+      {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={closeSidebar} aria-hidden="true" /> : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-[rgb(var(--border))]/70 bg-[rgb(var(--surface))]/90 p-5 backdrop-blur-2xl transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 border-r border-[rgb(var(--border))] bg-[rgb(var(--color-bg))]/98 backdrop-blur-2xl transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
-        } md:block`}
+        } ${collapsed ? "w-20" : "w-72"} md:translate-x-0`}
       >
-        <div className="mb-6 rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/60 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)]">
-          <div className="flex items-center justify-between">
-            <Logo size="md" showText href="/dashboard" />
+        <div className="flex h-full flex-col p-4">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <Logo size="md" showText={!collapsed} href="/dashboard" />
             <button
               type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-[var(--radius-sm)] p-2 text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] md:hidden"
-              aria-label="Close menu"
+              onClick={closeSidebar}
+              className="icon-button border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] md:hidden"
+              aria-label="Close sidebar"
             >
               <X size={18} />
             </button>
+            <button
+              type="button"
+              onClick={() => setCollapsed((value) => !value)}
+              className="icon-button hidden border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] md:inline-flex"
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-            <div className="rounded-[var(--radius-md)] bg-[rgb(var(--surface-hover))] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">Workspace</p>
-              <p className="mt-1 font-semibold text-[rgb(var(--text-primary))]">Unified study hub</p>
-            </div>
-            <div className="rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--primary-hover))]">Focus</p>
-              <p className="mt-1 font-semibold text-[rgb(var(--text-primary))]">Keep every deadline visible</p>
-            </div>
-          </div>
-        </div>
 
-        <nav className="space-y-4">
-          {[...navSections, ...adminSections].map((section) => (
-            <div key={section.label} className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/55 bg-[rgb(var(--surface))]/72 p-3 shadow-[var(--shadow-xs)]">
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">
-                {section.label}
-              </p>
-              <div className="space-y-1.5">
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.href} onClick={() => setOpen(false)}>
-                      <NavItem href={item.href} active={pathname === item.href}>
-                        <Icon size={16} />
-                        {item.label}
-                      </NavItem>
-                    </div>
-                  );
-                })}
+          {!collapsed ? (
+            <div className="mb-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-xs)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">Workspace</p>
+              <p className="mt-2 text-sm font-semibold text-[rgb(var(--text-primary))]">Notes, files, planning, and deadlines in one focused flow.</p>
+            </div>
+          ) : null}
+
+          <nav className="flex-1 space-y-4 overflow-y-auto">
+            {[...navSections, ...adminSections].map((section) => (
+              <div key={section.label} className="space-y-1">
+                {!collapsed ? (
+                  <p className="px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">
+                    {section.label}
+                  </p>
+                ) : null}
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={item.href} onClick={closeSidebar}>
+                        <NavItem href={item.href} active={pathname === item.href}>
+                          <Icon size={18} />
+                          {!collapsed ? <span>{item.label}</span> : null}
+                        </NavItem>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+
+          {isTeacher ? (
+            <div className="mt-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
+              {!collapsed ? <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Teacher</p> : null}
+              <div className="mt-2 space-y-1">
+                <NavItem href="/dashboard/teacher" active={pathname === "/dashboard/teacher"}>
+                  <User size={18} />
+                  {!collapsed ? <span>Teacher Workspace</span> : null}
+                </NavItem>
+                <NavItem href="/dashboard/teacher/review" active={pathname === "/dashboard/teacher/review"}>
+                  <Shield size={18} />
+                  {!collapsed ? <span>{isVerifiedTeacher ? "File Verification" : "Verification Pending"}</span> : null}
+                </NavItem>
+                {!collapsed ? (
+                  <p className={`mt-2 text-[11px] ${teacherStatusMap[teacherStatus].className}`}>{teacherStatusMap[teacherStatus].label}</p>
+                ) : null}
               </div>
             </div>
-          ))}
-        </nav>
+          ) : null}
 
-        {isTeacher ? (
-          <div className="mt-4 rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/60 bg-gradient-to-br from-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Teacher</p>
-            <div className="mt-2">
-              <NavItem href="/dashboard/teacher" active={pathname === "/dashboard/teacher"}>
-                <User size={16} />
-                Teacher Workspace
-              </NavItem>
-              <NavItem href="/dashboard/teacher/review" active={pathname === "/dashboard/teacher/review"}>
-                <Shield size={16} />
-                {isVerifiedTeacher ? "File Verification" : "Verification Pending"}
-              </NavItem>
-              <p className={`mt-2 text-[11px] ${teacherStatusMap[teacherStatus].className}`}>Status: {teacherStatusMap[teacherStatus].label}</p>
-            </div>
-          </div>
-        ) : null}
-        <div className="pb-8" />
+          <SidebarUserCard collapsed={collapsed} name={name} email={email} />
+        </div>
       </aside>
     </>
   );

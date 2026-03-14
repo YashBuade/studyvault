@@ -13,12 +13,8 @@ const THEME_EVENT = "studyvault-theme-change";
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
-
-  if (theme === "dark") {
-    root.classList.add("dark");
-  } else {
-    root.classList.remove("dark");
-  }
+  root.setAttribute("data-theme", theme);
+  root.classList.toggle("dark", theme === "dark");
 }
 
 type ThemeContextValue = {

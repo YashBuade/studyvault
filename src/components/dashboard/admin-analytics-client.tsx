@@ -539,10 +539,10 @@ export function AdminAnalyticsClient() {
         </div>
       </Card>
 
-      <Card className="border-amber-300/60 bg-gradient-to-r from-amber-50/70 via-orange-50/70 to-rose-50/70 dark:from-amber-900/20 dark:via-orange-900/20 dark:to-rose-900/20">
+      <Card className="border-[rgb(var(--color-warning))]/30 bg-[linear-gradient(90deg,rgb(var(--color-warning-light))_0%,rgb(var(--color-danger-light))_100%)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-300">
+            <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--color-warning))]">
               <Activity className="h-3.5 w-3.5" />
               Live Access Window
             </p>
@@ -553,8 +553,8 @@ export function AdminAnalyticsClient() {
               Activity is inferred from note/file/resource/planner/exam/content interactions.
             </p>
           </div>
-          <div className="rounded-[var(--radius-md)] border border-amber-300/70 bg-white/70 px-4 py-3 text-right dark:bg-black/20">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">Current activity</p>
+          <div className="rounded-[var(--radius-md)] border border-[rgb(var(--color-warning))]/30 bg-[rgb(var(--color-surface))]/80 px-4 py-3 text-right">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--color-warning))]">Current activity</p>
             <p className="text-3xl font-semibold text-[rgb(var(--text-primary))]">{analytics.currentlyActiveCount}</p>
           </div>
         </div>
@@ -607,14 +607,14 @@ export function AdminAnalyticsClient() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analytics.activityLast7Days}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.35)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--color-text-muted) / 0.35)" />
                 <XAxis dataKey="label" />
                 <YAxis allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: 10, borderColor: "rgba(148,163,184,0.5)" }} />
+                <Tooltip contentStyle={{ borderRadius: 10, borderColor: "rgb(var(--color-border-strong) / 0.7)" }} />
                 <Legend />
-                <Line type="monotone" dataKey="newUsers" name="New Users" stroke="#2563eb" strokeWidth={2} />
-                <Line type="monotone" dataKey="newNotes" name="New Notes" stroke="#059669" strokeWidth={2} />
-                <Line type="monotone" dataKey="newFiles" name="New Uploads" stroke="#ea580c" strokeWidth={2} />
+                <Line type="monotone" dataKey="newUsers" name="New Users" stroke="rgb(var(--color-primary))" strokeWidth={2} />
+                <Line type="monotone" dataKey="newNotes" name="New Notes" stroke="rgb(var(--color-success))" strokeWidth={2} />
+                <Line type="monotone" dataKey="newFiles" name="New Uploads" stroke="rgb(var(--color-warning))" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -638,7 +638,11 @@ export function AdminAnalyticsClient() {
               </div>
               <div>
                 <p className="text-[rgb(var(--text-tertiary))]">Day-over-day</p>
-                <p className={`text-base font-semibold ${dailyActivitySummary.delta >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                <p
+                  className={`text-base font-semibold ${
+                    dailyActivitySummary.delta >= 0 ? "text-[rgb(var(--color-success))]" : "text-[rgb(var(--color-danger))]"
+                  }`}
+                >
                   {dailyActivitySummary.delta >= 0 ? "+" : ""}
                   {dailyActivitySummary.delta}
                 </p>
@@ -648,14 +652,14 @@ export function AdminAnalyticsClient() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analytics.activityLast7Days}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.35)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--color-text-muted) / 0.35)" />
                 <XAxis dataKey="label" />
                 <YAxis allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: 10, borderColor: "rgba(148,163,184,0.5)" }} />
+                <Tooltip contentStyle={{ borderRadius: 10, borderColor: "rgb(var(--color-border-strong) / 0.7)" }} />
                 <Legend />
-                <Bar dataKey="newUsers" name="Users" fill="#2563eb" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="newNotes" name="Notes" fill="#059669" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="newFiles" name="Uploads" fill="#ea580c" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="newUsers" name="Users" fill="rgb(var(--color-primary))" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="newNotes" name="Notes" fill="rgb(var(--color-success))" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="newFiles" name="Uploads" fill="rgb(var(--color-warning))" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

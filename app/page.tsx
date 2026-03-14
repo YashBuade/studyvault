@@ -15,8 +15,8 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
 import { PublicFooter } from "@/components/ui/public-footer";
+import { PublicNavbar } from "@/components/ui/public-navbar";
 import { getSessionFromCookies } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -61,33 +61,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--background))]">
-      <header className="sticky top-0 z-40 border-b border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/75 backdrop-blur-2xl">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          <Logo size="md" showText href="/" />
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden items-center gap-2 md:flex">
-              <Link href="/notes" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
-                Public Library
-              </Link>
-              <Link href="/auth/admin/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
-                Admin Portal
-              </Link>
-              <Link href="/auth/teacher/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
-                Teacher Portal
-              </Link>
-            </div>
-            <Link href="/auth/login" className="px-3 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">
-              Sign In
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[rgb(var(--primary))] px-4 text-sm font-semibold text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] transition hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--surface))] sm:px-5"
-            >
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicNavbar />
 
       <main className="relative overflow-hidden">
         <div className="pointer-events-none absolute -left-28 top-12 h-80 w-80 rounded-full bg-sky-300/20 blur-3xl dark:bg-sky-500/20" />
@@ -204,7 +178,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="px-4 pb-20 sm:px-6 lg:px-8">
+        <section id="features" className="px-4 pb-20 sm:px-6 lg:px-8">
           <div className="mx-auto mb-6 max-w-6xl space-y-3">
             <div className="grid w-full gap-3 md:grid-cols-2">
               <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/90 p-5 shadow-[var(--shadow-sm)] backdrop-blur">
@@ -266,7 +240,7 @@ export default async function HomePage() {
                   key={item.title}
                   className="group rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))]/92 p-6 shadow-[var(--shadow-sm)] transition-all duration-300 hover:-translate-y-1 hover:border-[rgb(var(--primary))]/40 hover:shadow-[var(--shadow-lg)] animate-slide-up"
                 >
-                  <div className="mb-4 inline-flex rounded-[var(--radius-md)] bg-gradient-to-br from-[#0f172a] via-[#0f4c81] to-[#0b7a68] p-3 text-white shadow-[var(--shadow-sm)] transition-transform group-hover:scale-105">
+                  <div className="mb-4 inline-flex rounded-[var(--radius-md)] bg-[linear-gradient(135deg,rgb(var(--color-text-primary))_0%,rgb(var(--color-primary))_52%,rgb(var(--color-accent))_100%)] p-3 text-white shadow-[var(--shadow-sm)] transition-transform group-hover:scale-105">
                     <FeatureIcon className="h-6 w-6" />
                   </div>
                   <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">{item.title}</h2>

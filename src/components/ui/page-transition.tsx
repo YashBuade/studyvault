@@ -6,7 +6,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div key={pathname} className="animate-[fadeIn_0.2s_ease-out_forwards] opacity-0">
+    <div key={pathname} className="animate-fade-in opacity-0">
       {children}
     </div>
   );
