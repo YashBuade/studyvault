@@ -138,7 +138,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--background))]">
+    <div className="min-h-screen bg-[rgb(var(--background))] dark:bg-slate-950">
       <div className="mx-auto grid min-h-screen max-w-[1320px] lg:grid-cols-[1.12fr_0.88fr]">
         <section className="relative hidden overflow-hidden border-r border-[rgb(var(--border))] lg:flex">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--color-surface))_45%,rgb(var(--color-info-light))_100%)]" />
@@ -190,7 +190,7 @@ export default function LoginPage() {
             <div className="lg:hidden">
               <Logo size="md" />
             </div>
-            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl sm:p-8">
+            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/92 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/92 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:p-8">
               <div className="space-y-6">
                 <div className="space-y-3">
                   <div className="section-kicker">Access portal</div>

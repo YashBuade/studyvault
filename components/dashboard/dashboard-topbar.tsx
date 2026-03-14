@@ -46,15 +46,15 @@ export function DashboardTopbar({
   const displayName = name || email;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/96 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/96 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/96">
       <div className="flex min-h-14 items-center gap-3 px-4 py-3 sm:px-6 md:px-8">
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-xl font-semibold text-[rgb(var(--text-primary))]">{pageTitle}</h2>
+          <h2 className="truncate text-xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{pageTitle}</h2>
         </div>
 
         <button
           type="button"
-          className="hidden h-9 w-full max-w-[360px] items-center gap-3 rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 text-left text-sm text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] lg:inline-flex"
+          className="hidden h-9 w-full max-w-[360px] items-center gap-3 rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 text-left text-sm text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:shadow-none dark:ring-1 dark:ring-slate-700 lg:inline-flex"
           aria-label="Search notes, files, and tasks"
         >
           <Search size={16} />
@@ -68,19 +68,19 @@ export function DashboardTopbar({
           <Link
             href="/dashboard/notifications"
             aria-label="Open notifications"
-            className="icon-button relative border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] shadow-[var(--shadow-xs)]"
+          className="icon-button relative border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:shadow-none dark:ring-1 dark:ring-slate-700"
           >
             <Bell size={18} />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[rgb(var(--color-danger))]" />
           </Link>
           <ThemeToggle />
-          <div className="hidden items-center gap-3 rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2 py-1 shadow-[var(--shadow-xs)] sm:flex">
+          <div className="hidden items-center gap-3 rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2 py-1 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:flex">
             <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-xs font-semibold text-[rgb(var(--text-inverse))]">
               {getInitials(displayName)}
             </div>
             <div className="max-w-[160px]">
-              <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{displayName}</p>
-              <p className="truncate text-xs text-[rgb(var(--text-tertiary))]">{email}</p>
+              <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{displayName}</p>
+              <p className="truncate text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">{email}</p>
             </div>
           </div>
         </div>

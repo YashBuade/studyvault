@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Logo } from "@/components/ui/logo";
 
 const navLinks = [
   { href: "/#features", label: "Features" },
@@ -15,19 +16,16 @@ export function PublicNavbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]/95 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
       <div className="page-shell flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="inline-flex items-center gap-3">
-          <span className="inline-flex h-4 w-4 rounded-[4px] bg-[rgb(var(--color-primary))] shadow-[var(--shadow-xs)]" />
-          <span className="text-[18px] font-bold tracking-[-0.02em] text-[rgb(var(--color-text-primary))]">StudyVault</span>
-        </Link>
+        <Logo size="sm" />
 
         <nav className="hidden items-center gap-7 lg:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))]"
+              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:text-slate-100"
             >
               {link.label}
             </Link>
@@ -55,20 +53,20 @@ export function PublicNavbar() {
       </div>
 
       {open ? (
-        <div className="border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))] md:hidden">
+        <div className="border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))] dark:border-slate-700 dark:bg-slate-900 md:hidden">
           <div className="page-shell flex flex-col gap-3 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))]"
+                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="flex items-center justify-between rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--color-bg))] px-3 py-2">
-              <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))]">Theme</span>
+            <div className="flex items-center justify-between rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--color-bg))] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+              <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))] dark:text-slate-300">Theme</span>
               <ThemeToggle />
             </div>
             <Link href="/auth/login" onClick={() => setOpen(false)} className="btn btn-secondary w-full">

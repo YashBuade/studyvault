@@ -23,13 +23,13 @@ export const metadata: Metadata = {
 };
 
 function ThemeScript() {
-  const code = `(() => {
+  const code = `(function() {
     try {
-      const saved = localStorage.getItem("sv-theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const theme = saved || (prefersDark ? "dark" : "light");
-      document.documentElement.setAttribute("data-theme", theme);
-      document.documentElement.classList.toggle("dark", theme === "dark");
+      var saved = localStorage.getItem('sv-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
   })();`;
 

@@ -233,8 +233,8 @@ export default async function DashboardPage() {
 
   if (isNewWorkspace) {
     return (
-      <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_48%,rgb(var(--color-info-light))_100%)] px-6 py-12 text-center shadow-[var(--shadow-md)]">
-        <h1 className="text-3xl font-semibold text-[rgb(var(--text-primary))]">Welcome to StudyVault 👋</h1>
+      <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_48%,rgb(var(--color-info-light))_100%)] px-6 py-12 text-center shadow-[var(--shadow-md)] dark:border-slate-700 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+        <h1 className="text-3xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Welcome to StudyVault 👋</h1>
         <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[rgb(var(--surface))] text-sm font-semibold text-[rgb(var(--primary))] shadow-[var(--shadow-sm)]">
           SV
         </div>
@@ -255,7 +255,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-7">
-      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[linear-gradient(135deg,rgb(var(--surface))_0%,rgb(var(--surface-hover))_58%,rgb(var(--color-primary-light))_100%)] p-6 shadow-[var(--shadow-sm)] md:p-8">
+      <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-[linear-gradient(135deg,rgb(var(--surface))_0%,rgb(var(--surface-hover))_58%,rgb(var(--color-primary-light))_100%)] p-6 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:shadow-none dark:ring-1 dark:ring-slate-700 md:p-8">
         <div className="hero-grid absolute inset-0 opacity-35" />
         <div className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
         <div className="pointer-events-none absolute left-10 top-10 h-28 w-28 rounded-full bg-[rgb(var(--color-success))]/10 blur-3xl" />

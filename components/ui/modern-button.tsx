@@ -27,18 +27,18 @@ export const ModernButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center gap-2 font-semibold rounded-[var(--radius-md)] transition-all duration-[var(--transition-base)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--surface))] active:scale-[0.99] motion-safe:hover:-translate-y-0.5";
+      "inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-semibold transition-all duration-[var(--transition-base)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--surface))] motion-safe:hover:-translate-y-0.5 dark:focus-visible:ring-offset-slate-900";
 
     const variants = {
       primary:
-        "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary))]/40",
+        "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary))]/40 dark:shadow-none dark:ring-1 dark:ring-slate-700",
       secondary:
-        "bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--surface-active))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30",
+        "border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-active))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:shadow-none dark:ring-1 dark:ring-slate-700",
       outline:
-        "border border-[rgb(var(--border))] bg-transparent text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30",
-      ghost: "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))]",
+        "border border-[rgb(var(--border))] bg-transparent text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] focus-visible:ring-[rgb(var(--primary))]/30 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700",
+      ghost: "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100",
       danger:
-        "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:opacity-95 hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error))]/35",
+        "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:opacity-95 hover:text-[rgb(var(--text-inverse))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error))]/35 dark:shadow-none dark:ring-1 dark:ring-slate-700",
     };
 
     const sizes = {

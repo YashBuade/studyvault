@@ -60,7 +60,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--background))]">
+    <div className="min-h-screen bg-[rgb(var(--background))] dark:bg-slate-950">
       <PublicNavbar />
 
       <main className="relative overflow-hidden">
@@ -96,9 +96,9 @@ export default async function HomePage() {
               </div>
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 {highlights.map((item) => (
-                  <div key={item.value} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/70 bg-[rgb(var(--surface))]/90 p-4 shadow-[var(--shadow-sm)] backdrop-blur">
-                    <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">{item.value}</p>
-                    <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">{item.label}</p>
+                  <div key={item.value} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/70 bg-[rgb(var(--surface))]/90 p-4 shadow-[var(--shadow-sm)] backdrop-blur dark:border-slate-700 dark:bg-slate-800/90 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+                    <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{item.value}</p>
+                    <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">{item.label}</p>
                   </div>
                 ))}
               </div>
@@ -106,13 +106,13 @@ export default async function HomePage() {
 
             <div className="relative">
               <div className="hero-grid absolute inset-6 rounded-[28px] opacity-60" />
-              <div className="relative overflow-hidden rounded-[32px] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-5 shadow-[var(--shadow-xl)] backdrop-blur-2xl sm:p-6">
+              <div className="relative overflow-hidden rounded-[32px] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-5 shadow-[var(--shadow-xl)] backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/88 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:p-6">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">Today&apos;s command center</p>
-                    <p className="mt-1 text-2xl font-semibold text-[rgb(var(--text-primary))]">Study flow at a glance</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Today&apos;s command center</p>
+                    <p className="mt-1 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Study flow at a glance</p>
                   </div>
-                  <div className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs font-semibold text-[rgb(var(--text-secondary))]">
+                  <div className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-1 text-xs font-semibold text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
                     Dashboard preview
                   </div>
                 </div>
@@ -129,27 +129,27 @@ export default async function HomePage() {
                     <p className="mt-3 text-sm text-[rgb(var(--color-text-inverse))]/80">Strong momentum across notes, deadlines, and file organization.</p>
                   </div>
                   <div className="space-y-3">
-                    <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-4">
+                    <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-4 dark:border-slate-700 dark:bg-slate-800">
                       <div className="flex items-center gap-3">
                         <div className="rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] p-2 text-[rgb(var(--primary))]">
                           <CalendarCheck2 className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Next deadline</p>
-                          <p className="text-sm text-[rgb(var(--text-secondary))]">Physics assignment</p>
-                          <p className="text-xs text-[rgb(var(--text-tertiary))]">Due in 2 days</p>
+                          <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Next deadline</p>
+                          <p className="text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">Physics assignment</p>
+                          <p className="text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">Due in 2 days</p>
                         </div>
                         <span className="rounded-full bg-[rgb(var(--color-warning-light))] px-2.5 py-1 text-xs font-semibold text-[rgb(var(--color-warning))]">2 days</span>
                       </div>
                     </div>
-                    <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-4">
+                    <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] p-4 dark:border-slate-700 dark:bg-slate-800">
                       <div className="flex items-center gap-3">
                         <div className="rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] p-2 text-[rgb(var(--primary))]">
                           <Globe className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Public library</p>
-                          <p className="text-sm text-[rgb(var(--text-secondary))]">Share polished notes while keeping drafts private</p>
+                          <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Public library</p>
+                          <p className="text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">Share polished notes while keeping drafts private</p>
                         </div>
                       </div>
                     </div>
@@ -157,20 +157,20 @@ export default async function HomePage() {
                 </div>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
+                  <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 dark:border-slate-700 dark:bg-slate-800">
                     <Users className="h-5 w-5 text-[rgb(var(--primary))]" />
-                    <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Multi-role access</p>
-                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Built for students, teachers, and admins.</p>
+                    <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Multi-role access</p>
+                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Built for students, teachers, and admins.</p>
                   </div>
-                  <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
+                  <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 dark:border-slate-700 dark:bg-slate-800">
                     <FileUp className="h-5 w-5 text-[rgb(var(--primary))]" />
-                    <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Clean uploads</p>
-                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Files and notes stay connected to your study flow.</p>
+                    <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Clean uploads</p>
+                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Files and notes stay connected to your study flow.</p>
                   </div>
-                  <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4">
+                  <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 dark:border-slate-700 dark:bg-slate-800">
                     <ShieldCheck className="h-5 w-5 text-[rgb(var(--primary))]" />
-                    <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Private by default</p>
-                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Sharing and moderation controls stay intact.</p>
+                    <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Private by default</p>
+                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Sharing and moderation controls stay intact.</p>
                   </div>
                 </div>
               </div>

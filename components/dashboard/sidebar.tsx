@@ -83,15 +83,15 @@ function SidebarUserCard({
   const displayName = name || email;
 
   return (
-    <div className="mt-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
+    <div className="mt-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">
       <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
         <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-xs font-semibold text-[rgb(var(--text-inverse))]">
           {getInitials(displayName)}
         </div>
         {!collapsed ? (
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{displayName}</p>
-            <p className="truncate text-xs text-[rgb(var(--text-tertiary))]">{email}</p>
+            <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{displayName}</p>
+            <p className="truncate text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">{email}</p>
           </div>
         ) : null}
       </div>
@@ -147,7 +147,7 @@ export function DashboardSidebar({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="panel-shell fixed left-4 top-4 z-40 inline-flex items-center justify-center rounded-[var(--radius-md)] p-2 text-[rgb(var(--text-primary))] md:hidden"
+        className="panel-shell fixed left-4 top-4 z-40 inline-flex items-center justify-center rounded-[var(--radius-md)] p-2 text-[rgb(var(--text-primary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:shadow-none dark:ring-1 dark:ring-slate-700 md:hidden"
         aria-label="Open menu"
       >
         <Menu size={20} />
@@ -156,7 +156,7 @@ export function DashboardSidebar({
       {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={closeSidebar} aria-hidden="true" /> : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 border-r border-[rgb(var(--border))] bg-[rgb(var(--color-bg))]/98 backdrop-blur-2xl transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 z-50 border-r border-[rgb(var(--border))] bg-[rgb(var(--color-bg))]/98 backdrop-blur-2xl transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900/98 ${
           open ? "translate-x-0" : "-translate-x-full"
         } ${collapsed ? "w-20" : "w-72"} md:translate-x-0`}
       >
@@ -166,7 +166,7 @@ export function DashboardSidebar({
             <button
               type="button"
               onClick={closeSidebar}
-              className="icon-button border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] md:hidden"
+              className="icon-button border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:shadow-none dark:ring-1 dark:ring-slate-700 md:hidden"
               aria-label="Close sidebar"
             >
               <X size={18} />
@@ -174,7 +174,7 @@ export function DashboardSidebar({
             <button
               type="button"
               onClick={() => setCollapsed((value) => !value)}
-              className="icon-button hidden border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] md:inline-flex"
+              className="icon-button hidden border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:shadow-none dark:ring-1 dark:ring-slate-700 md:inline-flex"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -182,9 +182,9 @@ export function DashboardSidebar({
           </div>
 
           {!collapsed ? (
-            <div className="mb-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-xs)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">Workspace</p>
-              <p className="mt-2 text-sm font-semibold text-[rgb(var(--text-primary))]">Notes, files, planning, and deadlines in one focused flow.</p>
+            <div className="mb-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Workspace</p>
+              <p className="mt-2 text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Notes, files, planning, and deadlines in one focused flow.</p>
             </div>
           ) : null}
 
@@ -192,7 +192,7 @@ export function DashboardSidebar({
             {[...navSections, ...adminSections].map((section) => (
               <div key={section.label} className="space-y-1">
                 {!collapsed ? (
-                  <p className="px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))]">
+                  <p className="px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">
                     {section.label}
                   </p>
                 ) : null}
@@ -214,8 +214,8 @@ export function DashboardSidebar({
           </nav>
 
           {isTeacher ? (
-            <div className="mt-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)]">
-              {!collapsed ? <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Teacher</p> : null}
+            <div className="mt-4 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+              {!collapsed ? <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Teacher</p> : null}
               <div className="mt-2 space-y-1">
                 <NavItem href="/dashboard/teacher" active={pathname === "/dashboard/teacher"}>
                   <User size={18} />
