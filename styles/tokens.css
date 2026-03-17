@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif;
   --color-primary: 79 70 229;
   --color-primary-hover: 67 56 202;
   --color-primary-light: 238 242 255;
@@ -141,8 +142,9 @@
   --color-border: 51 65 85;
   --color-border-strong: 71 85 105;
   --color-text-primary: 241 245 249;
-  --color-text-secondary: 148 163 184;
-  --color-text-muted: 71 85 105;
+  /* Keep all text, including "muted" labels, readable on dark surfaces. */
+  --color-text-secondary: 203 213 225;
+  --color-text-muted: 148 163 184;
   --color-text-inverse: 255 255 255;
 
   --color-primary-light: 49 46 129;
@@ -172,9 +174,9 @@
   --border-hover: 71 85 105;
   --border-focus: 79 70 229;
   --text-primary: 241 245 249;
-  --text-secondary: 148 163 184;
-  --text-tertiary: 71 85 105;
-  --text-disabled: 71 85 105;
+  --text-secondary: 203 213 225;
+  --text-tertiary: 148 163 184;
+  --text-disabled: 148 163 184;
   --text-inverse: 255 255 255;
   --panel: rgb(30 41 59);
   --bg: rgb(15 23 42);
@@ -189,7 +191,7 @@
   --card-foreground: 241 245 249;
   --secondary: 26 34 52;
   --secondary-foreground: 241 245 249;
-  --muted-foreground: 71 85 105;
+  --muted-foreground: 148 163 184;
   --accent-foreground: 255 255 255;
   --destructive: 239 68 68;
   --destructive-foreground: 255 255 255;

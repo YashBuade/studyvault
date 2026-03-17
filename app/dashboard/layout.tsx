@@ -37,7 +37,7 @@ export default async function DashboardLayout({
         name={user.name}
         email={user.email}
       />
-      <div className="md:pl-72">
+      <div className="md:pl-[var(--sv-dashboard-sidebar-w)]">
         <DashboardTopbar name={user.name} email={user.email} />
 
         <main className="px-4 py-6 pb-24 sm:px-6 md:px-8 md:py-8 md:pb-8">

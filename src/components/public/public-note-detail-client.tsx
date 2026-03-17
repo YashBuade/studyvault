@@ -182,12 +182,12 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
         <h1 className="text-2xl font-semibold text-[var(--text)] dark:text-slate-100">{note.title}</h1>
         <div className="mt-2">
           {note.noteVerificationStatus === "VERIFIED" ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/60 bg-emerald-100/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/30 dark:text-emerald-200">
               <BadgeCheck size={12} />
               Verified note
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-warning)]" style={{ borderColor: "color-mix(in srgb, var(--color-warning) 50%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}>
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800 dark:border-amber-300/30 dark:bg-amber-900/30 dark:text-amber-200">
               <Info size={12} />
               Unverified note
             </span>
@@ -218,8 +218,7 @@ export function PublicNoteDetailClient({ slug }: { slug: string }) {
                 ) : (
                   <span
                     key={attachment.file.id}
-                    className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold text-[var(--color-warning)]"
-                    style={{ borderColor: "color-mix(in srgb, var(--color-warning) 45%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}
+                    className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 dark:border-amber-300/30 dark:bg-amber-900/30 dark:text-amber-200"
                   >
                     <Info size={12} />
                     {attachment.file.originalName} (Pending verification)

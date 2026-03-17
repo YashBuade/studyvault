@@ -9,10 +9,10 @@ import {
   Download,
   Info,
   FileUp,
-  Filter,
   Image as ImageIcon,
   LayoutGrid,
   List,
+  Menu,
   Plus,
   Search,
   Settings2,
@@ -21,6 +21,8 @@ import {
   Tag,
   X,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Logo } from "@/components/ui/logo";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
@@ -130,6 +132,7 @@ async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T> |
 }
 
 export function PublicNotesClient() {
+  const [navOpen, setNavOpen] = useState(false);
   const [notes, setNotes] = useState<PublicNote[]>([]);
   const [search, setSearch] = useState("");
   const [subject, setSubject] = useState("");
@@ -163,7 +166,7 @@ export function PublicNotesClient() {
   const [semesterDraft, setSemesterDraft] = useState("");
   const [tagDraft, setTagDraft] = useState("");
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [libraryMode, setLibraryMode] = useState<"browse" | "share" | "all">("browse");
+  const [libraryMode] = useState<"browse" | "share" | "all">("browse");
   const hydratedPrefs = useRef(false);
 
   const { pushToast } = useToast();
@@ -186,17 +189,6 @@ export function PublicNotesClient() {
     return Array.from(set);
   }, [notes, customSemesters]);
 
-  const tagsList = useMemo(() => {
-    const set = new Set<string>(customTags);
-    notes.forEach((note) => {
-      note.tags?.split(",").forEach((item) => {
-        const trimmed = item.trim();
-        if (trimmed) set.add(trimmed);
-      });
-    });
-    return Array.from(set);
-  }, [notes, customTags]);
-
   const sortedNotes = useMemo(() => {
     const copy = [...notes];
     copy.sort((a, b) =>
@@ -212,14 +204,10 @@ export function PublicNotesClient() {
     [sortedNotes, teacherOnly],
   );
 
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (search.trim()) count += 1;
-    if (subject) count += 1;
-    if (semester) count += 1;
-    if (tag) count += 1;
-    return count;
-  }, [search, subject, semester, tag]);
+  const hasActiveFilters = useMemo(
+    () => Boolean(search.trim() || subject || semester || tag || sort !== "latest" || teacherOnly),
+    [search, subject, semester, sort, tag, teacherOnly],
+  );
 
   const topTags = useMemo(() => {
     const counter = new Map<string, number>();
@@ -240,10 +228,17 @@ export function PublicNotesClient() {
     const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
     return notes.filter((item) => new Date(item.createdAt).getTime() >= threeDaysAgo).length;
   }, [notes]);
+
+  const weekNotesCount = useMemo(() => {
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return notes.filter((item) => new Date(item.createdAt).getTime() >= weekAgo).length;
+  }, [notes]);
   const verifiedNotesCount = useMemo(
     () => notes.filter((item) => item.noteVerificationStatus === "VERIFIED").length,
     [notes],
   );
+
+  const overviewAllZero = notes.length === 0 && files.length === 0 && weekNotesCount === 0 && subjects.length === 0;
 
   const availableFileKinds = useMemo(() => {
     const kinds = new Set<string>();
@@ -474,139 +469,189 @@ export function PublicNotesClient() {
   }
 
   return (
-    <div className="space-y-5">
+    <div>
+      <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.95)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
+        <div className="page-shell flex h-16 items-center justify-between gap-4">
+          <Logo size="sm" />
+
+          <nav className="hidden items-center gap-7 lg:flex">
+            <Link
+              href="#browse"
+              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:text-slate-100"
+            >
+              Browse All
+            </Link>
+            <Link
+              href="/notes"
+              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:text-slate-100"
+            >
+              Public Notes
+            </Link>
+            <Link
+              href="/auth/teacher/login"
+              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:text-slate-100"
+            >
+              For Teachers
+            </Link>
+          </nav>
+
+          <div className="hidden items-center gap-3 md:flex">
+            <ThemeToggle />
+            <Link href="/auth/login" className="btn btn-secondary btn-sm">
+              Sign in
+            </Link>
+            <Link href="/auth/signup" className="btn btn-primary btn-sm min-h-9">
+              Get started
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
+            onClick={() => setNavOpen((value) => !value)}
+            className="icon-button md:hidden"
+          >
+            {navOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+
+        {navOpen ? (
+          <div className="border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))] dark:border-slate-700 dark:bg-slate-900 md:hidden">
+            <div className="page-shell flex flex-col gap-3 py-4">
+              <Link
+                href="#browse"
+                onClick={() => setNavOpen(false)}
+                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              >
+                Browse All
+              </Link>
+              <Link
+                href="/notes"
+                onClick={() => setNavOpen(false)}
+                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              >
+                Public Notes
+              </Link>
+              <Link
+                href="/auth/teacher/login"
+                onClick={() => setNavOpen(false)}
+                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              >
+                For Teachers
+              </Link>
+              <div className="flex items-center justify-between rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--color-bg))] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))] dark:text-slate-300">Theme</span>
+                <ThemeToggle />
+              </div>
+              <Link href="/auth/login" onClick={() => setNavOpen(false)} className="btn btn-secondary w-full">
+                Sign in
+              </Link>
+              <Link href="/auth/signup" onClick={() => setNavOpen(false)} className="btn btn-primary w-full">
+                Get started
+              </Link>
+            </div>
+          </div>
+        ) : null}
+      </header>
+
+      <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+        <div className="space-y-5">
       <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-lg)] dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700">
         <div className="hero-grid absolute inset-0 opacity-35" />
         <div className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-[rgb(var(--color-success))]/12 blur-3xl" />
         <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
-        <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <div className="relative grid gap-6 lg:grid-cols-1 lg:items-center">
           <div>
             <div className="section-kicker">
               <Sparkles className="mr-2 h-3.5 w-3.5" />
-              Curated study discovery
+              Free · Open · Student-built
             </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100">
-              Discover strong notes, clean uploads, and trusted student contributions.
-            </h2>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100 sm:text-4xl">
+              Public Notes Library
+            </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[rgb(var(--text-secondary))] dark:text-slate-300 sm:text-base">
-              Browse by subject, semester, or tag, switch between note and file views, and focus on verified teacher content when you want higher-signal material fast.
+              Browse notes, summaries, and study files shared by students and verified teachers. No account needed to read — sign up to contribute.
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/88 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Recent activity</p>
-                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{recentNotesCount}</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">notes added in the last 3 days</p>
+                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{recentNotesCount === 0 ? "—" : recentNotesCount}</p>
+                <p
+                  className={`mt-1 text-xs dark:text-slate-300 ${recentNotesCount === 0 ? "text-[rgb(var(--text-tertiary))] dark:text-slate-400" : "text-[rgb(var(--text-secondary))]"}`}
+                >
+                  notes added in the last 3 days
+                </p>
               </div>
               <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/88 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Verified notes</p>
-                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{verifiedNotesCount}</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">already reviewed and surfaced clearly</p>
+                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{verifiedNotesCount === 0 ? "—" : verifiedNotesCount}</p>
+                <p
+                  className={`mt-1 text-xs dark:text-slate-300 ${verifiedNotesCount === 0 ? "text-[rgb(var(--text-tertiary))] dark:text-slate-400" : "text-[rgb(var(--text-secondary))]"}`}
+                >
+                  already reviewed and surfaced clearly
+                </p>
               </div>
               <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/88 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/88 dark:shadow-none dark:ring-1 dark:ring-slate-700">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">Topic spread</p>
-                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{subjects.length}</p>
-                <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">active subject paths to explore</p>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-3">
-            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface))]/92 p-4 shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/92 dark:shadow-none dark:ring-1 dark:ring-slate-700">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">How it works</p>
-              <div className="mt-3 space-y-3">
-                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3 dark:bg-slate-900">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">1. Browse by topic</p>
-                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Use search, trending tags, and category chips to narrow the library quickly.</p>
-                </div>
-                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3 dark:bg-slate-900">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">2. Open the best version</p>
-                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Verified notes and reviewed files stand out visually so you can trust what you open.</p>
-                </div>
-                <div className="rounded-[var(--radius-lg)] bg-[rgb(var(--surface-hover))] p-3 dark:bg-slate-900">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">3. Share your own notes</p>
-                  <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Publish a clean title, summary, and files when you want to contribute back.</p>
-                </div>
+                <p className="mt-2 text-2xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{subjects.length === 0 ? "—" : subjects.length}</p>
+                <p
+                  className={`mt-1 text-xs dark:text-slate-300 ${subjects.length === 0 ? "text-[rgb(var(--text-tertiary))] dark:text-slate-400" : "text-[rgb(var(--text-secondary))]"}`}
+                >
+                  active subject paths to explore
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <Card title="Choose Your Mode" description="Pick a focused mode so the library matches what you want to do right now.">
-        <div className="grid gap-3 md:grid-cols-3">
-          <button
-            type="button"
-            onClick={() => setLibraryMode("browse")}
-            className={`rounded-[var(--radius-lg)] border px-4 py-4 text-left transition ${
-              libraryMode === "browse"
-                ? "border-[rgb(var(--primary))]/50 bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))] shadow-[var(--shadow-sm)]"
-                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
-            }`}
-          >
-            <Search size={16} />
-            <p className="mt-3 text-sm font-semibold">Browse Content</p>
-            <p className="mt-1 text-xs text-inherit/80">Focus on note discovery and fast filtering.</p>
-          </button>
-          <button
-            type="button"
-            onClick={() => setLibraryMode("share")}
-            className={`rounded-[var(--radius-lg)] border px-4 py-4 text-left transition ${
-              libraryMode === "share"
-                ? "border-[rgb(var(--primary))]/50 bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))] shadow-[var(--shadow-sm)]"
-                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
-            }`}
-          >
-            <FileUp size={16} />
-            <p className="mt-3 text-sm font-semibold">Share Your Notes</p>
-            <p className="mt-1 text-xs text-inherit/80">Publish a title, summary, tags, and supporting files.</p>
-          </button>
-          <button
-            type="button"
-            onClick={() => setLibraryMode("all")}
-            className={`rounded-[var(--radius-lg)] border px-4 py-4 text-left transition ${
-              libraryMode === "all"
-                ? "border-[rgb(var(--primary))]/50 bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))] shadow-[var(--shadow-sm)]"
-                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
-            }`}
-          >
-            <LayoutGrid size={16} />
-            <p className="mt-3 text-sm font-semibold">Full Workspace</p>
-            <p className="mt-1 text-xs text-inherit/80">Show browse, uploads, and advanced controls together.</p>
-          </button>
-        </div>
-      </Card>
+      {overviewAllZero ? (
+        <Card className="border-[rgb(var(--border))] bg-[rgb(var(--surface))] dark:border-slate-700 dark:bg-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+          <div className="py-8 text-center">
+            <p className="text-base font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
+              The library is brand new — be the first to publish a note.
+            </p>
+            <Link href="/auth/signup" className="btn btn-primary mt-4 inline-flex">
+              Publish your first note
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))] dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700">
+          <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+            <div>
+              <p className="section-kicker">Library overview</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{notes.length}</p>
+                <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Published Notes</p>
+              </div>
+              <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{files.length}</p>
+                <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Attached Files</p>
+              </div>
+              <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{weekNotesCount}</p>
+                <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Added This Week</p>
+              </div>
+              <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{subjects.length}</p>
+                <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Subjects Covered</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
-      <Card className="overflow-hidden border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))] dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700">
-        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] md:items-center">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-[rgb(var(--primary-soft))] px-3 py-1 text-xs font-semibold text-[rgb(var(--primary))]">
-              <Sparkles size={14} />
-              Student-first public knowledge hub
-            </p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100">Public Notes Library</h2>
-            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">
-              Discover notes, formulas, summaries, and resources shared by students and verified teachers.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{notes.length}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Visible Notes</p>
-            </div>
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{files.length}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Public Files</p>
-            </div>
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{recentNotesCount}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Last 3 Days</p>
-            </div>
-            <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 text-center dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-xl font-bold text-[rgb(var(--text-primary))] dark:text-slate-100">{tagsList.length}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">Active Topics</p>
-            </div>
-          </div>
-        </div>
-      </Card>
+      <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-6 py-4 flex items-center justify-between gap-4">
+        <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
+          Want to share your notes with other students?
+        </p>
+        <Link href="/auth/signup" className="btn btn-primary btn-sm">
+          Create free account →
+        </Link>
+      </div>
 
       {libraryMode !== "browse" ? (
       <Card title="Upload to Public Library" description="Share your notes, images, and documents with student-friendly categorization.">
@@ -806,115 +851,99 @@ export function PublicNotesClient() {
 
       {libraryMode !== "share" ? (
       <Card title="Find Notes Quickly" description="Search once, then narrow the library with cleaner study-focused controls.">
-        <div className="space-y-3">
-          <div className="relative">
-            <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[rgb(var(--text-tertiary))]" />
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notes by title, content, subject or tags..." className="pl-9" />
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <Select
-              label="Category"
-              value={subject}
-              onChange={(event) => setSubject(event.target.value)}
-              options={[{ label: "All Categories", value: "" }, ...subjects.map((item) => ({ label: item, value: item }))]}
-            />
-            <Select
-              label="Semester"
-              value={semester}
-              onChange={(event) => setSemester(event.target.value)}
-              options={[{ label: "All Semesters", value: "" }, ...semesters.map((item) => ({ label: item, value: item }))]}
-            />
-            <Select
-              label="Tag"
-              value={tag}
-              onChange={(event) => setTag(event.target.value)}
-              options={[{ label: "All Tags", value: "" }, ...tagsList.map((item) => ({ label: item, value: item }))]}
-            />
-            <Select
-              label="Sort"
-              value={sort}
-              onChange={(event) => setSort(event.target.value as "latest" | "oldest")}
-              options={[
-                { label: "Latest first", value: "latest" },
-                { label: "Oldest first", value: "oldest" },
-              ]}
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {subjects.slice(0, 12).map((category) => (
+        <div className="space-y-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+            <div className="relative flex-1">
+              <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[rgb(var(--text-tertiary))]" />
+              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notes by title, content, subject or tags..." className="pl-9" />
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 lg:items-end">
+              <Select
+                label="Category"
+                value={subject}
+                onChange={(event) => setSubject(event.target.value)}
+                options={[{ label: "All Categories", value: "" }, ...subjects.map((item) => ({ label: item, value: item }))]}
+              />
+              <Select
+                label="Semester"
+                value={semester}
+                onChange={(event) => setSemester(event.target.value)}
+                options={[{ label: "All Semesters", value: "" }, ...semesters.map((item) => ({ label: item, value: item }))]}
+              />
+              <Select
+                label="Sort"
+                value={sort}
+                onChange={(event) => setSort(event.target.value as "latest" | "oldest")}
+                options={[
+                  { label: "Latest first", value: "latest" },
+                  { label: "Oldest first", value: "oldest" },
+                ]}
+              />
+            </div>
+
+            {hasActiveFilters ? (
               <button
-                key={category}
                 type="button"
-                onClick={() => setSubject((prev) => (prev === category ? "" : category))}
-                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition ${
-                  subject === category
-                    ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
-                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
-                }`}
+                onClick={() => {
+                  setSearch("");
+                  setSubject("");
+                  setSemester("");
+                  setTag("");
+                  setSort("latest");
+                  setTeacherOnly(false);
+                }}
+                className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-2 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
               >
-                <Filter size={12} />
-                {category}
+                Clear filters
               </button>
-            ))}
+            ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-xs text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-            <span className="font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{visibleNotes.length}</span>
-            matching notes
-            <span className="text-[rgb(var(--text-tertiary))] dark:text-slate-400">|</span>
-            <span className="font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{activeFiltersCount}</span>
-            active filters
+
+          <div className="flex flex-wrap items-center gap-2">
+            {hasActiveFilters ? (
+              <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{visibleNotes.length} notes found</p>
+            ) : null}
+
             <button
               type="button"
               onClick={() => setTeacherOnly((prev) => !prev)}
-              className={`rounded-full border px-2.5 py-1 font-semibold transition ${
+              className={`rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
                 teacherOnly
                   ? "border-emerald-500/70 bg-emerald-100/80 text-emerald-700"
-                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))]"
+                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               }`}
             >
               {teacherOnly ? "Verified Teachers Only" : "All Contributors"}
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSearch("");
-                setSubject("");
-                setSemester("");
-                setTag("");
-                setSort("latest");
-                setTeacherOnly(false);
-              }}
-              className="ml-auto rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-2.5 py-1 font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-            >
-              Clear all
-            </button>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:text-slate-400">View</span>
-            <button
-              type="button"
-              onClick={() => setNoteView("grid")}
-              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
-                noteView === "grid"
-                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
-                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
-              }`}
-            >
-              <LayoutGrid size={12} />
-              Grid
-            </button>
-            <button
-              type="button"
-              onClick={() => setNoteView("list")}
-              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
-                noteView === "list"
-                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
-                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
-              }`}
-            >
-              <List size={12} />
-              List
-            </button>
+
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:text-slate-400">View</span>
+              <button
+                type="button"
+                onClick={() => setNoteView("grid")}
+                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                  noteView === "grid"
+                    ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+                }`}
+              >
+                <LayoutGrid size={12} />
+                Grid
+              </button>
+              <button
+                type="button"
+                onClick={() => setNoteView("list")}
+                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
+                  noteView === "list"
+                    ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))]"
+                }`}
+              >
+                <List size={12} />
+                List
+              </button>
+            </div>
           </div>
           {topTags.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -927,7 +956,7 @@ export function PublicNotesClient() {
                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
                     tag === item
                       ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
-                      : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
+                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
                   }`}
                 >
                   <Tag size={11} />
@@ -940,11 +969,16 @@ export function PublicNotesClient() {
       </Card>
       ) : null}
 
+      <div id="browse" className="scroll-mt-24" />
+
       {libraryMode !== "share" && visibleNotes.length === 0 ? (
         <Card>
           <div className="py-6 text-center">
             <p className="text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">No notes match these filters yet.</p>
-            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">Try another subject, clear a few filters, or switch to Share mode to publish the first note in this topic.</p>
+            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">Try another subject, clear a few filters, or publish the first note by creating a free account.</p>
+            <Link href="/auth/signup" className="btn btn-primary mt-4 inline-flex">
+              Create free account →
+            </Link>
           </div>
         </Card>
       ) : libraryMode !== "share" ? (
@@ -961,12 +995,12 @@ export function PublicNotesClient() {
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] text-[rgb(var(--text-tertiary))]">{new Date(note.createdAt).toLocaleDateString()}</span>
                       {note.noteVerificationStatus === "VERIFIED" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/60 bg-emerald-100/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/30 dark:text-emerald-200">
                           <BadgeCheck size={10} />
                           Verified
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-warning)]" style={{ borderColor: "color-mix(in srgb, var(--color-warning) 50%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:border-amber-300/30 dark:bg-amber-900/30 dark:text-amber-200">
                           <Info size={10} />
                           Unverified
                         </span>
@@ -978,7 +1012,11 @@ export function PublicNotesClient() {
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">
                     <span>By {note.user.name}</span>
                     {note.semester ? <span className="rounded-full bg-[rgb(var(--surface-hover))] px-2 py-0.5 dark:bg-slate-900">{note.semester}</span> : null}
-                    {isVerifiedTeacher(note.user) ? <span className="rounded-full px-2 py-0.5 text-[var(--color-success)]" style={{ backgroundColor: "var(--color-success-light)" }}>Teacher Contributor</span> : null}
+                    {isVerifiedTeacher(note.user) ? (
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">
+                        Teacher Contributor
+                      </span>
+                    ) : null}
                   </div>
                   {note.tags ? (
                     <div className="mt-3 flex flex-wrap gap-1.5">
@@ -1009,8 +1047,7 @@ export function PublicNotesClient() {
                         ) : (
                           <span
                             key={attachment.file.id}
-                            className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold text-[var(--color-warning)]"
-                            style={{ borderColor: "color-mix(in srgb, var(--color-warning) 45%, var(--color-border))", backgroundColor: "color-mix(in srgb, #FFFBEB 82%, transparent)" }}
+                            className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-800 dark:border-amber-300/30 dark:bg-amber-900/30 dark:text-amber-200"
                           >
                             <Info size={10} />
                             {attachment.file.originalName} (Pending verification)
@@ -1111,6 +1148,8 @@ export function PublicNotesClient() {
         ) : null}
       </Card>
       ) : null}
+        </div>
+      </div>
     </div>
   );
 }

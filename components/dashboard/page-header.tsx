@@ -18,7 +18,7 @@ export function PageHeader({ title, description, insight }: PageHeaderProps) {
         <p className="inline-flex rounded-full border border-[rgb(var(--primary)/0.35)] bg-[rgb(var(--primary-soft))] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--primary-hover))] dark:border-indigo-400/40 dark:bg-indigo-950/70 dark:text-indigo-200">
           StudyVault Workspace
         </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[rgb(var(--text-primary))] dark:text-slate-100 sm:text-3xl md:text-4xl">{title}</h1>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight line-clamp-2 sm:text-3xl md:text-4xl text-[rgb(var(--text-primary))] dark:text-slate-100">{title}</h1>
         <p className="mt-3 max-w-3xl text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300 md:text-base">{description}</p>
         </div>
         {insight ? (

@@ -48,9 +48,9 @@ export function DashboardTopbar({
 
   return (
     <header className="sticky top-0 z-30 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.96)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/96">
-      <div className="flex min-h-14 items-center gap-3 px-4 py-3 sm:px-6 md:px-8">
+      <div className="flex min-h-14 items-center gap-3 py-3 pr-4 pl-16 sm:pr-6 md:px-8">
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{pageTitle}</h2>
+          <h2 className="truncate text-base sm:text-lg md:text-xl font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{pageTitle}</h2>
         </div>
 
         <GlobalSearch />

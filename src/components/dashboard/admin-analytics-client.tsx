@@ -86,6 +86,14 @@ type CurrentlyActiveUser = {
   activeSources: string[];
 };
 
+type LoginActiveUser = {
+  id: number;
+  name: string;
+  email: string;
+  role: "USER" | "TEACHER" | "ADMIN";
+  lastLoginAt: string;
+};
+
 type AdminAnalytics = {
   totalUsers: number;
   totalTeachers: number;
@@ -96,6 +104,9 @@ type AdminAnalytics = {
   totalAssignments: number;
   totalExams: number;
   totalStorageUsedBytes: number;
+  loginActiveUsers: LoginActiveUser[];
+  loginActiveCount: number;
+  loginActiveWindowHours: number;
   recentUsers: RecentUser[];
   recentNotes: RecentNote[];
   mostActiveUsers: MostActiveUser[];
@@ -273,7 +284,7 @@ async function buildPdfReport(snapshot: ReportSnapshot) {
   addSummaryCards([
     { label: "Total Users", value: analytics.totalUsers.toLocaleString(), color: [37, 99, 235] },
     { label: "Total Teachers", value: analytics.totalTeachers.toLocaleString(), color: [14, 116, 144] },
-    { label: "Active Users", value: analytics.currentlyActiveCount.toLocaleString(), color: [234, 88, 12] },
+    { label: `Active Logins (${analytics.loginActiveWindowHours}h)`, value: analytics.loginActiveCount.toLocaleString(), color: [234, 88, 12] },
     { label: "Total Notes", value: analytics.totalNotes.toLocaleString(), color: [5, 150, 105] },
     { label: "Notes (7 days)", value: analytics.notesUploadedLastWeek.toLocaleString(), color: [126, 34, 206] },
     { label: "Storage Used", value: formatStorage(analytics.totalStorageUsedBytes), color: [79, 70, 229] },
@@ -283,6 +294,7 @@ async function buildPdfReport(snapshot: ReportSnapshot) {
   addTable(
     ["Metric", "Value", "Metric", "Value"],
     [
+      ["Active users now", analytics.currentlyActiveCount.toLocaleString(), `Active logins (${analytics.loginActiveWindowHours}h)`, analytics.loginActiveCount.toLocaleString()],
       ["Public Notes", analytics.publicNotes.toLocaleString(), "Private Notes", analytics.privateNotes.toLocaleString()],
       ["Resources", analytics.totalResources.toLocaleString(), "Assignments", analytics.totalAssignments.toLocaleString()],
       ["Exams", analytics.totalExams.toLocaleString(), "Storage", formatStorage(analytics.totalStorageUsedBytes)],
@@ -304,6 +316,18 @@ async function buildPdfReport(snapshot: ReportSnapshot) {
         formatDateTime(user.lastActivityAt),
       ]),
       [62, 24, 22, 66],
+    );
+  }
+
+  addSectionTitle("Active Logins", [234, 88, 12]);
+  addLine(`Login window: last ${analytics.loginActiveWindowHours} hours`, { size: 9.5, color: [100, 116, 139] });
+  if (analytics.loginActiveUsers.length === 0) {
+    addLine("No logins detected in the window.");
+  } else {
+    addTable(
+      ["Name", "Role", "Email", "Last Login"],
+      analytics.loginActiveUsers.map((user) => [user.name, user.role, user.email, formatDateTime(user.lastLoginAt)]),
+      [44, 20, 64, 46],
     );
   }
 
@@ -429,6 +453,7 @@ export function AdminAnalyticsClient() {
       { label: "Total Users", value: analytics.totalUsers.toLocaleString() },
       { label: "Total Teachers", value: analytics.totalTeachers.toLocaleString() },
       { label: "Active Users Now", value: analytics.currentlyActiveCount.toLocaleString() },
+      { label: `Active Logins (${analytics.loginActiveWindowHours}h)`, value: analytics.loginActiveCount.toLocaleString() },
       { label: "Total Notes", value: analytics.totalNotes.toLocaleString() },
       { label: "Public Notes", value: analytics.publicNotes.toLocaleString() },
       { label: "Private Notes", value: analytics.privateNotes.toLocaleString() },
@@ -808,6 +833,7 @@ export function AdminAnalyticsClient() {
               <p className="font-semibold text-[rgb(var(--text-primary))]">System Overview</p>
               <p>Total users: {reportSnapshot.analytics.totalUsers}</p>
               <p>Currently active users: {reportSnapshot.analytics.currentlyActiveCount}</p>
+              <p>Active users (logins): {reportSnapshot.analytics.loginActiveCount}</p>
               <p>Total teachers: {reportSnapshot.analytics.totalTeachers}</p>
               <p>Total notes: {reportSnapshot.analytics.totalNotes}</p>
               <p>Public notes: {reportSnapshot.analytics.publicNotes}</p>

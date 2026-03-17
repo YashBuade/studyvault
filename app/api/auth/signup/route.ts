@@ -138,13 +138,14 @@ export async function POST(request: Request) {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await withDbRetry(() =>
-      prisma.user.create({
+    const user = (await withDbRetry(() =>
+      (prisma.user as unknown as { create: (args: unknown) => Promise<unknown> }).create({
         data: {
           name,
           email,
           passwordHash,
           role: role === "TEACHER" ? "TEACHER" : "USER",
+          lastLoginAt: new Date(),
           collegeId: role === "TEACHER" ? normalizedCollegeId : null,
           department: role === "TEACHER" ? normalizedExpertise : null,
           teacherVerificationStatus: role === "TEACHER" ? "PENDING" : "NONE",
@@ -152,7 +153,7 @@ export async function POST(request: Request) {
           teacherCollegeIdImageMimeType: role === "TEACHER" ? teacherCollegeIdImageMimeType : null,
         },
       })
-    );
+    )) as { id: number; email: string; name: string };
 
     const token = await signSession({
       sub: String(user.id),

@@ -1,11 +1,35 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { CheckCircle2, Clock, ShieldCheck, Users } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { getCurrentUserId } from "@/lib/require-user";
 import { isAdminUser } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { AdminReportsClient } from "@/src/components/dashboard/admin-reports-client";
 import { ModuleShell } from "@/components/dashboard/module-shell";
+
+function formatRelativeDate(input: Date) {
+  const date = new Date(input);
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffDays = Math.round((startOfToday.getTime() - startOfDate.getTime()) / 86_400_000);
+
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays >= 2 && diffDays <= 6) return `${diffDays} days ago`;
+  if (diffDays >= 7 && diffDays <= 29) {
+    const weeks = Math.round(diffDays / 7);
+    return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  }
+
+  const includeYear = now.getFullYear() !== date.getFullYear();
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(includeYear ? { year: "numeric" } : {}),
+  }).format(date);
+}
 
 export default async function AdminPage() {
   const userId = await getCurrentUserId();
@@ -47,6 +71,61 @@ export default async function AdminPage() {
           { label: "Recent Teacher Requests", value: String(recentTeacherRequests.length) },
         ]}
       >
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              label: "Pending Verifications",
+              value: String(pendingTeacherCount),
+              icon: Clock,
+              context: pendingTeacherCount === 0 ? "Queue is clear" : "Needs review",
+            },
+            {
+              label: "Recent Requests",
+              value: String(recentTeacherRequests.length),
+              icon: Users,
+              context: "Last 5 signups",
+            },
+            {
+              label: "Verification Desk",
+              value: "Open",
+              icon: ShieldCheck,
+              context: "Approve / reject teachers",
+              href: "/dashboard/admin/teachers",
+            },
+            {
+              label: "File Reviews",
+              value: "Queue",
+              icon: CheckCircle2,
+              context: "Teacher review portal",
+              href: "/dashboard/teacher/review",
+            },
+          ].map((stat) => {
+            const Icon = stat.icon;
+            const content = (
+              <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)] p-4 hover:shadow-[var(--shadow-md)] transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">{stat.value}</p>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">{stat.label}</p>
+                    <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">{stat.context}</p>
+                  </div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-tertiary))]">
+                    <Icon size={18} />
+                  </div>
+                </div>
+              </div>
+            );
+
+            return stat.href ? (
+              <Link key={stat.label} href={stat.href} className="block">
+                {content}
+              </Link>
+            ) : (
+              <div key={stat.label}>{content}</div>
+            );
+          })}
+        </section>
+
         <section className="mb-5 rounded-[var(--radius-lg)] border border-[rgb(var(--primary))]/30 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--surface))_52%,rgb(var(--color-info-light))_100%)] p-4 shadow-[var(--shadow-md)]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -64,13 +143,26 @@ export default async function AdminPage() {
             {recentTeacherRequests.map((teacher) => (
               <div
                 key={teacher.id}
-                className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2"
+                className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)] p-4 hover:shadow-[var(--shadow-md)] transition-all"
               >
-                <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">{teacher.name}</p>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">{teacher.email}</p>
-                <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
-                  {teacher.teacherVerificationStatus} | {teacher.createdAt.toLocaleDateString()}
-                </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{teacher.name}</p>
+                    <p className="truncate text-sm text-[rgb(var(--text-secondary))]">{teacher.email}</p>
+                    <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">Submitted {formatRelativeDate(teacher.createdAt)}</p>
+                  </div>
+                  <span
+                    className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${
+                      teacher.teacherVerificationStatus === "APPROVED"
+                        ? "border-emerald-500/40 bg-emerald-50 text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/30 dark:text-emerald-200"
+                        : teacher.teacherVerificationStatus === "REJECTED"
+                          ? "border-red-500/40 bg-red-50 text-red-700 dark:border-red-300/30 dark:bg-red-900/30 dark:text-red-200"
+                          : "border-amber-500/40 bg-amber-50 text-amber-800 dark:border-amber-300/30 dark:bg-amber-900/30 dark:text-amber-200"
+                    }`}
+                  >
+                    {teacher.teacherVerificationStatus}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -95,26 +187,6 @@ export default async function AdminPage() {
               Open File Verification Queue
             </Link>
           </div>
-        </section>
-        <section className="mb-5 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 sm:grid-cols-3">
-          <Link
-            href="/dashboard/admin/teachers"
-            className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
-          >
-            Open Teacher Verification Queue
-          </Link>
-          <Link
-            href="/admin/analytics"
-            className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
-          >
-            Open Admin Analytics Dashboard
-          </Link>
-          <Link
-            href="/dashboard/teacher/review"
-            className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-3 text-sm font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
-          >
-            Open File Verification Queue
-          </Link>
         </section>
         <AdminReportsClient />
       </ModuleShell>

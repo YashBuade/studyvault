@@ -50,8 +50,28 @@ export default async function AnalyticsPage() {
   const weeklyStatus =
     notesThisWeek >= 7 ? "Excellent weekly consistency" : notesThisWeek >= 3 ? "Good weekly consistency" : "Low weekly activity";
 
+  const noDataYet =
+    totalNotes === 0 &&
+    totalAssignments === 0 &&
+    upcomingExams === 0 &&
+    totalLikes === 0 &&
+    totalComments === 0 &&
+    totalBookmarks === 0 &&
+    totalRatings === 0;
+
   return (
     <div className="space-y-7">
+      {noDataYet ? (
+        <Card>
+          <div className="py-6 text-center">
+            <p className="text-lg font-semibold text-[rgb(var(--text-primary))]">Not enough data yet</p>
+            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+              Keep using StudyVault to see your activity trends. Add notes, upload files, and track deadlines to populate analytics.
+            </p>
+          </div>
+        </Card>
+      ) : null}
+
       <section className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--background-alt))] p-6 shadow-[var(--shadow-sm)]">
         <PageHeader
           title="Analytics"

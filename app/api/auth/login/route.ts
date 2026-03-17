@@ -78,6 +78,17 @@ export async function POST(request: Request) {
       }
     }
 
+    try {
+      await withDbRetry(() =>
+        (prisma.user as unknown as { update: (args: unknown) => Promise<unknown> }).update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
+        }),
+      );
+    } catch (updateError) {
+      logError("auth.login_last_login_update_failed", updateError, { userId: user.id });
+    }
+
     const token = await signSession({
       sub: String(user.id),
       email: user.email,
