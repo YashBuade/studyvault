@@ -1,9 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
 import { Providers } from "./providers";
-
-const uiFont = GeistSans;
 
 export const metadata: Metadata = {
   title: "StudyVault",
@@ -16,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={uiFont.variable}>
+    <html lang="en">
       <head />
       <body>
         <Providers>{children}</Providers>

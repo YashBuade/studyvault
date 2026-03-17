@@ -53,7 +53,7 @@ export default async function TeacherDashboardPage() {
 
         {approved ? (
           <section className="rounded-[var(--radius-lg)] border border-emerald-500/30 bg-emerald-50 p-5 shadow-[var(--shadow-sm)] dark:border-emerald-300/30 dark:bg-emerald-900/20">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">
                   <BadgeCheck size={22} />
@@ -67,7 +67,7 @@ export default async function TeacherDashboardPage() {
               </div>
               <Link
                 href="/dashboard/teacher/review"
-                className="inline-flex h-10 items-center justify-center rounded-[var(--radius-md)] border border-emerald-500/30 bg-white px-4 text-sm font-semibold text-emerald-800 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] dark:border-emerald-300/20 dark:bg-emerald-950/30 dark:text-emerald-100"
+                className="inline-flex min-h-10 w-full items-center justify-center rounded-[var(--radius-md)] border border-emerald-500/30 bg-white px-4 py-2 text-center text-sm font-semibold text-emerald-800 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] sm:w-auto dark:border-emerald-300/20 dark:bg-emerald-950/30 dark:text-emerald-100"
               >
                 Open review queue
               </Link>
