@@ -7,6 +7,7 @@ import { logError } from "@/lib/api/logger";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ACTIVE_WINDOW_MINUTES = 15;
+const LOGIN_ACTIVE_WINDOW_HOURS = 24;
 
 type ActivityBucket = {
   date: string;
@@ -46,6 +47,7 @@ export async function GET() {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 6 * DAY_MS);
     const activeSince = new Date(now.getTime() - ACTIVE_WINDOW_MINUTES * 60 * 1000);
+    const loginActiveSince = new Date(now.getTime() - LOGIN_ACTIVE_WINDOW_HOURS * 60 * 60 * 1000);
 
     const [
       totalUsers,
@@ -58,6 +60,8 @@ export async function GET() {
       totalExams,
       notesUploadedLastWeek,
       storageAggregate,
+      loginActiveCount,
+      loginActiveUsers,
       recentUsers,
       recentNotes,
       noteCountsByUser,
@@ -92,6 +96,15 @@ export async function GET() {
       prisma.file.aggregate({
         where: { deletedAt: null },
         _sum: { size: true },
+      }),
+      (prisma.user as unknown as { count: (args: unknown) => Promise<number> }).count({
+        where: { lastLoginAt: { gte: loginActiveSince } },
+      }),
+      (prisma.user as unknown as { findMany: (args: unknown) => Promise<unknown[]> }).findMany({
+        where: { lastLoginAt: { gte: loginActiveSince } },
+        orderBy: { lastLoginAt: "desc" },
+        take: 8,
+        select: { id: true, name: true, email: true, role: true, lastLoginAt: true },
       }),
       prisma.user.findMany({
         orderBy: { createdAt: "desc" },
@@ -420,6 +433,15 @@ export async function GET() {
         totalAssignments,
         totalExams,
         totalStorageUsedBytes: storageAggregate._sum.size ?? 0,
+        loginActiveCount,
+        loginActiveWindowHours: LOGIN_ACTIVE_WINDOW_HOURS,
+        loginActiveUsers: (loginActiveUsers as Array<{ id: number; name: string; email: string; role: string; lastLoginAt: Date | null }>).map((user) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          lastLoginAt: user.lastLoginAt?.toISOString() ?? now.toISOString(),
+        })),
         recentUsers,
         recentNotes,
         mostActiveUsers,

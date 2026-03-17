@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Copy, Download, FileText, Pencil, RotateCcw, Search, Trash2, UploadCloud } from "lucide-react";
+import { AlertCircle, Copy, Download, FileText, Pencil, Plus, RotateCcw, Search, Trash2, UploadCloud } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -50,6 +50,104 @@ type NotesClientProps = {
   initialNotes: Note[];
 };
 
+function stripHtml(input: string) {
+  return input.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function formatRelativeDate(input: string | undefined) {
+  if (!input) return "";
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffDays = Math.round((startOfToday.getTime() - startOfDate.getTime()) / 86_400_000);
+
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays >= 2 && diffDays <= 6) return `${diffDays} days ago`;
+  if (diffDays >= 7 && diffDays <= 29) {
+    const weeks = Math.round(diffDays / 7);
+    return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  }
+
+  const includeYear = now.getFullYear() !== date.getFullYear();
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(includeYear ? { year: "numeric" } : {}),
+  }).format(date);
+}
+
+function hashString(input: string) {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function subjectBadgeClasses(subject: string) {
+  const palette = [
+    "border-indigo-500/30 bg-indigo-50 text-indigo-700 dark:border-indigo-300/30 dark:bg-indigo-900/25 dark:text-indigo-200",
+    "border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/25 dark:text-emerald-200",
+    "border-amber-500/30 bg-amber-50 text-amber-800 dark:border-amber-300/30 dark:bg-amber-900/25 dark:text-amber-200",
+    "border-rose-500/30 bg-rose-50 text-rose-700 dark:border-rose-300/30 dark:bg-rose-900/25 dark:text-rose-200",
+    "border-cyan-500/30 bg-cyan-50 text-cyan-800 dark:border-cyan-300/30 dark:bg-cyan-900/25 dark:text-cyan-200",
+    "border-violet-500/30 bg-violet-50 text-violet-700 dark:border-violet-300/30 dark:bg-violet-900/25 dark:text-violet-200",
+  ];
+  const idx = hashString(subject) % palette.length;
+  return palette[idx] ?? palette[0]!;
+}
+
+function ErrorCard({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)]">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 rounded-full bg-[rgb(var(--color-danger-light))] p-2 text-[rgb(var(--error))]">
+          <AlertCircle size={18} />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Something went wrong</p>
+          <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">We couldn&apos;t load this section. Try refreshing.</p>
+          <div className="mt-3">
+            <Button variant="secondary" onClick={onRetry}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonNotes() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, idx) => (
+        <div
+          key={idx}
+          className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)] p-4"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1 space-y-3">
+              <div className="h-4 w-2/3 rounded-full bg-[rgb(var(--surface-hover))] animate-shimmer" />
+              <div className="h-3 w-28 rounded-full bg-[rgb(var(--surface-hover))] animate-shimmer" />
+              <div className="space-y-2">
+                <div className="h-3 w-full rounded-full bg-[rgb(var(--surface-hover))] animate-shimmer" />
+                <div className="h-3 w-5/6 rounded-full bg-[rgb(var(--surface-hover))] animate-shimmer" />
+              </div>
+              <div className="h-3 w-20 rounded-full bg-[rgb(var(--surface-hover))] animate-shimmer" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function NotesClient({ initialNotes }: NotesClientProps) {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("q") ?? "";
@@ -63,6 +161,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
   const [selectedAttachments, setSelectedAttachments] = useState<number[]>([]);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [searchInput, setSearchInput] = useState(initialSearch);
   const [search, setSearch] = useState(initialSearch);
   const [filterSubject, setFilterSubject] = useState("");
   const [filterSemester, setFilterSemester] = useState("");
@@ -70,10 +169,13 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
   const [view, setView] = useState<"active" | "trash">("active");
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [listError, setListError] = useState(false);
   const [error, setError] = useState("");
   const [cursor, setCursor] = useState<number | null>(initialNotes.at(-1)?.id ?? null);
   const [hasMore, setHasMore] = useState(initialNotes.length >= 10);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+  const [deletingNote, setDeletingNote] = useState(false);
+  const [restoringNoteId, setRestoringNoteId] = useState<number | null>(null);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
@@ -87,6 +189,12 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
   const [shareNote, setShareNote] = useState<Note | null>(null);
   const [sharePermission, setSharePermission] = useState<"VIEW" | "EDIT">("VIEW");
   const { pushToast } = useToast();
+  const newNoteTitleRef = useRef<HTMLInputElement | null>(null);
+
+  function goToNewNoteForm() {
+    document.getElementById("new-note-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => newNoteTitleRef.current?.focus(), 250);
+  }
 
   useEffect(() => {
     async function loadFiles() {
@@ -101,15 +209,21 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
   }, []);
 
   useEffect(() => {
+    setSearchInput(initialSearch);
     setSearch(initialSearch);
   }, [initialSearch]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setSearch(searchInput), 300);
+    return () => window.clearTimeout(id);
+  }, [searchInput]);
 
   const filteredNotes = useMemo(
     () =>
       notes.filter((note) =>
         search
           ? note.title.toLowerCase().includes(search.toLowerCase()) ||
-            note.content.toLowerCase().includes(search.toLowerCase())
+            stripHtml(note.content).toLowerCase().includes(search.toLowerCase())
           : true,
       ),
     [notes, search],
@@ -195,25 +309,33 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
   async function deleteNote() {
     if (!pendingDelete) return;
+    setDeletingNote(true);
 
-    const response = await fetch(`/api/notes?id=${pendingDelete}`, {
-      method: "DELETE",
-    });
+    try {
+      const response = await fetch(`/api/notes?id=${pendingDelete}`, {
+        method: "DELETE",
+      });
 
-    const payload = (await response.json()) as ApiResponse<{ id: number }>;
+      const payload = (await response.json()) as ApiResponse<{ id: number }>;
 
-    if (!response.ok || !payload.ok) {
-      setError(payload.error?.message ?? "Could not delete note.");
+      if (!response.ok || !payload.ok) {
+        setError(payload.error?.message ?? "Could not delete note.");
+        setPendingDelete(null);
+        return;
+      }
+
+      setNotes((prev) =>
+        prev.map((note) => (note.id === pendingDelete ? { ...note, deletedAt: new Date().toISOString() } : note)),
+      );
       setPendingDelete(null);
-      return;
+      pushToast("Note moved to trash", "info");
+    } finally {
+      setDeletingNote(false);
     }
-
-    setNotes((prev) => prev.map((note) => (note.id === pendingDelete ? { ...note, deletedAt: new Date().toISOString() } : note)));
-    setPendingDelete(null);
-    pushToast("Note moved to trash", "info");
   }
 
   async function restoreNote(id: number) {
+    setRestoringNoteId(id);
     const response = await fetch("/api/notes/restore", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -224,11 +346,13 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
     if (!response.ok || !payload.ok) {
       setError(payload.error?.message ?? "Could not restore note.");
+      setRestoringNoteId(null);
       return;
     }
 
     setNotes((prev) => prev.map((note) => (note.id === id ? { ...note, deletedAt: null } : note)));
     pushToast("Note restored", "success");
+    setRestoringNoteId(null);
   }
 
   function startEdit(note: Note) {
@@ -279,6 +403,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
     if (!hasMore || !cursor) return;
 
     setFetching(true);
+    setListError(false);
     const response = await fetch(
       `/api/notes?cursor=${cursor}&limit=10&includeDeleted=${view === "trash" ? "true" : "false"}`,
       {
@@ -290,6 +415,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
 
     if (!response.ok || !payload.ok || !payload.data) {
       setError(payload.error?.message ?? "Could not load more notes.");
+      setListError(true);
       setFetching(false);
       return;
     }
@@ -310,10 +436,22 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
   const trashCount = notes.filter((note) => Boolean(note.deletedAt)).length;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_1.2fr]">
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--primary))]">Your workspace</p>
+          <h1 className="mt-1 text-2xl font-semibold text-[rgb(var(--text-primary))]">My Notes</h1>
+          <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Capture, search, and manage private or public notes.</p>
+        </div>
+        <Button type="button" className="w-full sm:w-auto" onClick={goToNewNoteForm}>
+          <Plus size={16} /> New Note
+        </Button>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_1.2fr]">
       <Card title="New Note" description="Capture ideas quickly with rich, searchable notes." className="lg:sticky lg:top-24">
-        <form onSubmit={createNote} className="space-y-3">
-          <Input required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Note title" />
+        <form id="new-note-form" onSubmit={createNote} className="space-y-3">
+          <Input ref={newNoteTitleRef} required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Note title" />
           <div className="grid gap-2 sm:grid-cols-2">
             <Input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Subject (optional)" />
             <Input value={semester} onChange={(event) => setSemester(event.target.value)} placeholder="Semester (optional)" />
@@ -337,7 +475,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                 className="w-full rounded-lg border border-[rgb(var(--border))] bg-transparent px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500"
               />
               <Button type="button" variant="secondary" loading={uploading} onClick={() => void uploadAttachment()}>
-                Upload
+                {uploading ? "Uploading..." : "Upload"}
               </Button>
             </div>
           </div>
@@ -374,8 +512,8 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
           ) : null}
           <RichTextEditor value={content} onChange={setContent} placeholder="Write your note here..." />
           {error ? <Alert variant="error" message={error} /> : null}
-          <Button type="submit" loading={loading}>
-            Save Note
+          <Button type="submit" loading={loading} className="w-full sm:w-auto">
+            {loading ? "Saving..." : "Save note"}
           </Button>
         </form>
       </Card>
@@ -396,17 +534,20 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
               </Button>
             </div>
           </div>
-          <div className="grid gap-2 md:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
-          <div className="relative w-full">
-            <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)]" />
-            <Input
-              aria-label="Search notes"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by title or content"
-              className="pl-9"
-            />
-          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="relative w-full">
+              <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)]" />
+              <Input
+                aria-label="Search notes"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder="Search by title or content"
+                className="pl-9"
+              />
+              {search.trim() ? (
+                <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">{list.length} notes found</p>
+              ) : null}
+            </div>
             <Select
               label="Subject"
               value={filterSubject}
@@ -419,103 +560,201 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
               onChange={(event) => setFilterSemester(event.target.value)}
               options={[{ label: "All", value: "" }, ...semesters.map((item) => ({ label: item, value: item }))]}
             />
-            <Select
-              label="Tag"
-              value={filterTag}
-              onChange={(event) => setFilterTag(event.target.value)}
-              options={[{ label: "All", value: "" }, ...tagsList.map((item) => ({ label: item, value: item }))]}
-            />
-          </div>
           </div>
 
-        <div className="space-y-3">
-          {list.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-800/80">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
-                <FileText size={24} />
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
-                {view === "trash" ? "Trash is empty" : "No notes yet"}
-              </h3>
-              <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">
-                {view === "trash"
-                  ? "Deleted notes show up here so you can restore them later."
-                  : "Start capturing lectures, summaries, and study ideas in one searchable place."}
-              </p>
+          {tagsList.length > 0 ? (
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <button
+                type="button"
+                onClick={() => setFilterTag("")}
+                className={`whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                  filterTag === ""
+                    ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                    : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
+                }`}
+              >
+                All
+              </button>
+              {tagsList.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => setFilterTag(tag)}
+                  className={`whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                    filterTag === tag
+                      ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]"
+                      : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))]"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
             </div>
-          ) : (
-            list.map((note) => (
-              <article key={note.id} className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/80 bg-[rgb(var(--surface))]/95 p-4 shadow-[var(--shadow-xs)] transition hover:border-[rgb(var(--primary))]/25 hover:shadow-[var(--shadow-sm)] dark:border-slate-700 dark:bg-slate-800/95 dark:shadow-none dark:ring-1 dark:ring-slate-700">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{note.title}</h3>
-                      <span className={`badge ${note.isPublic ? "badge-primary" : ""}`}>{note.isPublic ? "Public" : "Private"}</span>
-                      {note.subject ? <span className="badge">{note.subject}</span> : null}
-                    </div>
-                    <div
-                      className="mt-2 line-clamp-3 text-sm text-[var(--muted)] dark:text-slate-400"
-                      dangerouslySetInnerHTML={{ __html: note.content }}
-                    />
-                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--muted)] dark:text-slate-400">
-                      {note.semester ? <span>Semester: {note.semester}</span> : null}
-                      {note.tags ? <span>Tags: {note.tags}</span> : null}
-                      <span>Updated {new Date(note.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    {note.attachments?.length ? (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {note.attachments.map((attachment) => (
-                          <a
-                            key={attachment.file.id}
-                            href={`/api/files/${attachment.file.id}/download`}
-                            className="rounded-full border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-1 text-xs font-semibold text-[var(--brand)] hover:underline dark:border-slate-700 dark:bg-slate-800"
-                          >
-                            {attachment.file.originalName}
-                          </a>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                  {view === "trash" ? (
-                    <Button variant="secondary" onClick={() => restoreNote(note.id)}>
-                      <RotateCcw size={14} /> Restore
-                    </Button>
-                  ) : (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Button variant="secondary" onClick={() => setShareNote(note)}>
-                        <Copy size={14} /> Share
-                      </Button>
-                      {note.isPublic ? (
-                        <a
-                          href={`/api/notes/${note.id}/download`}
-                          className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-sm"
-                        >
-                          <Download size={14} /> Download
-                        </a>
-                      ) : null}
-                      <Button variant="secondary" onClick={() => startEdit(note)}>
-                        <Pencil size={14} /> Edit
-                      </Button>
+          ) : null}
+
+          {listError ? <ErrorCard onRetry={() => void loadMore()} /> : null}
+        </div>
+
+        {list.length === 0 ? (
+          <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)] p-6 text-center hover:shadow-[var(--shadow-md)] transition-all">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[rgb(var(--surface-hover))] text-[rgb(var(--text-tertiary))]">
+              <FileText size={26} />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">
+              {view === "trash" ? "Trash is empty" : "No notes yet"}
+            </h3>
+            <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+              {view === "trash"
+                ? "Deleted notes show up here so you can restore them later."
+                : "Start capturing lectures, summaries, and study ideas in one searchable place."}
+            </p>
+            <div className="mt-4">
+              {view === "trash" ? (
+                <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={() => setView("active")}>
+                  Back to notes
+                </Button>
+              ) : (
+                <Button type="button" className="w-full sm:w-auto" onClick={goToNewNoteForm}>
+                  Create your first note
+                </Button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((note) => {
+              const subjectLabel = note.subject?.trim() || "General";
+              const preview = stripHtml(note.content);
+              return (
+                <article
+                  key={note.id}
+                  className="group relative rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-sm)] p-4 hover:shadow-[var(--shadow-md)] transition-all"
+                >
+                  {view !== "trash" ? (
+                    <div className="absolute right-3 top-3 flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(note)}
+                        className="rounded-lg p-2 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))]"
+                        aria-label="Edit note"
+                      >
+                        <Pencil size={16} />
+                      </button>
                       <button
                         type="button"
                         onClick={() => setPendingDelete(note.id)}
-                        className="rounded-lg p-2 text-[var(--muted)] hover:bg-[rgb(var(--surface-hover))] hover:text-red-500"
+                        className="rounded-lg p-2 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--error))]"
                         aria-label="Delete note"
                       >
                         <Trash2 size={16} />
                       </button>
                     </div>
-                  )}
-                </div>
-              </article>
-            ))
-          )}
-        </div>
+                  ) : null}
+
+                  <div className="min-w-0 pr-12">
+                    <h3 className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{note.title}</h3>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span
+                      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${subjectBadgeClasses(subjectLabel)}`}
+                    >
+                      {subjectLabel}
+                    </span>
+                    <span
+                      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                        note.isPublic
+                          ? "border-emerald-500/40 bg-emerald-50 text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/30 dark:text-emerald-200"
+                          : "border-slate-400/40 bg-slate-50 text-slate-700 dark:border-slate-500/40 dark:bg-slate-900/40 dark:text-slate-200"
+                      }`}
+                    >
+                      {note.isPublic ? "Public" : "Private"}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 line-clamp-2 text-sm text-[rgb(var(--text-secondary))]">{preview || "No content yet."}</p>
+
+                  {note.tags ? (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {note.tags
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter(Boolean)
+                        .slice(0, 4)
+                        .map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center rounded-full border border-[rgb(var(--border))] px-2 py-0.5 text-[11px] text-[rgb(var(--text-secondary))]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                    </div>
+                  ) : null}
+
+                  {note.attachments?.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {note.attachments.slice(0, 3).map((attachment) => (
+                        <a
+                          key={attachment.file.id}
+                          href={`/api/files/${attachment.file.id}/download`}
+                          className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--surface-active))]"
+                        >
+                          {attachment.file.originalName}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="mt-4 flex items-center justify-between gap-3 text-xs text-[rgb(var(--text-tertiary))]">
+                    <span>{formatRelativeDate(note.createdAt)}</span>
+                    {view === "trash" ? (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="min-h-8 px-3 py-1.5 text-xs"
+                        loading={restoringNoteId === note.id}
+                        onClick={() => restoreNote(note.id)}
+                      >
+                        <RotateCcw size={14} /> {restoringNoteId === note.id ? "Restoring..." : "Restore"}
+                      </Button>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className="min-h-8 px-3 py-1.5 text-xs"
+                          onClick={() => setShareNote(note)}
+                        >
+                          <Copy size={14} /> Share
+                        </Button>
+                        {note.isPublic ? (
+                          <a
+                            href={`/api/notes/${note.id}/download`}
+                            className="inline-flex min-h-8 items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1.5 text-xs font-semibold text-[rgb(var(--text-primary))] transition hover:bg-[rgb(var(--background))]"
+                          >
+                            <Download size={14} /> Download
+                          </a>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        {fetching ? (
+          <div className="mt-4">
+            <SkeletonNotes />
+          </div>
+        ) : null}
 
         {hasMore ? (
           <div className="mt-4">
-            <Button variant="secondary" onClick={loadMore} loading={fetching}>
-              Load More
+            <Button variant="secondary" onClick={loadMore} loading={fetching} className="w-full sm:w-auto">
+              {fetching ? "Loading..." : "Load more"}
             </Button>
           </div>
         ) : null}
@@ -552,13 +791,15 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
         </div>
       </Card>
 
+      </div>
+
       <Modal
         open={pendingDelete !== null}
         title="Delete note"
         description="This note will move to trash and can be restored later."
         onClose={() => setPendingDelete(null)}
         onConfirm={deleteNote}
-        confirmLabel="Move to Trash"
+        confirmLabel={deletingNote ? "Deleting..." : "Move to trash"}
         danger
       />
 
@@ -568,7 +809,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
         description="Update your note content and save the changes."
         onClose={() => setEditingNote(null)}
         onConfirm={updateNote}
-        confirmLabel="Save Changes"
+        confirmLabel={savingEdit ? "Saving..." : "Save changes"}
       >
         <div className="space-y-2">
           <Input value={editTitle} onChange={(event) => setEditTitle(event.target.value)} placeholder="Note title" />

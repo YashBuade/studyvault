@@ -101,25 +101,36 @@ export async function GET(request: Request) {
       return clearStateCookie(NextResponse.redirect(loginUrl));
     }
 
-    let user = await withDbRetry(() =>
+    let user = (await withDbRetry(() =>
       prisma.user.findUnique({
         where: { email: googleUser.email! },
       })
-    );
+    )) as { id: number; name: string; email: string } | null;
 
     if (!user) {
-      user = await withDbRetry(() =>
-        prisma.user.create({
+      user = (await withDbRetry(() =>
+        (prisma.user as unknown as { create: (args: unknown) => Promise<unknown> }).create({
           data: {
             email: googleUser.email!,
             name: googleUser.name || googleUser.email!.split("@")[0],
             avatarUrl: googleUser.picture,
             passwordHash: "",
+            lastLoginAt: new Date(),
           },
         })
-      );
+      )) as { id: number; name: string; email: string };
       logInfo("auth.google_signup", { userId: user.id, email: user.email });
     } else {
+      try {
+        await withDbRetry(() =>
+          (prisma.user as unknown as { update: (args: unknown) => Promise<unknown> }).update({
+            where: { id: user!.id },
+            data: { lastLoginAt: new Date() },
+          }),
+        );
+      } catch (updateError) {
+        logError("auth.google_last_login_update_failed", updateError, { userId: user.id });
+      }
       logInfo("auth.google_login", { userId: user.id, email: user.email });
     }
 

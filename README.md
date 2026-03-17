@@ -29,16 +29,18 @@ StudyVault is a production-ready full-stack student workspace built with Next.js
   - Exams
   - Profile
   - Settings
-- Notes CRUD (create, list, delete) persisted in MySQL via Prisma
+- Notes CRUD (create, list, delete) persisted in PostgreSQL via Prisma
 - User-scoped file upload, listing, and secure download APIs
 - Responsive design for mobile, tablet, and desktop
 
 ## Environment Variables
 
-Create a `.env` file:
+Copy `.env.example` to `.env` and fill in values:
 
 ```env
-DATABASE_URL="mysql://USER:PASSWORD@HOST:3306/studyvault"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/studyvault?sslmode=require"
+# Optional (recommended for Prisma migrations/introspection on some hosts)
+DIRECT_URL="postgresql://USER:PASSWORD@HOST:5432/studyvault?sslmode=require"
 AUTH_SECRET="replace-with-a-long-random-secret"
 ```
 
@@ -72,7 +74,7 @@ npm run dev
 
 1. Push this repository to GitHub.
 2. Import the repo into Vercel.
-3. Configure `DATABASE_URL` and `AUTH_SECRET` in Vercel Project Settings.
+3. Configure `DATABASE_URL` (and optionally `DIRECT_URL`) plus `AUTH_SECRET` in Vercel Project Settings.
 4. Deploy.
 
 No GitHub Pages-specific logic is used.

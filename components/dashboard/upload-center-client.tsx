@@ -1,7 +1,7 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { BadgeCheck, Clock3, RotateCcw, Search, Trash2, UploadCloud, XCircle } from "lucide-react";
+import { FormEvent, useMemo, useRef, useState } from "react";
+import { BadgeCheck, CheckCircle2, Clock3, RotateCcw, Search, Trash2, Upload, UploadCloud, X, XCircle } from "lucide-react";
 import { Alert } from "@/src/components/ui/alert";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
@@ -31,19 +31,33 @@ type UploadCenterClientProps = {
   initialFiles: UserFile[];
 };
 
+type UploadItem = {
+  id: string;
+  file: File;
+  status: "queued" | "uploading" | "success" | "error";
+  progress: number | null;
+  message?: string;
+};
+
 function formatBytes(size: number) {
   if (size < 1024) return `${size} B`;
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function createUploadId(file: File) {
+  return `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(16).slice(2)}`;
+}
+
 export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState<UserFile[]>(initialFiles);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"active" | "trash">("active");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [cursor, setCursor] = useState<number | null>(initialFiles.at(-1)?.id ?? null);
   const [hasMore, setHasMore] = useState(initialFiles.length >= 10);
@@ -65,60 +79,113 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
   const activeCount = files.filter((file) => !file.deletedAt).length;
   const trashCount = files.filter((file) => Boolean(file.deletedAt)).length;
 
+  function addFiles(incoming: File[]) {
+    if (incoming.length === 0) return;
+
+    setMessage("");
+    setUploads((prev) => {
+      const next = [...prev];
+      incoming.forEach((file) => {
+        const tooLarge = file.size > uploadLimitBytes;
+        next.unshift({
+          id: createUploadId(file),
+          file,
+          status: tooLarge ? "error" : "queued",
+          progress: null,
+          message: tooLarge ? `Exceeds ${Math.round(uploadLimitBytes / (1024 * 1024))}MB limit.` : undefined,
+        });
+      });
+      return next;
+    });
+  }
+
+  function removeUpload(id: string) {
+    setUploads((prev) => prev.filter((u) => u.id !== id));
+  }
+
+  function setUploadProgress(id: string, progress: number | null) {
+    setUploads((prev) => prev.map((u) => (u.id === id ? { ...u, progress } : u)));
+  }
+
+  function setUploadStatus(id: string, status: UploadItem["status"], message?: string) {
+    setUploads((prev) => prev.map((u) => (u.id === id ? { ...u, status, message } : u)));
+  }
+
+  function uploadWithProgress(file: File, id: string) {
+    return new Promise<{ ok: boolean; data?: UserFile; errorMessage?: string }>((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/files/upload");
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) {
+          setUploadProgress(id, null);
+          return;
+        }
+        const pct = Math.max(0, Math.min(100, Math.round((event.loaded / event.total) * 100)));
+        setUploadProgress(id, pct);
+      };
+
+      xhr.onerror = () => resolve({ ok: false, errorMessage: "Unable to reach upload service. Please retry." });
+
+      xhr.onload = () => {
+        const raw = xhr.responseText;
+        let payload: ApiResponse<UserFile> | null = null;
+        try {
+          payload = raw ? (JSON.parse(raw) as ApiResponse<UserFile>) : null;
+        } catch {
+          payload = null;
+        }
+
+        if (xhr.status >= 200 && xhr.status < 300 && payload?.ok && payload.data) {
+          resolve({ ok: true, data: payload.data });
+          return;
+        }
+
+        const fallback =
+          xhr.status === 413
+            ? "Upload payload too large for deployment function. Use a smaller file."
+            : xhr.status >= 500
+              ? `Server error (${xhr.status}).`
+              : `Request failed (${xhr.status}).`;
+
+        resolve({ ok: false, errorMessage: payload?.error?.message ?? fallback });
+      };
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("isPublic", String(makePublic));
+      xhr.send(formData);
+    });
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!selectedFile) {
-      setMessage("Please select a file to upload.");
-      return;
-    }
-    if (selectedFile.size > uploadLimitBytes) {
-      setMessage(`Selected file exceeds ${Math.round(uploadLimitBytes / (1024 * 1024))}MB limit.`);
+    const queued = uploads.filter((u) => u.status === "queued");
+    if (queued.length === 0) {
+      setMessage("Drag files into the upload box or click to browse.");
       return;
     }
 
-    setLoading(true);
+    setUploading(true);
     setMessage("");
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("isPublic", String(makePublic));
+    for (const upload of queued) {
+      setUploadStatus(upload.id, "uploading");
+      setUploadProgress(upload.id, 0);
 
-    try {
-      const response = await fetch("/api/files/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const raw = await response.text();
-      let payload: ApiResponse<UserFile> | null = null;
-      try {
-        payload = raw ? (JSON.parse(raw) as ApiResponse<UserFile>) : null;
-      } catch {
-        payload = null;
+      const result = await uploadWithProgress(upload.file, upload.id);
+      if (result.ok && result.data) {
+        setUploadStatus(upload.id, "success", "Uploaded successfully");
+        setUploadProgress(upload.id, 100);
+        setFiles((prev) => [result.data!, ...prev]);
+        pushToast("Upload complete", "success");
+      } else {
+        setUploadStatus(upload.id, "error", result.errorMessage ?? "Upload failed");
       }
-
-      if (!response.ok || !payload?.ok || !payload.data) {
-        const fallback =
-          response.status === 413
-            ? "Upload payload too large for deployment function. Use a smaller file."
-            : response.status >= 500
-              ? `Server error (${response.status}).`
-              : `Request failed (${response.status}).`;
-        setMessage(payload?.error?.message ?? fallback);
-        setLoading(false);
-        return;
-      }
-
-      setSelectedFile(null);
-      setMessage("File uploaded successfully.");
-      setMakePublic(true);
-      setLoading(false);
-      setFiles((prev) => [payload.data!, ...prev]);
-      pushToast("Upload complete", "success");
-    } catch {
-      setMessage("Unable to reach upload service. Please retry.");
-      setLoading(false);
     }
+
+    setUploading(false);
   }
 
   async function deleteFile() {
@@ -178,25 +245,59 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_1.1fr]">
       <Card title="Upload File" description="Upload and organize study assets by file name and size.">
         <form onSubmit={onSubmit}>
-          <label className="flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 px-5 py-10 text-center transition hover:border-[rgb(var(--primary))]/35 hover:bg-[rgb(var(--surface))] dark:border-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-900">
-            <UploadCloud className="h-8 w-8 text-[rgb(var(--primary))]" />
-            <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Drop files here or click to browse</p>
-            <p className="mt-1 text-xs text-[var(--muted)] dark:text-slate-400">PDF, DOC, PPT, image, text, or spreadsheet files up to {uploadLimitMb}MB.</p>
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") fileInputRef.current?.click();
+            }}
+            onDragEnter={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setIsDragging(true);
+            }}
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setIsDragging(true);
+            }}
+            onDragLeave={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setIsDragging(false);
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setIsDragging(false);
+              addFiles(Array.from(event.dataTransfer.files ?? []));
+            }}
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed px-5 py-10 text-center transition ${
+              isDragging
+                ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))]"
+                : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] hover:border-[rgb(var(--primary))]/35 hover:bg-[rgb(var(--surface-hover))]"
+            }`}
+          >
+            <Upload className="h-10 w-10 text-[rgb(var(--primary))]" />
+            <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Drag files here or click to browse</p>
+            <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">PDF, Word, Excel, images up to {uploadLimitMb}MB</p>
             <input
+              ref={fileInputRef}
               type="file"
-              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg,.txt"
-              onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+              multiple
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.gif,.svg"
+              onChange={(event) => {
+                const selected = Array.from(event.target.files ?? []);
+                addFiles(selected);
+                event.currentTarget.value = "";
+              }}
               className="sr-only"
             />
-          </label>
-          <p className="mt-2 text-xs text-[var(--muted)] dark:text-slate-400">
-            Accepted size: up to {uploadLimitMb}MB per file (deployment-safe limit).
-          </p>
-          {selectedFile ? (
-            <p className="mt-1 text-xs text-[var(--muted)] dark:text-slate-400">
-              Selected: {selectedFile.name} ({formatBytes(selectedFile.size)})
-            </p>
-          ) : null}
+          </div>
+
+          <p className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">Accepted size: up to {uploadLimitMb}MB per file.</p>
+
           <label className="mt-3 flex items-center gap-2 text-xs text-[var(--muted)]">
             <input
               type="checkbox"
@@ -206,10 +307,70 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
             />
             Make this file public (available in the public library)
           </label>
-          {message ? <div className="mt-3"><Alert message={message} variant={message.includes("success") ? "success" : "info"} /></div> : null}
 
-          <Button type="submit" loading={loading} className="mt-4">
-            <UploadCloud size={16} /> Upload
+          {uploads.length > 0 ? (
+            <div className="mt-4 space-y-3">
+              {uploads.map((upload) => (
+                <div
+                  key={upload.id}
+                  className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 shadow-[var(--shadow-sm)]"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{upload.file.name}</p>
+                      <p className="mt-0.5 text-xs text-[rgb(var(--text-tertiary))]">{formatBytes(upload.file.size)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {upload.status === "success" ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : null}
+                      {upload.status === "error" ? <XCircle className="h-4 w-4 text-[rgb(var(--error))]" /> : null}
+                      {upload.status === "uploading" ? (
+                        <span className="size-4 animate-spin rounded-full border-2 border-[rgb(var(--primary))] border-r-transparent" />
+                      ) : null}
+                      <button
+                        type="button"
+                        className="rounded-lg p-1 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] disabled:opacity-60"
+                        onClick={() => removeUpload(upload.id)}
+                        disabled={upload.status === "uploading"}
+                        aria-label="Dismiss"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-hover))]">
+                    {upload.status === "uploading" && upload.progress === null ? (
+                      <div className="h-full w-full bg-[rgb(var(--primary-soft))] animate-shimmer" />
+                    ) : (
+                      <div
+                        className="h-full bg-[rgb(var(--primary))] transition-all"
+                        style={{ width: `${upload.progress ?? (upload.status === "success" ? 100 : 0)}%` }}
+                      />
+                    )}
+                  </div>
+
+                  {upload.message ? (
+                    <p
+                      className={`mt-2 text-xs ${
+                        upload.status === "error" ? "text-[rgb(var(--error))]" : "text-[rgb(var(--text-secondary))]"
+                      }`}
+                    >
+                      {upload.message}
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {message ? (
+            <div className="mt-3">
+              <Alert message={message} variant="info" />
+            </div>
+          ) : null}
+
+          <Button type="submit" loading={uploading} className="mt-4 w-full sm:w-auto">
+            <UploadCloud size={16} /> {uploading ? "Uploading..." : "Upload files"}
           </Button>
         </form>
       </Card>

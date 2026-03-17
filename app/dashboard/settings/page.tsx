@@ -1,16 +1,10 @@
 import Link from "next/link";
-import { Bell, BookOpenCheck, CalendarCheck2, Lock, MoonStar, ShieldCheck, Sparkles } from "lucide-react";
+import { BookOpenCheck, CalendarCheck2, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Card } from "@/src/components/ui/card";
 import { ModuleShell } from "@/components/dashboard/module-shell";
-
-const preferences = [
-  { icon: Bell, title: "Notifications", description: "Weekly digests and deadline reminders are active." },
-  { icon: Lock, title: "Security", description: "HTTP-only session cookies keep your account secure." },
-  { icon: ShieldCheck, title: "Privacy", description: "Control public sharing defaults for notes and files." },
-  { icon: MoonStar, title: "Theme", description: "Switch between light and dark workspace modes instantly." },
-] as const;
+import { SettingsClient } from "@/components/dashboard/settings-client";
 
 const productivityModules = [
   {
@@ -48,36 +42,26 @@ export default function SettingsPage() {
         summary="Use settings once to align your workspace, then focus on study execution with fewer distractions."
         checklist={["Set preferred theme", "Review security/privacy defaults", "Use quick links to core modules"]}
       >
-      <section className="grid max-w-5xl gap-4 md:grid-cols-2">
-        <Card className="md:col-span-2">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Theme Controls</h2>
-              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
-                Toggle between light and dark mode for better readability in different environments.
-              </p>
-            </div>
-            <ThemeToggle />
-          </div>
-        </Card>
-
-        {preferences.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Card key={item.title} className="flex items-start gap-3">
-              <div className="rounded-xl bg-[rgb(var(--primary-soft))] p-2 text-[rgb(var(--primary))]">
-                <Icon size={18} />
-              </div>
+        <section className="grid max-w-5xl gap-4 md:grid-cols-2">
+          <Card className="md:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="font-semibold text-[rgb(var(--text-primary))]">{item.title}</h2>
-                <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">{item.description}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--primary))]">Appearance</p>
+                <h2 className="mt-1 text-lg font-semibold text-[rgb(var(--text-primary))]">Theme</h2>
+                <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
+                  Toggle between light and dark mode for better readability in different environments.
+                </p>
               </div>
-            </Card>
-          );
-        })}
-      </section>
+              <ThemeToggle />
+            </div>
+          </Card>
 
-      <section className="mt-6 grid max-w-5xl gap-4 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <SettingsClient />
+          </div>
+        </section>
+
+        <section className="mt-6 grid max-w-5xl gap-4 md:grid-cols-3">
         {productivityModules.map((module) => {
           const Icon = module.icon;
           return (
@@ -98,7 +82,7 @@ export default function SettingsPage() {
             </Card>
           );
         })}
-      </section>
+        </section>
       </ModuleShell>
     </>
   );

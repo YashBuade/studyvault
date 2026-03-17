@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Archive,
   BarChart3,
@@ -26,6 +26,8 @@ import { NavItem } from "@/src/components/ui/nav-item";
 import { Logo } from "@/components/ui/logo";
 import { NotificationBadge } from "@/components/dashboard/notification-badge";
 import { LogoutButton } from "@/components/dashboard/logout-button";
+
+const SIDEBAR_COLLAPSED_KEY = "sv-dashboard-sidebar-collapsed";
 
 const navSections = [
   {
@@ -119,7 +121,27 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1";
+    } catch {
+      // Ignore storage failures (privacy mode, restricted environments).
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const width = collapsed ? "5rem" : "18rem";
+    document.documentElement.style.setProperty("--sv-dashboard-sidebar-w", width);
+
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+    } catch {
+      // Ignore storage failures (privacy mode, restricted environments).
+    }
+  }, [collapsed]);
 
   const teacherStatusMap = {
     NONE: { label: "Not submitted", className: "text-[rgb(var(--text-tertiary))]" },
