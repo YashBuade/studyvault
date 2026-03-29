@@ -16,7 +16,7 @@ export const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
     return (
       <div className={`space-y-2 ${containerClassName}`}>
         {label && (
-          <label htmlFor={props.id} className="block text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
+          <label htmlFor={props.id} className="block text-sm font-semibold text-[rgb(var(--text-primary))]">
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -24,15 +24,15 @@ export const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
 
         <div className="relative group">
           {icon && (
-            <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors group-focus-within:text-[rgb(var(--primary))] dark:text-slate-400">
+            <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors group-focus-within:text-[rgb(var(--primary))]">
               {icon}
             </div>
           )}
 
           <input
             ref={ref}
-            className={`w-full rounded-[var(--radius-md)] border-2 border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-3 text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] transition-all duration-[var(--transition-base)] hover:border-[rgb(var(--border-hover))] focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-2 focus:ring-[rgb(var(--primary))]/25 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-400 ${icon ? "pl-12" : ""} ${
-              error ? "border-[rgb(var(--error))] focus:border-[rgb(var(--error))] focus:ring-[rgb(var(--error))]/20" : ""
+            className={`w-full rounded-[var(--radius-md)] border-2 border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-4 py-3 text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] transition-all duration-[var(--transition-base)] hover:border-[rgb(var(--border-hover))] focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-2 focus:ring-[rgb(var(--primary)/0.25)] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--surface))] dark:text-[rgb(var(--text-primary))] dark:placeholder:text-[rgb(var(--text-tertiary))] dark:focus:border-[rgb(var(--border-focus))] ${icon ? "pl-12" : ""} ${
+              error ? "border-[rgb(var(--error))] focus:border-[rgb(var(--error))] focus:ring-[rgb(var(--error)/0.20)]" : ""
             } ${className}`}
             {...props}
           />
@@ -45,7 +45,7 @@ export const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
           </div>
         )}
 
-        {helperText && !error && <p className="text-sm text-[rgb(var(--text-tertiary))] dark:text-slate-400">{helperText}</p>}
+        {helperText && !error ? <p className="text-sm text-[rgb(var(--text-tertiary))]">{helperText}</p> : null}
       </div>
     );
   }

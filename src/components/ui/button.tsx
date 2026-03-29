@@ -9,13 +9,13 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary))]/35 dark:shadow-none dark:ring-1 dark:ring-slate-700",
+    "bg-[rgb(var(--primary))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--primary-hover))] hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--primary)/0.35)] dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]",
   secondary:
-    "border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] hover:bg-[rgb(var(--background))] hover:shadow-[var(--shadow-xs)] focus-visible:ring-[rgb(var(--primary))]/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-900 dark:hover:shadow-none dark:ring-1 dark:ring-slate-700",
+    "border border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-hover))] hover:bg-[rgb(var(--surface-hover))] hover:shadow-[var(--shadow-xs)] focus-visible:ring-[rgb(var(--primary)/0.30)] dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]",
   danger:
-    "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--error))]/90 hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error))]/35 dark:shadow-none dark:ring-1 dark:ring-slate-700",
+    "bg-[rgb(var(--error))] text-[rgb(var(--text-inverse))] shadow-[var(--shadow-sm)] hover:bg-[rgb(var(--error))]/90 hover:shadow-[var(--shadow-md)] focus-visible:ring-[rgb(var(--error)/0.35)] dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]",
   ghost:
-    "bg-transparent text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-soft))] hover:text-[rgb(var(--primary-hover))] focus-visible:ring-[rgb(var(--primary))]/30 dark:text-indigo-300 dark:hover:bg-slate-800 dark:hover:text-slate-100",
+    "bg-transparent text-[rgb(var(--primary))] hover:bg-[rgb(var(--primary-soft))] hover:text-[rgb(var(--primary-hover))] focus-visible:ring-[rgb(var(--primary)/0.30)]",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(

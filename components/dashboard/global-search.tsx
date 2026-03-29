@@ -316,12 +316,12 @@ export function GlobalSearch() {
           setActiveIndex(0);
           setOpen(true);
         }}
-        className="hidden h-9 w-full max-w-[360px] items-center gap-3 rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 text-left text-sm text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:shadow-none dark:ring-1 dark:ring-slate-700 lg:inline-flex"
+        className="hidden h-9 w-full max-w-[360px] items-center gap-3 rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 text-left text-sm text-[rgb(var(--text-tertiary))] shadow-[var(--shadow-xs)] ring-1 ring-[rgb(var(--border)/0.55)] transition-colors hover:bg-[rgb(var(--surface-hover))] lg:inline-flex"
         aria-label="Search notes, files, and tasks"
       >
         <Search size={16} />
         <span className="flex-1">Search notes, files, tasks...</span>
-        <span className="rounded-full border border-[rgb(var(--border))] px-2 py-0.5 text-[11px] font-semibold text-[rgb(var(--text-secondary))] dark:border-slate-600 dark:text-slate-300">
+        <span className="rounded-full border border-[rgb(var(--border))] px-2 py-0.5 text-[11px] font-semibold text-[rgb(var(--text-secondary))]">
           Ctrl+K
         </span>
       </button>
@@ -329,15 +329,15 @@ export function GlobalSearch() {
       {open ? (
         <div className="fixed inset-0 z-[90] bg-black/45 p-4 backdrop-blur-sm" onClick={() => setOpen(false)} aria-hidden="true">
           <div
-            className="mx-auto mt-20 w-full max-w-2xl rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-lg)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-none dark:ring-1 dark:ring-slate-700"
+            className="mx-auto mt-20 w-full max-w-2xl rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-[var(--shadow-lg)] ring-1 ring-[rgb(var(--border)/0.55)]"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-label="Global search"
           >
-            <div className="border-b border-[rgb(var(--border))] p-4 dark:border-slate-700">
+            <div className="border-b border-[rgb(var(--border))] p-4">
               <div className="flex items-center gap-3">
-                <Search size={18} className="text-[rgb(var(--text-tertiary))] dark:text-slate-400" />
+                <Search size={18} className="text-[rgb(var(--text-tertiary))]" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -347,22 +347,20 @@ export function GlobalSearch() {
                     setQuery(event.target.value);
                   }}
                   placeholder="Search notes, files, and tasks..."
-                  className="w-full border-0 bg-transparent px-0 py-0 text-base text-[rgb(var(--text-primary))] shadow-none outline-none placeholder:text-[rgb(var(--text-tertiary))] focus-visible:ring-0 dark:text-slate-100 dark:placeholder-slate-500"
+                  className="w-full border-0 bg-transparent px-0 py-0 text-base text-[rgb(var(--text-primary))] shadow-none outline-none placeholder:text-[rgb(var(--text-tertiary))] focus-visible:ring-0"
                 />
               </div>
             </div>
 
             <div className="max-h-[70vh] overflow-y-auto p-4">
               {loading ? (
-                <div className="flex items-center gap-3 py-6 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">
+                <div className="flex items-center gap-3 py-6 text-sm text-[rgb(var(--text-secondary))]">
                   <Loader2 size={16} className="animate-spin" />
                   <span>Loading search index...</span>
                 </div>
               ) : !debouncedQuery ? (
                 <div className="space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">
-                    Recent searches
-                  </p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">Recent searches</p>
                   {recentSearches.length > 0 ? (
                     <div className="space-y-2">
                       {recentSearches.map((term, index) => (
@@ -372,8 +370,8 @@ export function GlobalSearch() {
                           onClick={() => setQuery(term)}
                           className={`flex w-full items-center justify-between rounded-[var(--radius-md)] border px-3 py-2 text-left text-sm ${
                             boundedActiveIndex === index
-                              ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary-hover))] dark:border-indigo-400 dark:bg-indigo-950/60 dark:text-indigo-200"
-                              : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                              ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft)/0.55)] text-[rgb(var(--primary-hover))]"
+                              : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text-primary))] transition-colors hover:bg-[rgb(var(--surface-hover))]"
                           }`}
                         >
                           <span>{term}</span>
@@ -382,23 +380,21 @@ export function GlobalSearch() {
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-[var(--radius-md)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 py-6 text-sm text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    <p className="rounded-[var(--radius-md)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 py-6 text-sm text-[rgb(var(--text-secondary))]">
                       Start typing to search notes, files, assignments, exams, and planner items.
                     </p>
                   )}
                 </div>
               ) : groupedResults.length === 0 ? (
-                <div className="rounded-[var(--radius-md)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 py-8 text-center dark:border-slate-700 dark:bg-slate-800">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">Nothing found for &quot;{debouncedQuery}&quot;</p>
-                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] dark:text-slate-300">Try a shorter keyword or check the spelling.</p>
+                <div className="rounded-[var(--radius-md)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] px-4 py-8 text-center">
+                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Nothing found for &quot;{debouncedQuery}&quot;</p>
+                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">Try a shorter keyword or check the spelling.</p>
                 </div>
               ) : (
                 <div className="space-y-5">
                   {groupedResults.map((group) => (
                     <div key={group.label} className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))] dark:text-slate-400">
-                        {group.label}
-                      </p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--text-tertiary))]">{group.label}</p>
                       <div className="space-y-2">
                         {group.items.map((item) => {
                           const globalIndex = results.findIndex((result) => result.id === item.id);
@@ -410,18 +406,18 @@ export function GlobalSearch() {
                               onClick={() => handleResultClick(item)}
                               className={`flex w-full items-center gap-3 rounded-[var(--radius-md)] border px-3 py-3 text-left transition ${
                                 boundedActiveIndex === globalIndex
-                                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft))] dark:border-indigo-400 dark:bg-indigo-950/60"
-                                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] hover:bg-[rgb(var(--surface-hover))] dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                                  ? "border-[rgb(var(--primary))] bg-[rgb(var(--primary-soft)/0.55)]"
+                                  : "border-[rgb(var(--border))] bg-[rgb(var(--surface))] transition-colors hover:bg-[rgb(var(--surface-hover))]"
                               }`}
                             >
-                              <div className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))] dark:bg-indigo-950/70 dark:text-indigo-200">
+                              <div className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-[rgb(var(--primary-soft)/0.55)] text-[rgb(var(--primary))]">
                                 <Icon size={16} />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">{item.title}</p>
-                                <p className="truncate text-xs text-[rgb(var(--text-secondary))] dark:text-slate-300">{item.subtitle}</p>
+                                <p className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">{item.title}</p>
+                                <p className="truncate text-xs text-[rgb(var(--text-secondary))]">{item.subtitle}</p>
                               </div>
-                              <ArrowRight size={14} className="text-[rgb(var(--text-tertiary))] dark:text-slate-400" />
+                              <ArrowRight size={14} className="text-[rgb(var(--text-tertiary))]" />
                             </button>
                           );
                         })}

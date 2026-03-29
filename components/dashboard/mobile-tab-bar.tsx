@@ -26,14 +26,12 @@ export function MobileTabBar() {
 
   return (
     <>
-      {open ? (
-        <div className="fixed inset-0 z-40 bg-[rgb(15_23_42_/_0.35)] md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />
-      ) : null}
+      {open ? <div className="fixed inset-0 z-40 bg-black/45 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" /> : null}
 
       {open ? (
-        <div className="fixed inset-x-4 bottom-24 z-50 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-[var(--shadow-lg)] dark:border-slate-700 dark:bg-slate-900 md:hidden">
+        <div className="fixed inset-x-4 bottom-24 z-50 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-elevated))] p-4 shadow-[var(--shadow-lg)] ring-1 ring-[rgb(var(--border)/0.55)] md:hidden">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">More</p>
+            <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">More</p>
             <button type="button" aria-label="Close more menu" className="icon-button" onClick={() => setOpen(false)}>
               <X size={16} />
             </button>
@@ -44,7 +42,7 @@ export function MobileTabBar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
+                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-[rgb(var(--text-primary))] dark:opacity-85 dark:hover:opacity-100"
               >
                 {link.label}
               </Link>
@@ -53,7 +51,7 @@ export function MobileTabBar() {
         </div>
       ) : null}
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.98)] px-2 py-2 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/95 md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.98)] px-2 py-2 backdrop-blur-xl dark:bg-[rgb(var(--surface-elevated)/0.92)] md:hidden">
         <div className="grid grid-cols-5 gap-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -63,10 +61,10 @@ export function MobileTabBar() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-[var(--radius-md)] text-[11px] font-medium ${
+                className={`flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-[var(--radius-md)] text-xs font-semibold leading-none ${
                   active
-                    ? "bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))] dark:bg-indigo-950/60 dark:text-indigo-200"
-                    : "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
+                    ? "bg-[rgb(var(--primary-soft)/0.75)] text-[rgb(var(--text-primary))] ring-1 ring-[rgb(var(--primary)/0.25)]"
+                    : "text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-[rgb(var(--text-primary))] dark:opacity-85 dark:hover:opacity-100"
                 }`}
               >
                 <Icon size={18} />
@@ -78,7 +76,7 @@ export function MobileTabBar() {
             type="button"
             aria-label="Open more navigation"
             onClick={() => setOpen(true)}
-            className="flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-[var(--radius-md)] text-[11px] font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
+            className="flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-[var(--radius-md)] text-xs font-semibold leading-none text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-hover))] hover:text-[rgb(var(--text-primary))] dark:text-[rgb(var(--text-primary))] dark:opacity-85 dark:hover:opacity-100"
           >
             <MoreHorizontal size={18} />
             <span>More</span>

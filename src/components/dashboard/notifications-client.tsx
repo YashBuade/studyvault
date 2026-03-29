@@ -48,7 +48,7 @@ function NotificationTypeIcon({ type }: { type: Notification["type"] }) {
   if (normalized === "LIKE") return <Heart className="h-4 w-4 text-pink-500" />;
   if (normalized === "COMMENT") return <MessageCircle className="h-4 w-4 text-blue-500" />;
   if (normalized === "BOOKMARK") return <Bookmark className="h-4 w-4 text-amber-500" />;
-  return <Bell className="h-4 w-4 text-slate-500" />;
+  return <Bell className="h-4 w-4 text-[rgb(var(--text-tertiary))]" />;
 }
 
 function ErrorCard({ onRetry }: { onRetry: () => void }) {

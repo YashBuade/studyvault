@@ -425,7 +425,7 @@ export function PlannerClient() {
         <div className="space-y-4">
           <Card>
             <div className="relative w-full max-w-xl">
-              <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)] dark:text-slate-400" />
+              <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)]" />
               <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks" className="pl-9" />
             </div>
           </Card>

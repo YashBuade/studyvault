@@ -376,13 +376,13 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
       </Card>
 
       <Card title="Files" description="Search files, load more, and restore from trash.">
-        <div className="mb-4 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/70 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+        <div className="mb-4 grid gap-3 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover)/0.7)] p-4 ring-1 ring-[rgb(var(--border)/0.55)]">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-2">
               <span className="badge badge-primary">{activeCount} active</span>
               <span className="badge">{trashCount} in trash</span>
             </div>
-            <div className="inline-flex rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-1 dark:border-slate-700 dark:bg-slate-900">
+            <div className="inline-flex rounded-[var(--radius-full)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-1">
               <Button variant={view === "active" ? "primary" : "ghost"} className="btn-sm" onClick={() => setView("active")}>
                 Active
               </Button>
@@ -405,14 +405,14 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
 
         <div className="space-y-3">
           {visible.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))]/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-800/80">
+            <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-hover)/0.6)] px-6 py-12 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
                 <UploadCloud size={24} />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">
+              <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">
                 {view === "trash" ? "Trash is empty" : "No files yet"}
               </h3>
-              <p className="mt-2 max-w-xs text-sm text-[var(--muted)] dark:text-slate-400">
+              <p className="mt-2 max-w-xs text-sm text-[var(--muted)]">
                 {view === "trash"
                   ? "Files you remove from the workspace will appear here until you restore them."
                   : "Upload your first study file to keep reference material available across notes and planning."}
@@ -420,12 +420,12 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
             </div>
           ) : (
             visible.map((file) => (
-              <article key={file.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 dark:border-slate-700 dark:bg-slate-800">
+              <article key={file.id} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 ring-1 ring-[rgb(var(--border)/0.35)]">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))] dark:text-slate-100">{file.originalName}</p>
-                    <p className="text-xs text-[var(--muted)] dark:text-slate-400">{formatBytes(file.size)}</p>
-                    <p className="mt-1 text-xs text-[var(--muted)] dark:text-slate-400">
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{file.originalName}</p>
+                    <p className="text-xs text-[var(--muted)]">{formatBytes(file.size)}</p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">
                       {file.verificationStatus === "VERIFIED" ? (
                         <span className="inline-flex items-center gap-1 text-[rgb(var(--color-success))]">
                           <BadgeCheck size={12} />
@@ -443,7 +443,7 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                         </span>
                       )}
                     </p>
-                    {file.verificationNotes ? <p className="text-xs text-[var(--muted)] dark:text-slate-400">Reviewer note: {file.verificationNotes}</p> : null}
+                    {file.verificationNotes ? <p className="text-xs text-[var(--muted)]">Reviewer note: {file.verificationNotes}</p> : null}
                   </div>
                   {view === "trash" ? (
                     <Button variant="secondary" onClick={() => restoreFile(file.id)}>
@@ -453,14 +453,14 @@ export function UploadCenterClient({ initialFiles }: UploadCenterClientProps) {
                     <div className="flex items-center gap-2">
                       <a
                         href={`/api/files/${file.id}/download`}
-                        className="rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                        className="rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] hover:-translate-y-0.5"
                       >
                         Download
                       </a>
                       <button
                         type="button"
                         onClick={() => setPendingDelete(file.id)}
-                        className="rounded-lg p-2 text-[var(--muted)] hover:bg-[rgb(var(--surface-hover))] hover:text-red-500 dark:text-slate-400 dark:hover:bg-slate-900"
+                        className="rounded-lg p-2 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--surface-hover))] hover:text-red-500"
                         aria-label="Delete file"
                       >
                         <Trash2 size={14} />

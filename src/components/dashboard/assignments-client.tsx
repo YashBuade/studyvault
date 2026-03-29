@@ -427,7 +427,7 @@ export function AssignmentsClient() {
           <Card>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               <div className="relative w-full">
-                <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)] dark:text-slate-400" />
+                <Search size={14} className="pointer-events-none absolute left-3 top-3 text-[var(--muted)]" />
                 <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search assignments" className="pl-9" />
               </div>
               <div className="flex flex-wrap gap-2">

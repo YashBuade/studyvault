@@ -42,7 +42,7 @@ export default async function TeacherDashboardPage() {
                   Your college ID is being reviewed by an admin. You&apos;ll be notified once approved.
                 </p>
                 {user.teacherReviewNotes ? (
-                  <p className="mt-3 rounded-[var(--radius-md)] border border-amber-500/20 bg-white/70 px-3 py-2 text-sm text-amber-900 dark:border-amber-300/20 dark:bg-amber-950/30 dark:text-amber-100">
+                  <p className="mt-3 rounded-[var(--radius-md)] border border-amber-500/20 bg-[rgb(var(--surface))]/80 px-3 py-2 text-sm text-amber-900 dark:border-amber-300/20 dark:bg-[rgb(var(--surface-elevated))]/70 dark:text-amber-100">
                     Admin note: {user.teacherReviewNotes}
                   </p>
                 ) : null}
@@ -67,7 +67,7 @@ export default async function TeacherDashboardPage() {
               </div>
               <Link
                 href="/dashboard/teacher/review"
-                className="inline-flex min-h-10 w-full items-center justify-center rounded-[var(--radius-md)] border border-emerald-500/30 bg-white px-4 py-2 text-center text-sm font-semibold text-emerald-800 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] sm:w-auto dark:border-emerald-300/20 dark:bg-emerald-950/30 dark:text-emerald-100"
+                className="inline-flex min-h-10 w-full items-center justify-center rounded-[var(--radius-md)] border border-emerald-500/30 bg-[rgb(var(--surface))] px-4 py-2 text-center text-sm font-semibold text-emerald-800 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] sm:w-auto dark:border-emerald-300/20 dark:bg-[rgb(var(--surface-elevated))] dark:text-emerald-100"
               >
                 Open review queue
               </Link>
@@ -88,7 +88,7 @@ export default async function TeacherDashboardPage() {
                 </p>
                 <a
                   href="mailto:support@studyvault.example"
-                  className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-red-500/30 bg-white px-4 text-sm font-semibold text-red-800 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] dark:border-red-300/20 dark:bg-red-950/30 dark:text-red-100"
+                  className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-red-500/30 bg-[rgb(var(--surface))] px-4 text-sm font-semibold text-red-800 shadow-[var(--shadow-sm)] transition hover:shadow-[var(--shadow-md)] dark:border-red-300/20 dark:bg-[rgb(var(--surface-elevated))] dark:text-red-100"
                 >
                   <Mail size={16} /> Contact support
                 </a>

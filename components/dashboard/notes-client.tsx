@@ -91,7 +91,7 @@ function hashString(input: string) {
 
 function subjectBadgeClasses(subject: string) {
   const palette = [
-    "border-indigo-500/30 bg-indigo-50 text-indigo-700 dark:border-indigo-300/30 dark:bg-indigo-900/25 dark:text-indigo-200",
+    "border-blue-500/30 bg-blue-50 text-blue-700 dark:border-blue-300/30 dark:bg-blue-900/25 dark:text-blue-200",
     "border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/25 dark:text-emerald-200",
     "border-amber-500/30 bg-amber-50 text-amber-800 dark:border-amber-300/30 dark:bg-amber-900/25 dark:text-amber-200",
     "border-rose-500/30 bg-rose-50 text-rose-700 dark:border-rose-300/30 dark:bg-rose-900/25 dark:text-rose-200",
@@ -466,13 +466,13 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
               { label: "Private", value: "private" },
             ]}
           />
-          <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover))]/80 p-3 shadow-[var(--shadow-xs)] dark:border-slate-700 dark:bg-slate-800/90 dark:shadow-none dark:ring-1 dark:ring-slate-700">
-            <p className="text-xs font-semibold text-[var(--muted)] dark:text-slate-400">Upload files for this note</p>
+          <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover)/0.8)] p-3 shadow-[var(--shadow-xs)] ring-1 ring-[rgb(var(--border)/0.35)]">
+            <p className="text-xs font-semibold text-[var(--muted)]">Upload files for this note</p>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
                 type="file"
                 onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
-                className="w-full rounded-lg border border-[rgb(var(--border))] bg-transparent px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500"
+                className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary)/0.25)]"
               />
               <Button type="button" variant="secondary" loading={uploading} onClick={() => void uploadAttachment()}>
                 {uploading ? "Uploading..." : "Upload"}
@@ -665,7 +665,7 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
                       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
                         note.isPublic
                           ? "border-emerald-500/40 bg-emerald-50 text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/30 dark:text-emerald-200"
-                          : "border-slate-400/40 bg-slate-50 text-slate-700 dark:border-slate-500/40 dark:bg-slate-900/40 dark:text-slate-200"
+                          : "border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] text-[rgb(var(--text-secondary))]"
                       }`}
                     >
                       {note.isPublic ? "Public" : "Private"}
@@ -766,17 +766,20 @@ export function NotesClient({ initialNotes }: NotesClientProps) {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--primary-soft))] text-[rgb(var(--primary))]">
               <UploadCloud size={24} />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))] dark:text-slate-100">No uploads yet</h3>
+            <h3 className="mt-4 text-lg font-semibold text-[rgb(var(--text-primary))]">No uploads yet</h3>
             <p className="mt-2 text-sm text-[var(--muted)]">Add PDFs, slides, docs, or images so they are ready to attach to your notes.</p>
           </div>
         ) : (
           <div className="space-y-2">
             {recentFiles.map((file) => (
-              <div key={file.id} className="flex items-center justify-between rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover))]/80 p-3 shadow-[var(--shadow-xs)]">
+              <div
+                key={file.id}
+                className="flex items-center justify-between rounded-[var(--radius-lg)] border border-[rgb(var(--border))]/75 bg-[rgb(var(--surface-hover)/0.8)] p-3 shadow-[var(--shadow-xs)] ring-1 ring-[rgb(var(--border)/0.35)]"
+              >
                 <p className="text-sm font-medium">{file.originalName}</p>
                 <a
                   href={`/api/files/${file.id}/download`}
-                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold hover:-translate-y-0.5 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:shadow-none dark:ring-1 dark:ring-slate-700"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] bg-[var(--panel)] px-3 py-2 text-xs font-semibold text-[rgb(var(--text-primary))] hover:-translate-y-0.5 hover:shadow-sm"
                 >
                   Download
                 </a>

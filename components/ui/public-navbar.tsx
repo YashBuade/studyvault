@@ -8,7 +8,9 @@ import { Logo } from "@/components/ui/logo";
 
 const navLinks = [
   { href: "/#features", label: "Features" },
+  { href: "/#spotlight", label: "Spotlight" },
   { href: "/notes", label: "Public Notes" },
+  { href: "/#faq", label: "FAQ" },
   { href: "/auth/teacher/login", label: "For Teachers" },
 ];
 
@@ -16,7 +18,7 @@ export function PublicNavbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.95)] backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
+    <header className="sticky top-0 z-50 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.95)] backdrop-blur-xl dark:bg-[rgb(var(--surface-elevated))]/90">
       <div className="page-shell flex h-16 items-center justify-between gap-4">
         <Logo size="sm" />
 
@@ -25,7 +27,7 @@ export function PublicNavbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:text-slate-100"
+              className="text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-text-primary))] dark:text-[rgb(var(--color-text-secondary))] dark:hover:text-[rgb(var(--color-text-primary))]"
             >
               {link.label}
             </Link>
@@ -53,20 +55,20 @@ export function PublicNavbar() {
       </div>
 
       {open ? (
-        <div className="border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))] dark:border-slate-700 dark:bg-slate-900 md:hidden">
+        <div className="border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))] dark:bg-[rgb(var(--surface-elevated))] md:hidden">
           <div className="page-shell flex flex-col gap-3 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                className="rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-surface-2))] hover:text-[rgb(var(--color-text-primary))] dark:text-[rgb(var(--color-text-secondary))] dark:hover:bg-[rgb(var(--color-surface-2))] dark:hover:text-[rgb(var(--color-text-primary))]"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="flex items-center justify-between rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--color-bg))] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-              <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))] dark:text-slate-300">Theme</span>
+            <div className="flex items-center justify-between rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--color-bg))] px-3 py-2 dark:bg-[rgb(var(--color-surface))]">
+              <span className="text-sm font-medium text-[rgb(var(--color-text-secondary))] dark:text-[rgb(var(--color-text-secondary))]">Theme</span>
               <ThemeToggle />
             </div>
             <Link href="/auth/login" onClick={() => setOpen(false)} className="btn btn-secondary w-full">

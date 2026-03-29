@@ -5,7 +5,7 @@ import { PublicNavbar } from "@/components/ui/public-navbar";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[rgb(var(--background))] dark:bg-slate-950">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[rgb(var(--background))]">
       <div className="relative z-10">
         <PublicNavbar />
       </div>

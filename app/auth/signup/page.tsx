@@ -209,9 +209,9 @@ export default function SignupPage() {
   const disableSubmit = loading || passwordsMismatch;
 
   return (
-    <div className="min-h-screen w-full bg-[rgb(var(--background))] text-[rgb(var(--text-primary))] dark:bg-slate-950 dark:text-slate-100">
-      <div className="mx-auto grid min-h-screen w-full max-w-[1280px] lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="relative hidden border-r border-[rgb(var(--border))] dark:border-slate-800 lg:flex">
+    <div className="w-full bg-[rgb(var(--background))] text-[rgb(var(--text-primary))]">
+      <div className="mx-auto grid min-h-[calc(100vh-128px)] w-full max-w-[1280px] lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="relative hidden border-r border-[rgb(var(--border))] lg:flex">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--color-surface))_48%,rgb(var(--color-info-light))_100%)]" />
           <div className="absolute right-16 top-16 h-64 w-64 rounded-full bg-[rgb(var(--color-primary)/0.14)] blur-3xl" />
           <div className="absolute bottom-20 left-10 h-72 w-72 rounded-full bg-[rgb(var(--color-info)/0.14)] blur-3xl" />
@@ -230,8 +230,11 @@ export default function SignupPage() {
               </div>
               <div className="space-y-3">
                 {(isTeacherSignup ? teacherBullets : studentBullets).map((item) => (
-                  <div key={item} className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.8)] px-4 py-3 shadow-[var(--shadow-xs)] backdrop-blur dark:border-slate-700 dark:bg-slate-900/80 dark:shadow-none dark:ring-1 dark:ring-slate-700">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))] dark:text-slate-100">{item}</p>
+                  <div
+                    key={item}
+                    className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.8)] px-4 py-3 shadow-[var(--shadow-xs)] ring-1 ring-[rgb(var(--border)/0.55)] backdrop-blur"
+                  >
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{item}</p>
                   </div>
                 ))}
               </div>
@@ -239,12 +242,12 @@ export default function SignupPage() {
           </div>
         </section>
 
-        <section className="flex items-center justify-center px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
+        <section className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
           <div className="w-full max-w-md space-y-6">
             <div className="lg:hidden">
               <Logo size="md" />
             </div>
-            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border)/0.8)] bg-[rgb(var(--surface)/0.92)] p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/92 dark:shadow-none dark:ring-1 dark:ring-slate-700 sm:p-8">
+            <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border)/0.8)] bg-[rgb(var(--surface)/0.92)] p-5 shadow-[var(--shadow-lg)] ring-1 ring-[rgb(var(--border)/0.55)] backdrop-blur-2xl sm:p-8">
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="section-kicker">New account</div>
@@ -272,17 +275,19 @@ export default function SignupPage() {
                 )}
 
                 {isTeacherSignup ? (
-                  <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--color-warning)/0.3)] bg-[rgb(var(--color-warning-light))] px-4 py-3 text-sm text-[rgb(var(--color-warning))] dark:border-[rgb(var(--color-warning)/0.4)] dark:bg-[rgb(var(--color-warning-light)/0.18)] dark:text-amber-300">
+                  <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--color-warning)/0.35)] bg-[rgb(var(--color-warning-light))] px-4 py-3 text-sm text-[rgb(var(--color-warning))]">
                     <div className="flex items-start gap-3">
-                      <span className="text-base" aria-hidden="true">⏱</span>
+                      <span className="text-base" aria-hidden="true">
+                        ⏱
+                      </span>
                       <div>
                         <p className="font-semibold">Teacher profile remains pending until admin verifies your College ID and expertise.</p>
-                        <p className="mt-1 text-xs text-[rgb(var(--color-warning))] dark:text-amber-300">Approval typically takes 1-2 business days.</p>
+                        <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Approval typically takes 1-2 business days.</p>
                       </div>
                     </div>
                   </div>
                 ) : googleStatus === "loading" ? (
-                  <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-sm text-[rgb(var(--text-secondary))] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-3 py-2 text-sm text-[rgb(var(--text-secondary))]">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Loading sign-in options...</span>
                   </div>
@@ -294,7 +299,7 @@ export default function SignupPage() {
                         <div className="w-full border-t border-[rgb(var(--border))]" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="bg-[rgb(var(--surface))] px-3 text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:bg-slate-900 dark:text-slate-400">or use email</span>
+                        <span className="bg-[rgb(var(--surface))] px-3 text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">or use email</span>
                       </div>
                     </div>
                   </>
@@ -303,7 +308,7 @@ export default function SignupPage() {
                     <button
                       type="button"
                       disabled
-                      className="inline-flex min-h-[46px] w-full items-center justify-center gap-3 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-2.5 text-sm font-semibold text-[rgb(var(--text-tertiary))] opacity-80 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                      className="inline-flex min-h-[46px] w-full items-center justify-center gap-3 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] px-4 py-2.5 text-sm font-semibold text-[rgb(var(--text-tertiary))] opacity-80"
                     >
                       Continue with Google (unavailable)
                     </button>
@@ -312,7 +317,7 @@ export default function SignupPage() {
                         <div className="w-full border-t border-[rgb(var(--border))]" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="bg-[rgb(var(--surface))] px-3 text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))] dark:bg-slate-900 dark:text-slate-400">or use email</span>
+                        <span className="bg-[rgb(var(--surface))] px-3 text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">or use email</span>
                       </div>
                     </div>
                   </>
@@ -425,15 +430,15 @@ export default function SignupPage() {
                             const file = event.dataTransfer.files?.[0] ?? null;
                             setTeacherIdPhoto(file);
                           }}
-                          className={`flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed px-5 py-8 text-center transition hover:border-[rgb(var(--primary)/0.5)] hover:bg-[rgb(var(--surface))] dark:hover:bg-slate-800 ${
+                          className={`flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed px-5 py-8 text-center transition hover:border-[rgb(var(--primary)/0.5)] hover:bg-[rgb(var(--surface))] dark:hover:bg-[rgb(var(--surface-hover))] ${
                             dragActive
-                              ? "border-[rgb(var(--primary)/0.6)] bg-[rgb(var(--primary-soft))] dark:bg-indigo-950/60"
-                              : "border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] dark:border-slate-700 dark:bg-slate-900/80"
+                              ? "border-[rgb(var(--primary)/0.6)] bg-[rgb(var(--primary-soft))] dark:bg-[rgb(var(--primary-light))]/25"
+                              : "border-[rgb(var(--border))] bg-[rgb(var(--surface-hover))] dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--surface-elevated))]/70"
                           }`}
                         >
                           <UploadCloud className="h-8 w-8 text-[rgb(var(--primary))]" />
                           <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Drag & drop your College ID photo here</p>
-                          <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))] dark:text-slate-400">or click to browse - JPG, PNG, WEBP - Max 5MB</p>
+                          <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">or click to browse - JPG, PNG, WEBP - Max 5MB</p>
                         </label>
                         <input
                           id="teacherIdPhoto"
@@ -444,8 +449,8 @@ export default function SignupPage() {
                           required
                         />
                         {teacherIdPhoto ? (
-                          <div className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3 dark:border-slate-700 dark:bg-slate-800">
-                            <p className="text-sm font-medium text-[rgb(var(--text-primary))] dark:text-slate-100">{teacherIdPhoto.name}</p>
+                          <div className="rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-3">
+                            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{teacherIdPhoto.name}</p>
                             {teacherIdPreview ? (
                               <Image
                                 src={teacherIdPreview}
@@ -482,7 +487,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={() => setShowPassword((value) => !value)}
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors hover:text-[rgb(var(--text-primary))] dark:text-slate-400 dark:hover:text-slate-100"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors hover:text-[rgb(var(--text-primary))]"
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -514,7 +519,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={() => setShowConfirmPassword((value) => !value)}
                         aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors hover:text-[rgb(var(--text-primary))] dark:text-slate-400 dark:hover:text-slate-100"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))] transition-colors hover:text-[rgb(var(--text-primary))]"
                       >
                         {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>

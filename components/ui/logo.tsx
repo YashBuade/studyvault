@@ -42,7 +42,7 @@ export function Logo({ size = "md", showText = true, href = "/" }: LogoProps) {
     <Link href={href} className="group inline-flex items-center gap-3">
       <LogoMark size={size} />
       {showText ? (
-        <span className={`${s.text} font-bold tracking-[-0.02em] text-[rgb(var(--text-primary))] dark:text-slate-100`}>
+        <span className={`${s.text} font-bold tracking-[-0.02em] text-[rgb(var(--text-primary))]`}>
           Study<span className="text-[rgb(var(--primary))]">Vault</span>
         </span>
       ) : null}
@@ -52,7 +52,7 @@ export function Logo({ size = "md", showText = true, href = "/" }: LogoProps) {
 
 export function LogoText() {
   return (
-    <span className="text-xl font-bold tracking-[-0.02em] text-[rgb(var(--text-primary))] dark:text-slate-100">
+    <span className="text-xl font-bold tracking-[-0.02em] text-[rgb(var(--text-primary))]">
       Study<span className="text-[rgb(var(--primary))]">Vault</span>
     </span>
   );

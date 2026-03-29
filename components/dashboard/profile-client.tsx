@@ -180,11 +180,11 @@ export function ProfileClient({ initialProfile }: { initialProfile: Profile }) {
                   alt="Profile avatar"
                   width={96}
                   height={96}
-                  className="h-24 w-24 rounded-3xl border border-[rgb(var(--border))] object-cover dark:border-slate-700"
+                  className="h-24 w-24 rounded-3xl border border-[rgb(var(--border))] object-cover"
                 />
               ) : (
                 <div
-                  className="flex h-24 w-24 items-center justify-center rounded-3xl border border-[rgb(var(--border))] text-xl font-semibold text-white dark:border-slate-700"
+                  className="flex h-24 w-24 items-center justify-center rounded-3xl border border-[rgb(var(--border))] text-xl font-semibold text-white"
                   style={{ backgroundImage: avatarGradient }}
                 >
                   {initials}

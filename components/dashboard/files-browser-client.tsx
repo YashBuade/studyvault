@@ -62,7 +62,7 @@ function getFileIcon(mimeType: string) {
     return { Icon: Presentation, tone: "text-orange-600 dark:text-orange-300" };
   }
   if (normalized.includes("image")) return { Icon: ImageIcon, tone: "text-purple-600 dark:text-purple-300" };
-  return { Icon: FileIcon, tone: "text-slate-500 dark:text-slate-300" };
+  return { Icon: FileIcon, tone: "text-[rgb(var(--text-tertiary))]" };
 }
 
 function formatRelativeDate(input: string | undefined) {

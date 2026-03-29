@@ -23,15 +23,15 @@ const variantStyles: Record<
 > = {
   info: {
     icon: Info,
-    className: "border-[rgb(var(--color-primary))]/15 bg-[rgb(var(--color-primary-light))] text-[rgb(var(--color-primary))]",
+    className: "border-[rgb(var(--color-primary)/0.15)] bg-[rgb(var(--color-primary-light))] text-[rgb(var(--color-primary))]",
   },
   success: {
     icon: CheckCircle2,
-    className: "border-[rgb(var(--color-success))]/15 bg-[rgb(var(--color-success-light))] text-[rgb(var(--color-success))]",
+    className: "border-[rgb(var(--color-success)/0.15)] bg-[rgb(var(--color-success-light))] text-[rgb(var(--color-success))]",
   },
   error: {
     icon: AlertCircle,
-    className: "border-[rgb(var(--color-danger))]/15 bg-[rgb(var(--color-danger-light))] text-[rgb(var(--color-danger))]",
+    className: "border-[rgb(var(--color-danger)/0.15)] bg-[rgb(var(--color-danger-light))] text-[rgb(var(--color-danger))]",
   },
 };
 
@@ -77,7 +77,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 aria-label="Dismiss notification"
-                className="icon-button h-8 w-8 shrink-0 text-current hover:bg-black/5"
+                className="icon-button h-8 w-8 shrink-0 text-current hover:bg-black/5 dark:hover:bg-white/10"
                 onClick={() => setToasts((prev) => prev.filter((item) => item.id !== toast.id))}
               >
                 <X size={14} />
