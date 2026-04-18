@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import dns from "node:dns";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
@@ -81,6 +82,14 @@ function assertNoInvalidEnvUrl(name: string, value: string | undefined) {
 }
 
 function createPrismaClient() {
+  // Prefer IPv4 on systems/networks where IPv6 routes to managed DB hosts are flaky.
+  // (Prevents transient "Can't reach database server" when AAAA records are returned first.)
+  try {
+    dns.setDefaultResultOrder("ipv4first");
+  } catch {
+    // Ignore if not supported by current Node version.
+  }
+
   assertNoInvalidEnvUrl("DATABASE_URL", process.env.DATABASE_URL);
   assertNoInvalidEnvUrl("DIRECT_URL", process.env.DIRECT_URL);
   assertNoInvalidEnvUrl("DATABASE_RUNTIME_URL", process.env.DATABASE_RUNTIME_URL);
@@ -89,7 +98,11 @@ function createPrismaClient() {
   const pooled = asValidConnectionString(process.env.DATABASE_URL);
   const direct = asValidConnectionString(process.env.DIRECT_URL);
 
-  const effectiveConnectionString = runtimeOverride || pooled || direct;
+  const effectiveConnectionString = runtimeOverride
+    ? runtimeOverride
+    : process.env.NODE_ENV === "production"
+      ? pooled || direct
+      : direct || pooled;
   if (!effectiveConnectionString) {
     throw new Error("DATABASE_URL or DIRECT_URL must be set for Prisma.");
   }

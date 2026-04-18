@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import dns from "node:dns";
 
 function asValidConnectionString(value) {
   if (!value) return undefined;
@@ -59,10 +60,21 @@ function shouldEnableTls(connectionString) {
 }
 
 export function createScriptPrismaClient() {
+  // Prefer IPv4 on networks where AAAA-first resolution breaks DB connectivity.
+  try {
+    dns.setDefaultResultOrder("ipv4first");
+  } catch {
+    // ignore
+  }
+
   const runtimeOverride = asValidConnectionString(process.env.DATABASE_RUNTIME_URL);
   const pooled = asValidConnectionString(process.env.DATABASE_URL);
   const direct = asValidConnectionString(process.env.DIRECT_URL);
-  const effectiveConnectionString = runtimeOverride || pooled || direct;
+  const effectiveConnectionString = runtimeOverride
+    ? runtimeOverride
+    : process.env.NODE_ENV === "production"
+      ? pooled || direct
+      : direct || pooled;
   if (!effectiveConnectionString) {
     throw new Error("DATABASE_URL or DIRECT_URL must be set for Prisma scripts.");
   }
@@ -92,4 +104,3 @@ export function createScriptPrismaClient() {
     log: [{ emit: "stdout", level: "error" }, { emit: "stdout", level: "warn" }],
   });
 }
-
