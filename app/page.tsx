@@ -8,7 +8,9 @@ import {
   FileUp,
   Globe,
   GraduationCap,
+  Heart,
   Lock,
+  MessageCircle,
   Pencil,
   Presentation,
   ShieldCheck,
@@ -21,7 +23,33 @@ import { FeatureSpotlight } from "@/components/landing/feature-spotlight";
 import { AnimatedStats } from "@/components/landing/animated-stats";
 import { FaqAccordion } from "@/components/landing/faq-accordion";
 import { getSessionFromCookies } from "@/lib/auth";
+import { getLandingSnapshot } from "@/lib/landing";
+import { RotatingWords } from "@/components/landing/rotating-words";
 import { redirect } from "next/navigation";
+
+function formatRelativeDate(input: Date) {
+  if (Number.isNaN(input.getTime())) return "";
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfDate = new Date(input.getFullYear(), input.getMonth(), input.getDate());
+  const diffDays = Math.round((startOfToday.getTime() - startOfDate.getTime()) / 86_400_000);
+
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays >= 2 && diffDays <= 6) return `${diffDays} days ago`;
+  if (diffDays >= 7 && diffDays <= 29) {
+    const weeks = Math.round(diffDays / 7);
+    return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  }
+
+  const includeYear = now.getFullYear() !== input.getFullYear();
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(includeYear ? { year: "numeric" } : {}),
+  }).format(input);
+}
 
 const coreModules = [
   {
@@ -62,6 +90,9 @@ export default async function HomePage() {
     redirect("/dashboard");
   }
 
+  const landingSnapshot = await getLandingSnapshot();
+  const latestNotes = landingSnapshot.latestNotes;
+
   return (
     <div className="min-h-screen bg-[rgb(var(--background))] text-[rgb(var(--text-primary))]">
       <PublicNavbar />
@@ -78,7 +109,9 @@ export default async function HomePage() {
                 All-in-one academic workspace
               </div>
               <h1 className="mt-5 max-w-4xl text-balance text-4xl font-bold tracking-tight text-[rgb(var(--text-primary))] animate-slide-up sm:text-6xl">
-                One place for notes, deadlines, and files. Zero chaos.
+                One place for{" "}
+                <RotatingWords words={["notes", "deadlines", "files", "assignments"]} className="mx-1 align-baseline" />
+                . Zero chaos.
               </h1>
               <p className="mt-5 max-w-3xl text-base text-[rgb(var(--text-secondary))] animate-slide-up animate-stagger-1 sm:text-lg">
                 StudyVault brings together everything students need — notes, planning, file uploads, and assignment tracking — in one fast, focused workspace.
@@ -108,7 +141,7 @@ export default async function HomePage() {
             </div>
 
             <div className="relative">
-              <div className="hero-grid absolute inset-6 rounded-[28px] opacity-60" />
+              <div className="hero-grid absolute inset-6 rounded-[28px] opacity-60 animate-grid-drift" />
               <div className="relative overflow-hidden rounded-[32px] border border-[rgb(var(--border)/0.75)] bg-[rgb(var(--surface)/0.88)] p-5 shadow-[var(--shadow-xl)] backdrop-blur-2xl dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--surface-elevated))]/80 dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))] sm:p-6">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -304,12 +337,117 @@ export default async function HomePage() {
 
             <AnimatedStats
               items={[
-                { label: "Core modules", value: coreModules.length, description: "Notes, files, planner, and privacy" },
-                { label: "Roles supported", value: 3, description: "Student, teacher, and admin flows" },
-                { label: "Public-first feature", value: 1, description: "Share notes without losing control" },
-                { label: "On-ramp options", value: 2, description: "Sign up or explore public notes" },
+                { label: "Public notes", value: landingSnapshot.stats.publicNotes, description: "Available in the library right now" },
+                { label: "New this week", value: landingSnapshot.stats.newPublicNotesThisWeek, description: "Fresh notes added recently" },
+                { label: "Verified teachers", value: landingSnapshot.stats.verifiedTeachers, description: "Trusted contributors in the community" },
+                { label: "Verified files", value: landingSnapshot.stats.verifiedPublicFiles, description: "Public resources that passed review" },
               ]}
             />
+          </div>
+        </section>
+
+        <section id="library" className="scroll-mt-24 px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-8 grid gap-5 lg:grid-cols-2 lg:items-end">
+              <div>
+                <div className="section-kicker">
+                  <BookOpen className="mr-2 h-3.5 w-3.5" />
+                  Live from the library
+                </div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[rgb(var(--text-primary))] sm:text-4xl">
+                  Explore what people are sharing
+                </h2>
+                <p className="mt-3 text-sm text-[rgb(var(--text-secondary))] sm:text-base">
+                  The public library updates as new notes are published — browse anything, then sign up when you&apos;re ready.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.92)] px-5 py-4 text-sm shadow-[var(--shadow-sm)] backdrop-blur dark:bg-[rgb(var(--surface-elevated))]/80 dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">Updated</p>
+                  <p className="mt-1 font-semibold text-[rgb(var(--text-primary))]">{formatRelativeDate(landingSnapshot.generatedAt)}</p>
+                </div>
+                <Link
+                  href="/notes"
+                  className="inline-flex h-11 items-center justify-center rounded-[var(--radius-md)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-5 text-sm font-semibold text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--surface-hover))]"
+                >
+                  View all notes <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+
+            {latestNotes.length ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {latestNotes.map((note) => {
+                  const tags = note.tags
+                    ?.split(",")
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                    .slice(0, 3);
+                  const isVerifiedTeacher = note.user.role === "TEACHER" && note.user.teacherVerificationStatus === "APPROVED";
+                  return (
+                    <Link
+                      key={note.id}
+                      href={`/notes/${note.slug}`}
+                      className="group rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.92)] p-6 shadow-[var(--shadow-sm)] transition-all duration-300 hover:-translate-y-1 hover:border-[rgb(var(--primary)/0.4)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary)/0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--background))] dark:bg-[rgb(var(--surface-elevated))]/80 dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(var(--text-tertiary))]">
+                            {note.subject?.trim() ? note.subject.trim() : "Public note"}
+                          </p>
+                          <h3 className="mt-2 line-clamp-2 text-lg font-semibold tracking-tight text-[rgb(var(--text-primary))]">
+                            {note.title}
+                          </h3>
+                        </div>
+                        <span className="rounded-full bg-[rgb(var(--surface-hover))] px-2.5 py-1 text-xs font-semibold text-[rgb(var(--text-secondary))]">
+                          {formatRelativeDate(note.createdAt)}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {tags?.length ? (
+                          tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1 text-xs font-semibold text-[rgb(var(--text-secondary))]"
+                            >
+                              {tag}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-[rgb(var(--text-tertiary))]">No tags yet</span>
+                        )}
+                      </div>
+
+                      <div className="mt-5 flex items-center justify-between gap-3 text-xs font-semibold text-[rgb(var(--text-tertiary))]">
+                        <div className="min-w-0">
+                          <p className="truncate text-[rgb(var(--text-secondary))]">
+                            {note.user.name}
+                            {isVerifiedTeacher ? (
+                              <span className="ml-2 rounded-full bg-[rgb(var(--primary-soft))] px-2 py-0.5 text-[10px] font-semibold text-[rgb(var(--primary))]">
+                                Verified teacher
+                              </span>
+                            ) : null}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex items-center gap-1">
+                            <Heart className="h-3.5 w-3.5" /> {note._count.likes}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <MessageCircle className="h-3.5 w-3.5" /> {note._count.comments}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="rounded-[var(--radius-xl)] border border-[rgb(var(--border))] bg-[rgb(var(--surface)/0.92)] p-6 text-sm text-[rgb(var(--text-secondary))] shadow-[var(--shadow-sm)] backdrop-blur dark:bg-[rgb(var(--surface-elevated))]/80 dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]">
+                No public notes yet. Create an account to be the first to share.
+              </div>
+            )}
           </div>
         </section>
 

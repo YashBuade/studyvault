@@ -548,6 +548,16 @@
   }
 }
 
+@keyframes grid-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 56px 56px, 56px 56px;
+  }
+}
+
 @layer utilities {
   .animate-fade-in {
     animation: fade-in 350ms ease forwards;
@@ -571,6 +581,10 @@
 
   .animate-float-slow {
     animation: float-y 6s ease-in-out infinite;
+  }
+
+  .animate-grid-drift {
+    animation: grid-drift 22s linear infinite;
   }
 
   .text-balance {

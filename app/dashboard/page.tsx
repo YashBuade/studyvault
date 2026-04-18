@@ -256,7 +256,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-7">
       <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border)/0.8)] bg-[linear-gradient(135deg,rgb(var(--surface))_0%,rgb(var(--surface-hover))_58%,rgb(var(--color-primary-light))_100%)] p-6 shadow-[var(--shadow-sm)] ring-1 ring-[rgb(var(--border)/0.55)] md:p-8">
-        <div className="hero-grid absolute inset-0 opacity-35" />
+        <div className="hero-grid absolute inset-0 opacity-35 animate-grid-drift" />
         <div className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info)/0.12)] blur-3xl" />
         <div className="pointer-events-none absolute left-10 top-10 h-28 w-28 rounded-full bg-[rgb(var(--color-success)/0.1)] blur-3xl" />
         <div className="relative">

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AlertCircle, FolderOpen, Link as LinkIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
@@ -96,6 +97,8 @@ function SkeletonFolders() {
 }
 
 export function ResourcesClient() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") ?? "";
   const [folders, setFolders] = useState<Folder[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [folderName, setFolderName] = useState("");
@@ -104,7 +107,7 @@ export function ResourcesClient() {
   const [notes, setNotes] = useState("");
   const [tags, setTags] = useState("");
   const [folderId, setFolderId] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null);
@@ -118,6 +121,10 @@ export function ResourcesClient() {
   const [hasError, setHasError] = useState(false);
   const [expanded, setExpanded] = useState<Set<number | null>>(() => new Set([null]));
   const [creatingItem, setCreatingItem] = useState(false);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [updatingItem, setUpdatingItem] = useState(false);
   const [updatingFolder, setUpdatingFolder] = useState(false);

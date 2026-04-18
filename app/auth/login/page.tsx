@@ -7,6 +7,7 @@ import { AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff, Info, LockKeyhole, 
 import { ModernButton } from "@/components/ui/modern-button";
 import { ModernInput } from "@/components/ui/modern-input";
 import { Logo } from "@/components/ui/logo";
+import { AuthTipRotator } from "@/components/auth/auth-tip-rotator";
 import { GoogleAuthButton } from "@/google-auth-button";
 
 type AuthErrorResponse = {
@@ -45,6 +46,24 @@ export default function LoginPage() {
     : isTeacherLogin
       ? ["Approval-aware access", "Dedicated teacher workspace", "Review queue after verification"]
       : ["Live deadline tracking", "Smart study organization", "Private and share-ready workspace"];
+
+  const tips = isAdminLogin
+    ? [
+        { title: "Use role tabs to switch portals", description: "Student, Teacher, and Admin sign-in stay separated to keep permissions clean." },
+        { title: "Keep sessions secure", description: "Use a password manager and avoid reusing credentials across tools." },
+        { title: "Audit quickly", description: "Check teacher status and report queues first to clear the biggest blockers." },
+      ]
+    : isTeacherLogin
+      ? [
+          { title: "Verification unlocks reviewer tools", description: "Once approved, you’ll be able to verify files and handle review queues." },
+          { title: "Review with context", description: "Notes, attachments, and metadata stay connected so approvals are faster." },
+          { title: "Stay consistent", description: "Use clear verification notes to help students understand what to fix." },
+        ]
+      : [
+          { title: "Pin what matters", description: "Use tags and quick search so your high-priority topics are always one click away." },
+          { title: "Keep deadlines visible", description: "Planner + assignments make it easier to study in small, repeatable sessions." },
+          { title: "Share only when ready", description: "Publish polished notes to the public library while keeping drafts private." },
+        ];
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -146,7 +165,7 @@ export default function LoginPage() {
           <div className="absolute left-8 top-52 h-64 w-64 rounded-full bg-[rgb(var(--color-primary)/0.14)] blur-3xl" />
           <div className="absolute bottom-10 right-28 h-44 w-44 rounded-3xl bg-[linear-gradient(135deg,rgb(var(--color-primary))_0%,rgb(var(--color-accent))_100%)] opacity-20 shadow-[var(--shadow-lg)] backdrop-blur-xl rotate-12" />
           <div className="absolute bottom-24 right-56 h-28 w-28 rounded-2xl bg-[linear-gradient(135deg,rgb(var(--color-accent))_0%,rgb(var(--color-info))_100%)] opacity-20 shadow-[var(--shadow-md)] -rotate-12" />
-          <div className="hero-grid absolute inset-0 opacity-35" />
+          <div className="hero-grid absolute inset-0 opacity-35 animate-grid-drift" />
 
           <div className="relative z-10 flex w-full flex-col items-start gap-4 p-12 xl:p-16">
             <Logo size="lg" />
@@ -180,6 +199,8 @@ export default function LoginPage() {
                 <p className="mt-3 text-sm font-semibold text-[rgb(var(--text-primary))]">Protected sessions</p>
                 <p className="mt-1 text-xs text-[rgb(var(--text-secondary))]">Role-specific portals remain unchanged while the UI feels more polished and clear.</p>
               </div>
+
+              <AuthTipRotator tips={tips} className="mt-6" />
             </div>
           </div>
         </section>

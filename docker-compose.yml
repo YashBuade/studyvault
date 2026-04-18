@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: studyvault-postgres
+    environment:
+      POSTGRES_DB: studyvault
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - studyvault_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d studyvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  studyvault_pgdata:
+

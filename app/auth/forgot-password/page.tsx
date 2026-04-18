@@ -7,6 +7,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { ModernButton } from "@/components/ui/modern-button";
 import { ModernInput } from "@/components/ui/modern-input";
 import { Logo } from "@/components/ui/logo";
+import { AuthTipRotator } from "@/components/auth/auth-tip-rotator";
 
 type ForgotPasswordResponse = {
   ok: boolean;
@@ -21,6 +22,12 @@ export default function ForgotPasswordPage() {
   const [submitted, setSubmitted] = useState(false);
   const [resetUrl, setResetUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  const tips = [
+    { title: "Check spam or promotions", description: "Reset emails sometimes land in filtered inbox tabs." },
+    { title: "Use a password manager", description: "It helps you generate strong passwords you don’t have to remember." },
+    { title: "Keep accounts unique", description: "Avoid reusing the same password across services." },
+  ];
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,6 +117,8 @@ export default function ForgotPasswordPage() {
                 ) : null}
               </div>
             ) : null}
+
+            <AuthTipRotator tips={tips} />
 
             <div className="flex items-center justify-between gap-3 text-xs text-[rgb(var(--text-tertiary))]">
               <Link href="/auth/login" className="font-semibold text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">

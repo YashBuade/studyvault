@@ -6,6 +6,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { ModernButton } from "@/components/ui/modern-button";
 import { Logo } from "@/components/ui/logo";
+import { AuthTipRotator } from "@/components/auth/auth-tip-rotator";
 
 type ResetPasswordResponse = {
   ok: boolean;
@@ -25,6 +26,12 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+
+  const tips = [
+    { title: "Make it long", description: "Aim for 12+ characters; length beats complexity in practice." },
+    { title: "Don’t reuse passwords", description: "A unique password keeps other accounts safer too." },
+    { title: "Store it safely", description: "Use a password manager so you never lose access again." },
+  ];
 
   const passwordsMismatch = useMemo(
     () => confirmPassword.length > 0 && password !== confirmPassword,
@@ -161,6 +168,8 @@ export default function ResetPasswordPage() {
                 </ModernButton>
               </form>
             )}
+
+            <AuthTipRotator tips={tips} />
 
             <div className="flex items-center justify-between gap-3 text-xs text-[rgb(var(--text-tertiary))]">
               <Link href="/auth/login" className="font-semibold text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">

@@ -8,6 +8,7 @@ import { AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, Sparkles, 
 import { ModernButton } from "@/components/ui/modern-button";
 import { ModernInput } from "@/components/ui/modern-input";
 import { Logo } from "@/components/ui/logo";
+import { AuthTipRotator } from "@/components/auth/auth-tip-rotator";
 import { GoogleAuthButton } from "@/google-auth-button";
 import { CUSTOM_TEACHER_EXPERTISE, TEACHER_EXPERTISE_FIELDS } from "@/lib/teacher-validation";
 
@@ -66,6 +67,18 @@ export default function SignupPage() {
     "Help students access quality academic resources",
     "Manage file approvals from your teacher dashboard",
   ];
+
+  const tips = isTeacherSignup
+    ? [
+        { title: "Choose expertise carefully", description: "It helps admins verify your profile faster and routes reviews to the right person." },
+        { title: "Upload a clear ID photo", description: "A readable image reduces back-and-forth and speeds up approval." },
+        { title: "Keep your inbox handy", description: "Admins may follow up if they need extra verification details." },
+      ]
+    : [
+        { title: "Use a strong password", description: "12+ characters with a mix of letters, numbers, and symbols is ideal." },
+        { title: "Tag early, search later", description: "Subjects + tags make your notes and files easy to find during exam week." },
+        { title: "Publish only the polished version", description: "Keep drafts private and share the cleaned-up notes with confidence." },
+      ];
 
   useEffect(() => () => {
     if (teacherIdPreview) {
@@ -215,7 +228,7 @@ export default function SignupPage() {
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgb(var(--color-primary-light))_0%,rgb(var(--color-surface))_48%,rgb(var(--color-info-light))_100%)]" />
           <div className="absolute right-16 top-16 h-64 w-64 rounded-full bg-[rgb(var(--color-primary)/0.14)] blur-3xl" />
           <div className="absolute bottom-20 left-10 h-72 w-72 rounded-full bg-[rgb(var(--color-info)/0.14)] blur-3xl" />
-          <div className="hero-grid absolute inset-0 opacity-35" />
+          <div className="hero-grid absolute inset-0 opacity-35 animate-grid-drift" />
           <div className="relative z-10 flex w-full flex-col gap-4 p-12 xl:p-16">
             <Logo size="lg" />
             <div className="max-w-xl space-y-6 pt-1">
@@ -238,6 +251,7 @@ export default function SignupPage() {
                   </div>
                 ))}
               </div>
+              <AuthTipRotator tips={tips} />
             </div>
           </div>
         </section>

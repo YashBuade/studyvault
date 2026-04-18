@@ -557,7 +557,7 @@ export function PublicNotesClient() {
       <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
         <div className="space-y-5">
       <section className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[rgb(var(--border))]/80 bg-gradient-to-br from-[rgb(var(--surface))] via-[rgb(var(--surface-hover))] to-[rgb(var(--surface))] p-6 shadow-[var(--shadow-lg)] dark:border-[rgb(var(--border))] dark:shadow-none dark:ring-1 dark:ring-[rgb(var(--border))]">
-        <div className="hero-grid absolute inset-0 opacity-35" />
+        <div className="hero-grid absolute inset-0 opacity-35 animate-grid-drift" />
         <div className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-[rgb(var(--color-success))]/12 blur-3xl" />
         <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full bg-[rgb(var(--color-info))]/12 blur-3xl" />
         <div className="relative grid gap-6 lg:grid-cols-1 lg:items-center">
