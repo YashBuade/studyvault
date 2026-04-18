@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { createScriptPrismaClient } from "./prisma-client.mjs";
 
 function readArg(flag) {
   const index = process.argv.indexOf(flag);
@@ -62,7 +62,7 @@ const normalized = admins.map((item, idx) => {
   return { email, name, password };
 });
 
-const prisma = new PrismaClient();
+const prisma = createScriptPrismaClient();
 
 try {
   for (const admin of normalized) {

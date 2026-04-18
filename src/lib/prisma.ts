@@ -14,7 +14,15 @@ function asValidConnectionString(value: string | undefined) {
   if (!unquoted) return undefined;
   if (unquoted.includes("${")) return undefined;
   if (!unquoted.startsWith("postgresql://") && !unquoted.startsWith("postgres://")) return undefined;
-  return unquoted;
+  // Guard against accidental whitespace/newlines, which can lead to confusing DNS errors.
+  if (/\s/.test(unquoted)) return undefined;
+  try {
+    const url = new URL(unquoted);
+    if (!url.hostname) return undefined;
+    return unquoted;
+  } catch {
+    return undefined;
+  }
 }
 
 function isLocalHostname(hostname: string) {
@@ -77,17 +85,17 @@ function createPrismaClient() {
   assertNoInvalidEnvUrl("DIRECT_URL", process.env.DIRECT_URL);
   assertNoInvalidEnvUrl("DATABASE_RUNTIME_URL", process.env.DATABASE_RUNTIME_URL);
 
+  const runtimeOverride = asValidConnectionString(process.env.DATABASE_RUNTIME_URL);
   const pooled = asValidConnectionString(process.env.DATABASE_URL);
   const direct = asValidConnectionString(process.env.DIRECT_URL);
-  const runtimeOverride = asValidConnectionString(process.env.DATABASE_RUNTIME_URL);
-  const runtimeUrl = runtimeOverride || pooled || direct;
 
-  if (runtimeUrl && !asValidConnectionString(process.env.DATABASE_URL)) {
-    process.env.DATABASE_URL = runtimeUrl;
-  }
-  if (!process.env.DATABASE_URL) {
+  const effectiveConnectionString = runtimeOverride || pooled || direct;
+  if (!effectiveConnectionString) {
     throw new Error("DATABASE_URL or DIRECT_URL must be set for Prisma.");
   }
+
+  // Ensure Prisma and pg both see the same sanitized URL (no wrapping quotes/whitespace).
+  process.env.DATABASE_URL = effectiveConnectionString;
 
   const poolMaxRaw = (process.env.DATABASE_POOL_MAX ?? "").trim();
   const defaultPoolMax = process.env.NODE_ENV === "production" ? 5 : 10;
@@ -100,8 +108,8 @@ function createPrismaClient() {
     (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED ?? "").trim().toLowerCase() === "true";
 
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: shouldEnableTls(process.env.DATABASE_URL)
+    connectionString: effectiveConnectionString,
+    ssl: shouldEnableTls(effectiveConnectionString)
       ? { rejectUnauthorized }
       : undefined,
     max: poolMax,

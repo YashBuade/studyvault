@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { createScriptPrismaClient } from "./prisma-client.mjs";
 
 function readArg(flag) {
   const index = process.argv.indexOf(flag);
@@ -35,7 +35,7 @@ if (password.length < 8) {
   fail("Password must be at least 8 characters.");
 }
 
-const prisma = new PrismaClient();
+const prisma = createScriptPrismaClient();
 
 try {
   const passwordHash = await bcrypt.hash(password, 12);
